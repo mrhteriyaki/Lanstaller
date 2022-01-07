@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanstaller", "Lanstaller\Lanstaller.csproj", "{8B255B64-FDB3-4072-AA2E-651E01DD984A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanstaller Management Console", "Lanstaller Management Console\Lanstaller Management Console.csproj", "{982EC2B2-53D0-48BC-91A5-49176056DBA6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8B255B64-FDB3-4072-AA2E-651E01DD984A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B255B64-FDB3-4072-AA2E-651E01DD984A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B255B64-FDB3-4072-AA2E-651E01DD984A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B255B64-FDB3-4072-AA2E-651E01DD984A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{982EC2B2-53D0-48BC-91A5-49176056DBA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{982EC2B2-53D0-48BC-91A5-49176056DBA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{982EC2B2-53D0-48BC-91A5-49176056DBA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{982EC2B2-53D0-48BC-91A5-49176056DBA6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6FC63733-01AA-4030-A77C-4BE0439F4EA7}
+	EndGlobalSection
+EndGlobal

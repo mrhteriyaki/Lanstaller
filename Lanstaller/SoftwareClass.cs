@@ -1,0 +1,608 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Win32;
+
+using IWshRuntimeLibrary;
+using System.Windows.Forms;
+
+using System.Text.RegularExpressions; //Regex
+
+namespace Lanstaller
+{
+    public class SoftwareClass
+    {
+        public static string ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;user=lanstaller;password=LanJoekf192!";
+
+        public int id;
+        public string Name;
+        static string status = "Status: Ready";
+
+        //List<Servers> ServerList = new List<Servers>();
+        static List<FileCopyOperation> FileCopyList = new List<FileCopyOperation>();
+        static List<RegistryOperation> RegistryList = new List<RegistryOperation>();
+        static List<ShortcutOperation> ShortcutList = new List<ShortcutOperation>();
+        public static List<SerialNumber> SerialList = new List<SerialNumber>();
+
+
+        //Locks.
+        static readonly object _statuslock = new object();
+
+        public static List<SoftwareClass> LoadSoftware()
+        {
+            List<SoftwareClass> tmpList = new List<SoftwareClass>();
+
+            //Get List of Software from Server
+            string QueryString = "SELECT [id],[name] from tblSoftware order by [name]";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                SoftwareClass tmpSoftware = new SoftwareClass();
+                tmpSoftware.id = (int)SQLOutput[0];
+                tmpSoftware.Name = SQLOutput[1].ToString();
+                tmpList.Add(tmpSoftware);
+            }
+            SQLConn.Close();
+
+            return tmpList;
+
+        }
+
+        public static int AddSoftware(string softwarename)
+        {
+            string QueryString = "INSERT into tblSoftware ([name]) VALUES (@softname); SELECT SCOPE_IDENTITY();";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softname", softwarename);
+            object output = SQLCmd.ExecuteScalar();
+            int idval = int.Parse(output.ToString());
+            SQLConn.Close();
+            return idval;
+        }
+
+        public static void Install(SoftwareClass SWI, bool installfiles, bool installregistry, bool installshortcuts)
+        {
+            string ServerAddress = GetServers();
+
+            //Run Installation
+
+            if (installregistry == true)
+            {
+                SetStatus("Applying Registry - " + SWI.Name);
+                GetRegistry(SWI.id);
+                GenerateRegistry();
+            }
+
+
+
+            if (installfiles == true)
+            {
+                SetStatus("Indexing - " + SWI.Name);
+                GetFiles(SWI.id, ServerAddress);
+                SetStatus("Copying Files - " + SWI.Name);
+                GenerateFiles();
+            }
+
+            if (installshortcuts == true)
+            {
+                SetStatus("Generating Shortcuts - " + SWI.Name);
+                GetShortcuts(SWI.id);
+                GenerateShortcuts();
+            }
+
+            SetStatus("Install Complete - " + SWI.Name);
+
+        }
+
+
+        static void SetStatus(string message)
+        {
+            lock (_statuslock)
+            {
+                status = "Status: " + message;
+            }
+        }
+
+        public static string GetStatus()
+        {
+            return status;
+        }
+
+        static string GetServers()
+        {
+            //ServerList.Clear();
+            string QueryString = "SELECT TOP(1) [address] FROM [tblServers]";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            string servadd = SQLCmd.ExecuteScalar().ToString();
+
+            SQLConn.Close();
+
+            return servadd;
+
+        }
+
+        static void GetFiles(int softwareid, string ServerAddress)
+        {
+            FileCopyList.Clear();
+
+            string QueryString = "select [filename],[source],[destination] from tblFiles WHERE software_id = @softwareid";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                //Prepare full source and destination locations for transfer process.
+                string Sfilename = SQLOutput[0].ToString();
+                string Ssource = SQLOutput[1].ToString();
+                string Sdestination = SQLOutput[2].ToString();
+
+
+                FileCopyOperation tFCO = new FileCopyOperation();
+                tFCO.source = ServerAddress + "\\" + Ssource;
+
+
+                //Determine file destination.
+                if (SQLOutput[2].ToString().Equals(""))
+                {
+                    //Empty Destination - Uses Install Directory.
+                    tFCO.destination = LanstallerSettings.InstallDirectory + "\\" + Sfilename;
+                }
+                else
+                {
+                    //Use static path.
+                    string destination = Sdestination + "\\" + Sfilename;
+                    //Replace any variables in static destination path.
+                    tFCO.destination = ReplaceVariable(destination);
+                }
+
+                //Add copy operation to list.
+                FileCopyList.Add(tFCO);
+
+            }
+            SQLConn.Close();
+        }
+
+        public static void AddFile(string filename, string fullsource, string destination, int softwareid)
+        {
+            string QueryString = "INSERT into tblFiles ([filename],[source],[destination],[software_id]) VALUES (@filename,@sourcefile,@destinationfile,@softwareid)";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("filename", filename);
+            SQLCmd.Parameters.AddWithValue("sourcefile", fullsource);
+            SQLCmd.Parameters.AddWithValue("destinationfile", destination);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.ExecuteNonQuery();
+            SQLConn.Close();
+        }
+
+        public static void AddRegistry(int softwareid, int hkey, string subkey, string value, int regtype, string data)
+        {
+            string QueryString = "INSERT into tblRegistry ([hkey],[subkey],[value],[type],[data],[software_id]) VALUES (@hkey,@subkey,@value,@type,@data,@softwareid)";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("hkey", hkey);
+            SQLCmd.Parameters.AddWithValue("subkey", subkey);
+            SQLCmd.Parameters.AddWithValue("value", value);
+            SQLCmd.Parameters.AddWithValue("type", regtype);
+            SQLCmd.Parameters.AddWithValue("data", data);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.ExecuteNonQuery();
+
+            SQLConn.Close();
+
+        }
+
+        public static void AddShortcut(string name, string location, string filepath, string runpath, string arguments, string icon, int softwareid)
+        {
+
+            string QueryString = "INSERT into tblShortcut ([name],[location],[filepath],[runpath],[arguments],[icon],[software_id]) VALUES (@name,@location,@filepath,@runpath,@arguments,@icon,@softwareid)";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("name", name);
+            SQLCmd.Parameters.AddWithValue("location", location);
+            SQLCmd.Parameters.AddWithValue("filepath", filepath);
+            SQLCmd.Parameters.AddWithValue("runpath", runpath);
+            SQLCmd.Parameters.AddWithValue("arguments", arguments);
+            SQLCmd.Parameters.AddWithValue("icon", icon);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.ExecuteNonQuery();
+
+            SQLConn.Close();
+        }
+
+        public static void AddFirewallRule(string filepath, int softwareid)
+        {
+            string QueryString = "INSERT into tblFirewallExceptions ([filepath],[software_id]) VALUES (@filepath,@software_id)";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("filepath", filepath);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.ExecuteNonQuery();
+
+            SQLConn.Close();
+        }
+
+        public static void AddSerial(string name, int instancenumber, int softwareid)
+        {
+            string QueryString = "INSERT into tblSerials ([name],[instance],[software_id]) VALUES (@name,@instancenumb,@softwareid)";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("name", name);
+            SQLCmd.Parameters.AddWithValue("instancenumb", instancenumber);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.ExecuteNonQuery();
+
+            SQLConn.Close();
+        }
+
+
+        static void GenerateFiles()
+        {
+            //Generate Directories.
+            List<string> DirectoryList = new List<string>();
+            foreach (FileCopyOperation FCO in FileCopyList)
+            {
+                //Get File Directory, trim end filename.
+                string filedirectory = FCO.destination.Substring(0, FCO.destination.LastIndexOf("\\"));
+                string checkdir = "";
+                //Split up file directory for parent folders.
+                int count = 0;
+                foreach (string FileDirSection in filedirectory.Split(Char.Parse("\\")))
+                {
+                    //Check each directory including parents against list and add if missing.
+                    checkdir = checkdir + FileDirSection + "\\";
+
+                    count++;
+                    if (count == 1)
+                    {
+                        //Skip Root of drive.
+                        continue;
+                    }
+
+                    bool missing = true;
+                    foreach (string existingdir in DirectoryList)
+                    {
+                        if (existingdir.Equals(checkdir))
+                        {
+                            missing = false;
+                            break;
+                        }
+                    }
+                    if (missing == true)
+                    {
+
+                        DirectoryList.Add(checkdir);
+                    }
+
+                }
+
+            }
+            SetStatus("Generating Directories");
+
+            foreach (string dir in DirectoryList)
+            {
+                if (Pri.LongPath.Directory.Exists(dir) == false)
+                {
+                    Pri.LongPath.Directory.CreateDirectory(dir);
+                }
+
+            }
+
+            int statuscount = 0;
+
+            //Copy Files.
+            foreach (FileCopyOperation FCO in FileCopyList)
+            {
+                Pri.LongPath.File.Copy(FCO.source, FCO.destination, true);
+                statuscount++;
+                SetStatus("Copying Files:" + statuscount + " / " + FileCopyList.Count);
+                //Provision for hashing has been put into database table.
+            }
+        }
+
+
+        //Gets Serial Requirements for Queued Installs.
+        public static void GetSerials(List<int> SoftwareIDList)
+        {
+            SerialList.Clear();
+            foreach (int SoftwareID in SoftwareIDList)
+            {
+      
+
+                string QueryString = "select [name],[instance] from [tblSerials] WHERE software_id = @softwareid";
+
+                SqlConnection SQLConn = new SqlConnection(ConnectionString);
+                SQLConn.Open();
+                SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+                SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+                SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+                while (SQLOutput.Read())
+                {
+                    SerialNumber tSerial = new SerialNumber();
+                    tSerial.softwareid = SoftwareID;
+                    tSerial.name = SQLOutput[0].ToString();
+                    tSerial.instancenumber = (int)SQLOutput[1];
+                    SerialList.Add(tSerial);
+                }
+                SQLConn.Close();
+            }
+            
+            foreach (SerialNumber SN in SerialList)
+            {
+                //Prompt user to enter serial numbers.
+                string prom = SN.name + Environment.NewLine + "(Note: spaces will be removed)";
+                SN.serialnumber = Microsoft.VisualBasic.Interaction.InputBox(prom, SN.name).Replace(" ",""); //Strip whitespace.
+                
+            }
+
+        }
+
+        static void GetRegistry(int SoftwareID)
+        {
+            RegistryList.Clear();
+
+            string QueryString = "select [hkey],[subkey],[value],[type],[data] from [tblRegistry] WHERE software_id = @softwareid";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                RegistryOperation tReg = new RegistryOperation();
+                tReg.SetHiveKey((int)SQLOutput[0]); //Hive Key.
+                tReg.subkey = SQLOutput[1].ToString(); //Sub Key.
+                tReg.value = SQLOutput[2].ToString();
+                tReg.SetRegType((int)SQLOutput[3]);
+                tReg.data = ReplaceSerial(ReplaceVariable(SQLOutput[4].ToString()), SoftwareID); //Includes ReplaceSerial to check for Serial number.
+
+                RegistryList.Add(tReg);
+            }
+            SQLConn.Close();
+        }
+
+        static void GenerateRegistry()
+        {
+            foreach (RegistryOperation REGOP in RegistryList)
+            {
+                RegistryKey HKEY = null;
+
+                if (REGOP.GetHiveKey() == RegistryHive.LocalMachine)
+                {
+                    Registry.LocalMachine.CreateSubKey(REGOP.subkey, true);
+                    HKEY = Registry.LocalMachine.OpenSubKey(REGOP.subkey, true);
+                }
+                else if (REGOP.GetHiveKey() == RegistryHive.CurrentUser)
+                {
+                    Registry.CurrentUser.CreateSubKey(REGOP.subkey, true);
+                    HKEY = Registry.CurrentUser.OpenSubKey(REGOP.subkey, true);
+                }
+                else if (REGOP.GetHiveKey() == RegistryHive.Users)
+                {
+                    Registry.Users.CreateSubKey(REGOP.subkey, true);
+                    HKEY = Registry.Users.OpenSubKey(REGOP.subkey, true);
+                }
+
+                HKEY.SetValue(REGOP.value, REGOP.data, REGOP.GetRegType());
+            }
+        }
+
+        static void GetShortcuts(int SoftwareID)
+        {
+            ShortcutList.Clear();
+
+            string QueryString = "SELECT [name],[location],[filepath],[runpath],[arguments],[icon] FROM [tblShortcut] WHERE software_id = @softwareid";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                ShortcutOperation tScut = new ShortcutOperation();
+                tScut.name = SQLOutput[0].ToString();
+                tScut.location = ReplaceVariable(SQLOutput[1].ToString());
+                tScut.filepath = ReplaceVariable(SQLOutput[2].ToString());
+                tScut.runpath = ReplaceVariable(SQLOutput[3].ToString());
+                tScut.arguments = ReplaceVariable(SQLOutput[4].ToString());
+                tScut.icon = ReplaceVariable(SQLOutput[5].ToString());
+
+                ShortcutList.Add(tScut);
+            }
+            SQLConn.Close();
+        }
+
+        static void GenerateShortcuts()
+        {
+            foreach (ShortcutOperation SCO in ShortcutList)
+            {
+                WshShell shell = new WshShell();
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(SCO.location + "\\" + SCO.name + ".lnk");
+
+                shortcut.TargetPath = SCO.filepath;
+                shortcut.WorkingDirectory = SCO.runpath;
+                shortcut.Arguments = SCO.arguments;
+                shortcut.IconLocation = SCO.icon;
+
+                shortcut.Save();
+            }
+
+
+        }
+
+
+        public static string ReplaceVariable(string dataline)
+        {
+            //VARIABLES for FilePath, Shortcut Path, Registry Data.
+
+            //%INSTALLPATH% = Installation Directory.
+            string updateline = dataline.Replace("%INSTALLPATH%", LanstallerSettings.InstallDirectory);
+
+            //%USERPROFILE% = User profile directory.
+            updateline = updateline.Replace("%USERPROFILE%", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+
+            //Resolution.
+            updateline = updateline.Replace("%WIDTH%", LanstallerSettings.ScreenWidth.ToString());
+            updateline = updateline.Replace("%HEIGHT%", LanstallerSettings.ScreenHeight.ToString());
+
+
+            return updateline;
+
+        }
+
+
+        static string ReplaceSerial(string data, int softwareid)
+        {
+            //Serial Numbers.
+            //Check SerialList for matching serial number.
+            string newdata = data;
+
+            //check if %SERIALx%
+            Regex rx = new Regex("[%SERIAL]\\d[%]");
+            
+
+            if (rx.Matches(data).Count > 0)
+            {
+                int SInstance = int.Parse(rx.Match(data).Value.ToString().Substring(1, 1)); //Get Serial Instance Number.
+                string replacestring = "%SERIAL" + SInstance.ToString() + "%";
+
+                foreach (SerialNumber SN in SerialList)
+                {
+                    if (SN.softwareid == softwareid)
+                    {
+                        if (SN.instancenumber == SInstance)
+                        {
+                            newdata = newdata.Replace(replacestring, SN.serialnumber); //update serial number.
+                        }
+
+                    }
+                }
+
+            }
+
+            
+
+            return newdata;
+        }
+
+
+
+
+    }
+
+
+
+    class FileCopyOperation
+    {
+        public string source;
+        public string destination;
+        public string filename;
+
+    }
+
+    class RegistryOperation
+    {
+        RegistryHive hkey;
+        RegistryValueKind regtype;
+        public string subkey;
+        public string value;
+        public string data;
+
+
+        public void SetHiveKey(int hkey_val)
+        {
+            // 1 = Local Machine.
+            //2 = Current User.
+            //3 = Users.
+
+            if (hkey_val == 1)
+            {
+                hkey = RegistryHive.LocalMachine;
+            }
+            else if (hkey_val == 2)
+            {
+                hkey = RegistryHive.CurrentUser;
+            }
+            else if (hkey_val == 3)
+            {
+                hkey = RegistryHive.Users;
+            }
+
+        }
+
+        public RegistryHive GetHiveKey()
+        {
+            return hkey;
+        }
+
+        public void SetRegType(int type_val)
+        {
+            regtype = (RegistryValueKind)type_val;
+            //string = 1
+            //binary = 3
+            //dword = 4
+            //expanded string = 2
+            //multi string = 7
+            //qword = 11
+        }
+
+        public RegistryValueKind GetRegType()
+        {
+            return regtype;
+        }
+
+
+
+
+    }
+
+    class ShortcutOperation
+    {
+        public string name;
+        public string location;
+        public string filepath;
+        public string runpath;
+        public string icon;
+        public string arguments;
+    }
+
+    public class SerialNumber
+    {
+        public string name;
+        public int instancenumber;
+        public string serialnumber;
+        public int softwareid;
+
+    }
+}
