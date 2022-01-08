@@ -10,6 +10,7 @@ using IWshRuntimeLibrary;
 using System.Windows.Forms;
 
 using System.Text.RegularExpressions; //Regex
+using System.Diagnostics;
 
 namespace Lanstaller
 {
@@ -99,6 +100,10 @@ namespace Lanstaller
                 GenerateShortcuts();
             }
 
+            //firewall rules.
+            GenerateFirewallRules(SWI.id,SWI.Name);
+
+
             SetStatus("Install Complete - " + SWI.Name);
 
         }
@@ -177,7 +182,26 @@ namespace Lanstaller
             SQLConn.Close();
         }
 
-        public static void AddFile(string filename, string fullsource, string destination, int softwareid)
+        static void GenerateFirewallRules(int softwareid, string softwarename)
+        {
+            FileCopyList.Clear();
+
+            string QueryString = "select [filepath] from tblFirewallExceptions WHERE software_id = @softwareid";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                AddFirewallRule(softwarename, SQLOutput[0].ToString());
+            }
+
+            SQLConn.Close();
+        }
+
+                public static void AddFile(string filename, string fullsource, string destination, int softwareid)
         {
             string QueryString = "INSERT into tblFiles ([filename],[source],[destination],[software_id]) VALUES (@filename,@sourcefile,@destinationfile,@softwareid)";
 
@@ -329,6 +353,20 @@ namespace Lanstaller
             }
         }
 
+
+        public static void AddFirewallRule(string RuleName, string EXEPath)
+        {
+            //netsh advfirewall firewall add rule name="My Application" dir=in action=allow program="C:\games\The Call of Duty\CoDMP.exe" enable=yes
+            Process FWNetSHProc = new Process();
+            FWNetSHProc.StartInfo.FileName = "c:\\windows\\system32\\netsh.exe";
+            FWNetSHProc.StartInfo.Arguments = "advfirewall firewall add rule name=\"" + RuleName + "\" dir=in action=allow program=\"" + ReplaceVariable(EXEPath) + "\" enable=yes";
+            FWNetSHProc.StartInfo.UseShellExecute = false;
+            FWNetSHProc.StartInfo.RedirectStandardOutput = true;
+
+            FWNetSHProc.Start();
+            
+
+        }
 
         //Gets Serial Requirements for Queued Installs.
         public static void GetSerials(List<int> SoftwareIDList)
