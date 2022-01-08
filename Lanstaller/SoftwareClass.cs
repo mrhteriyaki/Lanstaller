@@ -89,7 +89,7 @@ namespace Lanstaller
                 SetStatus("Indexing - " + SWI.Name);
                 GetFiles(SWI.id, ServerAddress);
                 SetStatus("Copying Files - " + SWI.Name);
-                GenerateFiles();
+                GenerateFiles(SWI.Name);
             }
 
             if (installshortcuts == true)
@@ -265,7 +265,7 @@ namespace Lanstaller
         }
 
 
-        static void GenerateFiles()
+        static void GenerateFiles(string softwarename)
         {
             //Generate Directories.
             List<string> DirectoryList = new List<string>();
@@ -306,7 +306,7 @@ namespace Lanstaller
                 }
 
             }
-            SetStatus("Generating Directories");
+            SetStatus("Installing: " + softwarename + Environment.NewLine + "Status: Generating Directories");
 
             foreach (string dir in DirectoryList)
             {
@@ -324,7 +324,7 @@ namespace Lanstaller
             {
                 Pri.LongPath.File.Copy(FCO.source, FCO.destination, true);
                 statuscount++;
-                SetStatus("Copying Files:" + statuscount + " / " + FileCopyList.Count);
+                SetStatus("Installing: " + softwarename + Environment.NewLine + "Copying Files:" + statuscount + " / " + FileCopyList.Count);
                 //Provision for hashing has been put into database table.
             }
         }
@@ -359,8 +359,8 @@ namespace Lanstaller
             foreach (SerialNumber SN in SerialList)
             {
                 //Prompt user to enter serial numbers.
-                string prom = SN.name + Environment.NewLine + "(Note: spaces will be removed)";
-                SN.serialnumber = Microsoft.VisualBasic.Interaction.InputBox(prom, SN.name).Replace(" ",""); //Strip whitespace.
+                string prom = SN.name + Environment.NewLine + "(Note: spaces and dashes will be removed automatically.)";
+                SN.serialnumber = Microsoft.VisualBasic.Interaction.InputBox(prom, SN.name).Replace(" ","").Replace("-",""); //Strip whitespace.
                 
             }
 
