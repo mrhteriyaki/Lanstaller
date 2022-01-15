@@ -131,7 +131,10 @@ namespace Lanstaller_Management_Console
             foreach (string filename in filelist)
             {
                 //Trim Base Line + last \
-                SoftwareClass.AddFile(filename.Substring(basefolder.Length + 1), filename.Substring(servershare.Length + 1), destination, selectedsoftwareid);
+                Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(filename);
+                SoftwareClass.AddFile(filename.Substring(basefolder.Length + 1), filename.Substring(servershare.Length + 1), destination, FI.Length, selectedsoftwareid);
+                
+                
             }
 
         }
@@ -321,13 +324,20 @@ namespace Lanstaller_Management_Console
 
         private void btnAddSerial_Click(object sender, EventArgs e)
         {
-            SoftwareClass.AddSerial(txtSerialName.Text, int.Parse(txtSerialInstance.Text), selectedsoftwareid);
+            SoftwareClass.AddSerial(txtSerialName.Text, int.Parse(txtSerialInstance.Text), selectedsoftwareid, txtRegKey.Text,txtRegVal.Text);
         }
 
         private void txtSerialName_TextChanged(object sender, EventArgs e)
         {
             if (!txtSerialName.Text.Equals(""))
                 btnAddSerial.Enabled = true;
+        }
+
+        private void btnRescanFileSize_Click(object sender, EventArgs e)
+        {
+            btnRescanFileSize.Enabled = false;
+            SoftwareClass.RescanFileSize();
+            btnRescanFileSize.Enabled = true;
         }
     }
 }

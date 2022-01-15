@@ -39,6 +39,7 @@ namespace Lanstaller
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.gbxActions = new System.Windows.Forms.GroupBox();
+            this.chkFirewall = new System.Windows.Forms.CheckBox();
             this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.chkShortcuts = new System.Windows.Forms.CheckBox();
             this.chkRegistry = new System.Windows.Forms.CheckBox();
@@ -52,6 +53,7 @@ namespace Lanstaller
             this.label2 = new System.Windows.Forms.Label();
             this.txtUsername = new System.Windows.Forms.TextBox();
             this.gbxStatus = new System.Windows.Forms.GroupBox();
+            this.pbInstall = new System.Windows.Forms.ProgressBar();
             this.lblStatus = new System.Windows.Forms.Label();
             this.txtChatMessages = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -60,6 +62,7 @@ namespace Lanstaller
             this.btnOpenTool = new System.Windows.Forms.Button();
             this.cmbxTool = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
+            this.lblSpaceRequired = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.gbxActions.SuspendLayout();
             this.gbxPref.SuspendLayout();
@@ -76,11 +79,12 @@ namespace Lanstaller
             this.cmbxSoftware.Size = new System.Drawing.Size(302, 21);
             this.cmbxSoftware.TabIndex = 0;
             this.cmbxSoftware.Text = "Select Game...";
+            this.cmbxSoftware.SelectedIndexChanged += new System.EventHandler(this.cmbxSoftware_SelectedIndexChanged);
             // 
             // lbxInstallList
             // 
             this.lbxInstallList.FormattingEnabled = true;
-            this.lbxInstallList.Location = new System.Drawing.Point(11, 260);
+            this.lbxInstallList.Location = new System.Drawing.Point(11, 277);
             this.lbxInstallList.Name = "lbxInstallList";
             this.lbxInstallList.Size = new System.Drawing.Size(302, 134);
             this.lbxInstallList.TabIndex = 1;
@@ -88,9 +92,9 @@ namespace Lanstaller
             // btnInstall
             // 
             this.btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnInstall.Location = new System.Drawing.Point(446, 248);
+            this.btnInstall.Location = new System.Drawing.Point(446, 245);
             this.btnInstall.Name = "btnInstall";
-            this.btnInstall.Size = new System.Drawing.Size(174, 94);
+            this.btnInstall.Size = new System.Drawing.Size(174, 114);
             this.btnInstall.TabIndex = 2;
             this.btnInstall.Text = "Install";
             this.btnInstall.UseVisualStyleBackColor = true;
@@ -98,7 +102,7 @@ namespace Lanstaller
             // 
             // btnAdd
             // 
-            this.btnAdd.Location = new System.Drawing.Point(11, 208);
+            this.btnAdd.Location = new System.Drawing.Point(10, 245);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(111, 26);
             this.btnAdd.TabIndex = 3;
@@ -108,7 +112,7 @@ namespace Lanstaller
             // 
             // btnClear
             // 
-            this.btnClear.Location = new System.Drawing.Point(128, 208);
+            this.btnClear.Location = new System.Drawing.Point(127, 245);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(111, 26);
             this.btnClear.TabIndex = 4;
@@ -145,16 +149,30 @@ namespace Lanstaller
             // 
             // gbxActions
             // 
+            this.gbxActions.Controls.Add(this.chkFirewall);
             this.gbxActions.Controls.Add(this.checkBox4);
             this.gbxActions.Controls.Add(this.chkShortcuts);
             this.gbxActions.Controls.Add(this.chkRegistry);
             this.gbxActions.Controls.Add(this.chkFiles);
             this.gbxActions.Location = new System.Drawing.Point(319, 242);
             this.gbxActions.Name = "gbxActions";
-            this.gbxActions.Size = new System.Drawing.Size(121, 100);
+            this.gbxActions.Size = new System.Drawing.Size(121, 117);
             this.gbxActions.TabIndex = 8;
             this.gbxActions.TabStop = false;
             this.gbxActions.Text = "Actions:";
+            // 
+            // chkFirewall
+            // 
+            this.chkFirewall.AutoSize = true;
+            this.chkFirewall.Checked = true;
+            this.chkFirewall.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkFirewall.Enabled = false;
+            this.chkFirewall.Location = new System.Drawing.Point(5, 100);
+            this.chkFirewall.Name = "chkFirewall";
+            this.chkFirewall.Size = new System.Drawing.Size(91, 17);
+            this.chkFirewall.TabIndex = 4;
+            this.chkFirewall.Text = "Firewall Rules";
+            this.chkFirewall.UseVisualStyleBackColor = true;
             // 
             // checkBox4
             // 
@@ -283,18 +301,26 @@ namespace Lanstaller
             // 
             // gbxStatus
             // 
+            this.gbxStatus.Controls.Add(this.pbInstall);
             this.gbxStatus.Controls.Add(this.lblStatus);
-            this.gbxStatus.Location = new System.Drawing.Point(319, 348);
+            this.gbxStatus.Location = new System.Drawing.Point(319, 365);
             this.gbxStatus.Name = "gbxStatus";
             this.gbxStatus.Size = new System.Drawing.Size(301, 98);
             this.gbxStatus.TabIndex = 10;
             this.gbxStatus.TabStop = false;
             this.gbxStatus.Text = "Install Status:";
             // 
+            // pbInstall
+            // 
+            this.pbInstall.Location = new System.Drawing.Point(6, 50);
+            this.pbInstall.Name = "pbInstall";
+            this.pbInstall.Size = new System.Drawing.Size(289, 40);
+            this.pbInstall.TabIndex = 1;
+            // 
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(6, 16);
+            this.lblStatus.Location = new System.Drawing.Point(7, 20);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(74, 13);
             this.lblStatus.TabIndex = 0;
@@ -307,7 +333,7 @@ namespace Lanstaller
             this.txtChatMessages.Name = "txtChatMessages";
             this.txtChatMessages.ReadOnly = true;
             this.txtChatMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtChatMessages.Size = new System.Drawing.Size(278, 258);
+            this.txtChatMessages.Size = new System.Drawing.Size(278, 276);
             this.txtChatMessages.TabIndex = 11;
             // 
             // groupBox1
@@ -316,14 +342,14 @@ namespace Lanstaller
             this.groupBox1.Controls.Add(this.txtChatMessages);
             this.groupBox1.Location = new System.Drawing.Point(626, 136);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(290, 312);
+            this.groupBox1.Size = new System.Drawing.Size(290, 327);
             this.groupBox1.TabIndex = 12;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Chat";
             // 
             // txtChatSendMessage
             // 
-            this.txtChatSendMessage.Location = new System.Drawing.Point(6, 283);
+            this.txtChatSendMessage.Location = new System.Drawing.Point(6, 301);
             this.txtChatSendMessage.Name = "txtChatSendMessage";
             this.txtChatSendMessage.Size = new System.Drawing.Size(278, 20);
             this.txtChatSendMessage.TabIndex = 12;
@@ -333,7 +359,7 @@ namespace Lanstaller
             // 
             this.groupBox2.Controls.Add(this.btnOpenTool);
             this.groupBox2.Controls.Add(this.cmbxTool);
-            this.groupBox2.Location = new System.Drawing.Point(11, 398);
+            this.groupBox2.Location = new System.Drawing.Point(11, 415);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(301, 48);
             this.groupBox2.TabIndex = 14;
@@ -361,17 +387,27 @@ namespace Lanstaller
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(8, 242);
+            this.label6.Location = new System.Drawing.Point(8, 229);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(72, 13);
+            this.label6.Size = new System.Drawing.Size(111, 13);
             this.label6.TabIndex = 15;
-            this.label6.Text = "Install Queue:";
+            this.label6.Text = "Multiple Install Queue:";
+            // 
+            // lblSpaceRequired
+            // 
+            this.lblSpaceRequired.AutoSize = true;
+            this.lblSpaceRequired.Location = new System.Drawing.Point(8, 207);
+            this.lblSpaceRequired.Name = "lblSpaceRequired";
+            this.lblSpaceRequired.Size = new System.Drawing.Size(87, 13);
+            this.lblSpaceRequired.TabIndex = 16;
+            this.lblSpaceRequired.Text = "Space Required:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(925, 450);
+            this.ClientSize = new System.Drawing.Size(925, 468);
+            this.Controls.Add(this.lblSpaceRequired);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -437,6 +473,9 @@ namespace Lanstaller
         private System.Windows.Forms.Button btnOpenTool;
         private System.Windows.Forms.ComboBox cmbxTool;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lblSpaceRequired;
+        private System.Windows.Forms.CheckBox chkFirewall;
+        private System.Windows.Forms.ProgressBar pbInstall;
     }
 }
 

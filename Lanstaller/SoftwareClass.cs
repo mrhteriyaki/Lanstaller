@@ -22,6 +22,9 @@ namespace Lanstaller
         public string Name;
         static string status = "Status: Ready";
 
+        static long InstallSize; //Size of current install.
+        static long InstalledSize; //Progres of current install.
+
         //List<Servers> ServerList = new List<Servers>();
         static List<FileCopyOperation> FileCopyList = new List<FileCopyOperation>();
         static List<RegistryOperation> RegistryList = new List<RegistryOperation>();
@@ -31,6 +34,7 @@ namespace Lanstaller
 
         //Locks.
         static readonly object _statuslock = new object();
+        static readonly object _progresslock = new object();
 
         public static List<SoftwareClass> LoadSoftware()
         {
@@ -70,13 +74,13 @@ namespace Lanstaller
             return idval;
         }
 
-        public static void Install(SoftwareClass SWI, bool installfiles, bool installregistry, bool installshortcuts)
+        public static void Install(SoftwareClass SWI, bool installfiles, bool installregistry, bool installshortcuts, bool applyfirewallrules)
         {
             string ServerAddress = GetServers();
 
             //Run Installation
 
-            if (installregistry == true)
+            if (installregistry)
             {
                 SetStatus("Applying Registry - " + SWI.Name);
                 GetRegistry(SWI.id);
@@ -85,15 +89,17 @@ namespace Lanstaller
 
 
 
-            if (installfiles == true)
+            if (installfiles)
             {
                 SetStatus("Indexing - " + SWI.Name);
                 GetFiles(SWI.id, ServerAddress);
+                InstallSize = GetInstallSize(SWI.id);
+                
                 SetStatus("Copying Files - " + SWI.Name);
                 GenerateFiles(SWI.Name);
             }
 
-            if (installshortcuts == true)
+            if (installshortcuts)
             {
                 SetStatus("Generating Shortcuts - " + SWI.Name);
                 GetShortcuts(SWI.id);
@@ -101,7 +107,11 @@ namespace Lanstaller
             }
 
             //firewall rules.
-            GenerateFirewallRules(SWI.id,SWI.Name);
+            if (applyfirewallrules)
+            {
+                GenerateFirewallRules(SWI.id, SWI.Name);
+            }
+
 
 
             SetStatus("Install Complete - " + SWI.Name);
@@ -114,12 +124,38 @@ namespace Lanstaller
             lock (_statuslock)
             {
                 status = "Status: " + message;
+
             }
         }
 
         public static string GetStatus()
         {
-            return status;
+            lock (_statuslock)
+            {
+                return status;
+            }
+        }
+
+        public static void SetProgress(long currentbytes)
+        {
+            lock (_progresslock)
+            {
+                InstalledSize = currentbytes;
+            }
+        }
+
+        public static int GetProgressPercentage()
+        {
+            lock (_progresslock)
+            {
+                if (InstallSize == 0 || InstalledSize == 0)
+                {
+                    return 0;
+                }
+                double perc = ((double)InstalledSize / (double)InstallSize) * 100;
+                
+                return Convert.ToInt32(perc);
+            }
         }
 
         static string GetServers()
@@ -142,7 +178,7 @@ namespace Lanstaller
         {
             FileCopyList.Clear();
 
-            string QueryString = "select [filename],[source],[destination] from tblFiles WHERE software_id = @softwareid";
+            string QueryString = "select [filename],[source],[destination],[filesize] from tblFiles WHERE software_id = @softwareid";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -155,11 +191,11 @@ namespace Lanstaller
                 string Sfilename = SQLOutput[0].ToString();
                 string Ssource = SQLOutput[1].ToString();
                 string Sdestination = SQLOutput[2].ToString();
-
+                long filesize = (long)SQLOutput[3];
 
                 FileCopyOperation tFCO = new FileCopyOperation();
                 tFCO.source = ServerAddress + "\\" + Ssource;
-
+                tFCO.size = filesize;
 
                 //Determine file destination.
                 if (SQLOutput[2].ToString().Equals(""))
@@ -201,9 +237,9 @@ namespace Lanstaller
             SQLConn.Close();
         }
 
-                public static void AddFile(string filename, string fullsource, string destination, int softwareid)
+        public static void AddFile(string filename, string fullsource, string destination, long filesize, int softwareid)
         {
-            string QueryString = "INSERT into tblFiles ([filename],[source],[destination],[software_id]) VALUES (@filename,@sourcefile,@destinationfile,@softwareid)";
+            string QueryString = "INSERT into tblFiles ([filename],[source],[destination],[filesize],[software_id]) VALUES (@filename,@sourcefile,@destinationfile,@filesize,@softwareid)";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -211,10 +247,52 @@ namespace Lanstaller
             SQLCmd.Parameters.AddWithValue("filename", filename);
             SQLCmd.Parameters.AddWithValue("sourcefile", fullsource);
             SQLCmd.Parameters.AddWithValue("destinationfile", destination);
+            SQLCmd.Parameters.AddWithValue("filesize", filesize);
             SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
         }
+
+        public static void RescanFileSize()
+        {
+            string SA = GetServers();
+
+            string QueryString = "SELECT [id],[source] from tblFiles";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SqlDataReader SR = SQLCmd.ExecuteReader();
+
+            List<FileCopyOperation> FileList = new List<FileCopyOperation>();
+
+            while (SR.Read())
+            {
+                FileCopyOperation tmpFCO = new FileCopyOperation();
+                tmpFCO.id = (int)SR[0];
+                tmpFCO.source = SR[1].ToString();
+                Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(SA + "\\" + SR[1].ToString());
+                tmpFCO.size = FI.Length;
+                FileList.Add(tmpFCO);
+            }
+            SQLConn.Close();
+
+            QueryString = "UPDATE tblFiles SET filesize = @filesize WHERE id = @fileid";
+            foreach (FileCopyOperation FCO in FileList)
+            {
+                SQLConn = new SqlConnection(ConnectionString);
+                SQLConn.Open();
+                SQLCmd = new SqlCommand(QueryString, SQLConn);
+                SQLCmd.Parameters.AddWithValue("filesize", FCO.size);
+                SQLCmd.Parameters.AddWithValue("fileid", FCO.id);
+                SQLCmd.ExecuteNonQuery();
+                SQLConn.Close();
+            }
+
+
+        }
+
+
 
         public static void AddRegistry(int softwareid, int hkey, string subkey, string value, int regtype, string data)
         {
@@ -272,9 +350,9 @@ namespace Lanstaller
             SQLConn.Close();
         }
 
-        public static void AddSerial(string name, int instancenumber, int softwareid)
+        public static void AddSerial(string name, int instancenumber, int softwareid, string regKey, string regVal)
         {
-            string QueryString = "INSERT into tblSerials ([name],[instance],[software_id]) VALUES (@name,@instancenumb,@softwareid)";
+            string QueryString = "INSERT into tblSerials ([name],[instance],[regKey],[regVal],[software_id]) VALUES (@name,@instancenumb,@regKey,@regVal,@softwareid)";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -283,6 +361,8 @@ namespace Lanstaller
             SQLCmd.Parameters.AddWithValue("name", name);
             SQLCmd.Parameters.AddWithValue("instancenumb", instancenumber);
             SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("regKey", regKey);
+            SQLCmd.Parameters.AddWithValue("regVal", regVal);
             SQLCmd.ExecuteNonQuery();
 
             SQLConn.Close();
@@ -342,13 +422,16 @@ namespace Lanstaller
             }
 
             int statuscount = 0;
-
+            long bytecounter = 0;
             //Copy Files.
             foreach (FileCopyOperation FCO in FileCopyList)
             {
                 Pri.LongPath.File.Copy(FCO.source, FCO.destination, true);
                 statuscount++;
                 SetStatus("Installing: " + softwarename + Environment.NewLine + "Copying Files:" + statuscount + " / " + FileCopyList.Count);
+                
+                bytecounter += FCO.size;
+                SetProgress(bytecounter);
                 //Provision for hashing has been put into database table.
             }
         }
@@ -364,7 +447,7 @@ namespace Lanstaller
             FWNetSHProc.StartInfo.RedirectStandardOutput = true;
 
             FWNetSHProc.Start();
-            
+
 
         }
 
@@ -374,9 +457,9 @@ namespace Lanstaller
             SerialList.Clear();
             foreach (int SoftwareID in SoftwareIDList)
             {
-      
 
-                string QueryString = "select [name],[instance] from [tblSerials] WHERE software_id = @softwareid";
+
+                string QueryString = "select [name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid";
 
                 SqlConnection SQLConn = new SqlConnection(ConnectionString);
                 SQLConn.Open();
@@ -389,17 +472,34 @@ namespace Lanstaller
                     tSerial.softwareid = SoftwareID;
                     tSerial.name = SQLOutput[0].ToString();
                     tSerial.instancenumber = (int)SQLOutput[1];
+                    tSerial.regKey = SQLOutput[2].ToString();
+                    tSerial.regVal = SQLOutput[3].ToString();
                     SerialList.Add(tSerial);
                 }
                 SQLConn.Close();
             }
-            
+
             foreach (SerialNumber SN in SerialList)
             {
                 //Prompt user to enter serial numbers.
-                string prom = SN.name + Environment.NewLine + "(Note: spaces and dashes will be removed automatically.)";
-                SN.serialnumber = Microsoft.VisualBasic.Interaction.InputBox(prom, SN.name).Replace(" ","").Replace("-",""); //Strip whitespace.
-                
+                //string prom = SN.name + Environment.NewLine + "(Note: spaces and dashes will be removed automatically.)";
+                //SN.serialnumber = Microsoft.VisualBasic.Interaction.InputBox(prom, SN.name).Replace(" ","").Replace("-",""); //Strip whitespace.
+
+                frmSerial SF = new frmSerial();
+                SF.TopMost = true;
+                SF.Text = "Serial: " + SN.name;
+                SF.FormBorderStyle = FormBorderStyle.FixedSingle;
+
+                if (!SN.regKey.Equals(""))
+                {
+                    SF.txtSerial.Text = Microsoft.Win32.Registry.GetValue(SN.regKey, SN.regVal, "").ToString();
+                }
+                SF.ShowDialog();
+
+
+                SN.serialnumber = SF.txtSerial.Text;
+
+
             }
 
         }
@@ -499,6 +599,19 @@ namespace Lanstaller
 
         }
 
+        public static long GetInstallSize(int softwareid)
+        {
+            string QueryString = "SELECT SUM(filesize) FROM tblFiles where software_id = @softwareid";
+
+            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            long filesize = (long)SQLCmd.ExecuteScalar();
+            SQLConn.Close();
+            return filesize;
+        }
+
 
         public static string ReplaceVariable(string dataline)
         {
@@ -528,7 +641,7 @@ namespace Lanstaller
 
             //check if %SERIALx%
             Regex rx = new Regex("[%SERIAL]\\d[%]");
-            
+
 
             if (rx.Matches(data).Count > 0)
             {
@@ -549,7 +662,7 @@ namespace Lanstaller
 
             }
 
-            
+
 
             return newdata;
         }
@@ -563,11 +676,15 @@ namespace Lanstaller
 
     class FileCopyOperation
     {
+        public int id;
         public string source;
         public string destination;
         public string filename;
-
+        public long size;
     }
+
+
+
 
     class RegistryOperation
     {
@@ -640,6 +757,8 @@ namespace Lanstaller
         public string name;
         public int instancenumber;
         public string serialnumber;
+        public string regKey;
+        public string regVal;
         public int softwareid;
 
     }

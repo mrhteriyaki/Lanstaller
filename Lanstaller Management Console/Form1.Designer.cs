@@ -36,6 +36,8 @@ namespace Lanstaller_Management_Console
             this.label2 = new System.Windows.Forms.Label();
             this.lblFolderStatus = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnAddFolder = new System.Windows.Forms.Button();
+            this.btnScan = new System.Windows.Forms.Button();
             this.lblDestination = new System.Windows.Forms.Label();
             this.lblFilename = new System.Windows.Forms.Label();
             this.lblSource = new System.Windows.Forms.Label();
@@ -43,10 +45,8 @@ namespace Lanstaller_Management_Console
             this.label16 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.txtServerShare = new System.Windows.Forms.TextBox();
-            this.btnAddFolder = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.txtDestination = new System.Windows.Forms.TextBox();
-            this.btnScan = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btnAddReg = new System.Windows.Forms.Button();
             this.txtData = new System.Windows.Forms.TextBox();
@@ -79,10 +79,15 @@ namespace Lanstaller_Management_Console
             this.txtFirewallPath = new System.Windows.Forms.TextBox();
             this.txtSerialName = new System.Windows.Forms.TextBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.txtSerialInstance = new System.Windows.Forms.TextBox();
-            this.label18 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.txtRegVal = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.txtRegKey = new System.Windows.Forms.TextBox();
             this.btnAddSerial = new System.Windows.Forms.Button();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.txtSerialInstance = new System.Windows.Forms.TextBox();
+            this.btnRescanFileSize = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -95,7 +100,7 @@ namespace Lanstaller_Management_Console
             this.lbxSoftware.FormattingEnabled = true;
             this.lbxSoftware.Location = new System.Drawing.Point(12, 45);
             this.lbxSoftware.Name = "lbxSoftware";
-            this.lbxSoftware.Size = new System.Drawing.Size(171, 303);
+            this.lbxSoftware.Size = new System.Drawing.Size(171, 836);
             this.lbxSoftware.TabIndex = 0;
             this.lbxSoftware.SelectedIndexChanged += new System.EventHandler(this.lbxSoftware_SelectedIndexChanged);
             // 
@@ -138,7 +143,7 @@ namespace Lanstaller_Management_Console
             // lblFolderStatus
             // 
             this.lblFolderStatus.AutoSize = true;
-            this.lblFolderStatus.Location = new System.Drawing.Point(27, 245);
+            this.lblFolderStatus.Location = new System.Drawing.Point(46, 205);
             this.lblFolderStatus.Name = "lblFolderStatus";
             this.lblFolderStatus.Size = new System.Drawing.Size(40, 13);
             this.lblFolderStatus.TabIndex = 5;
@@ -146,6 +151,8 @@ namespace Lanstaller_Management_Console
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btnAddFolder);
+            this.groupBox1.Controls.Add(this.btnScan);
             this.groupBox1.Controls.Add(this.lblDestination);
             this.groupBox1.Controls.Add(this.lblFilename);
             this.groupBox1.Controls.Add(this.lblSource);
@@ -153,24 +160,44 @@ namespace Lanstaller_Management_Console
             this.groupBox1.Controls.Add(this.label16);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.txtServerShare);
-            this.groupBox1.Controls.Add(this.btnAddFolder);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.txtDestination);
-            this.groupBox1.Controls.Add(this.btnScan);
             this.groupBox1.Controls.Add(this.txtScanfolder);
             this.groupBox1.Controls.Add(this.lblFolderStatus);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Location = new System.Drawing.Point(189, 21);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(565, 271);
+            this.groupBox1.Size = new System.Drawing.Size(565, 228);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Scan Folder";
             // 
+            // btnAddFolder
+            // 
+            this.btnAddFolder.Enabled = false;
+            this.btnAddFolder.Location = new System.Drawing.Point(459, 182);
+            this.btnAddFolder.Name = "btnAddFolder";
+            this.btnAddFolder.Size = new System.Drawing.Size(100, 28);
+            this.btnAddFolder.TabIndex = 9;
+            this.btnAddFolder.Text = "Add to Database";
+            this.btnAddFolder.UseVisualStyleBackColor = true;
+            this.btnAddFolder.Click += new System.EventHandler(this.btnAddFolder_Click);
+            // 
+            // btnScan
+            // 
+            this.btnScan.Enabled = false;
+            this.btnScan.Location = new System.Drawing.Point(459, 150);
+            this.btnScan.Name = "btnScan";
+            this.btnScan.Size = new System.Drawing.Size(100, 28);
+            this.btnScan.TabIndex = 6;
+            this.btnScan.Text = "Scan";
+            this.btnScan.UseVisualStyleBackColor = true;
+            this.btnScan.Click += new System.EventHandler(this.btnScan_Click);
+            // 
             // lblDestination
             // 
             this.lblDestination.AutoSize = true;
-            this.lblDestination.Location = new System.Drawing.Point(27, 203);
+            this.lblDestination.Location = new System.Drawing.Point(4, 180);
             this.lblDestination.Name = "lblDestination";
             this.lblDestination.Size = new System.Drawing.Size(82, 13);
             this.lblDestination.TabIndex = 16;
@@ -179,7 +206,7 @@ namespace Lanstaller_Management_Console
             // lblFilename
             // 
             this.lblFilename.AutoSize = true;
-            this.lblFilename.Location = new System.Drawing.Point(57, 177);
+            this.lblFilename.Location = new System.Drawing.Point(34, 165);
             this.lblFilename.Name = "lblFilename";
             this.lblFilename.Size = new System.Drawing.Size(52, 13);
             this.lblFilename.TabIndex = 15;
@@ -188,7 +215,7 @@ namespace Lanstaller_Management_Console
             // lblSource
             // 
             this.lblSource.AutoSize = true;
-            this.lblSource.Location = new System.Drawing.Point(68, 149);
+            this.lblSource.Location = new System.Drawing.Point(42, 150);
             this.lblSource.Name = "lblSource";
             this.lblSource.Size = new System.Drawing.Size(44, 13);
             this.lblSource.TabIndex = 14;
@@ -228,17 +255,6 @@ namespace Lanstaller_Management_Console
             this.txtServerShare.TabIndex = 10;
             this.txtServerShare.TextChanged += new System.EventHandler(this.txtServerShare_TextChanged);
             // 
-            // btnAddFolder
-            // 
-            this.btnAddFolder.Enabled = false;
-            this.btnAddFolder.Location = new System.Drawing.Point(459, 237);
-            this.btnAddFolder.Name = "btnAddFolder";
-            this.btnAddFolder.Size = new System.Drawing.Size(100, 28);
-            this.btnAddFolder.TabIndex = 9;
-            this.btnAddFolder.Text = "Add to Database";
-            this.btnAddFolder.UseVisualStyleBackColor = true;
-            this.btnAddFolder.Click += new System.EventHandler(this.btnAddFolder_Click);
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -256,17 +272,6 @@ namespace Lanstaller_Management_Console
             this.txtDestination.TabIndex = 7;
             this.txtDestination.TextChanged += new System.EventHandler(this.txtDestination_TextChanged);
             // 
-            // btnScan
-            // 
-            this.btnScan.Enabled = false;
-            this.btnScan.Location = new System.Drawing.Point(367, 237);
-            this.btnScan.Name = "btnScan";
-            this.btnScan.Size = new System.Drawing.Size(86, 28);
-            this.btnScan.TabIndex = 6;
-            this.btnScan.Text = "Scan";
-            this.btnScan.UseVisualStyleBackColor = true;
-            this.btnScan.Click += new System.EventHandler(this.btnScan_Click);
-            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.btnAddReg);
@@ -280,7 +285,7 @@ namespace Lanstaller_Management_Console
             this.groupBox2.Controls.Add(this.label6);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.cmbxHiveKey);
-            this.groupBox2.Location = new System.Drawing.Point(851, 234);
+            this.groupBox2.Location = new System.Drawing.Point(187, 506);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(325, 158);
             this.groupBox2.TabIndex = 7;
@@ -404,7 +409,7 @@ namespace Lanstaller_Management_Console
             this.groupBox3.Controls.Add(this.txtName);
             this.groupBox3.Controls.Add(this.txtLocation);
             this.groupBox3.Controls.Add(this.label10);
-            this.groupBox3.Location = new System.Drawing.Point(851, 26);
+            this.groupBox3.Location = new System.Drawing.Point(187, 670);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(358, 202);
             this.groupBox3.TabIndex = 8;
@@ -526,7 +531,7 @@ namespace Lanstaller_Management_Console
             this.groupBox4.Controls.Add(this.btnFirewallRuleAdd);
             this.groupBox4.Controls.Add(this.label17);
             this.groupBox4.Controls.Add(this.txtFirewallPath);
-            this.groupBox4.Location = new System.Drawing.Point(189, 304);
+            this.groupBox4.Location = new System.Drawing.Point(187, 255);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(400, 95);
             this.groupBox4.TabIndex = 9;
@@ -563,58 +568,67 @@ namespace Lanstaller_Management_Console
             // 
             // txtSerialName
             // 
-            this.txtSerialName.Location = new System.Drawing.Point(107, 19);
+            this.txtSerialName.Location = new System.Drawing.Point(170, 15);
             this.txtSerialName.Name = "txtSerialName";
-            this.txtSerialName.Size = new System.Drawing.Size(100, 20);
+            this.txtSerialName.Size = new System.Drawing.Size(224, 20);
             this.txtSerialName.TabIndex = 10;
             this.txtSerialName.TextChanged += new System.EventHandler(this.txtSerialName_TextChanged);
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.label21);
+            this.groupBox5.Controls.Add(this.txtRegVal);
+            this.groupBox5.Controls.Add(this.label20);
+            this.groupBox5.Controls.Add(this.txtRegKey);
             this.groupBox5.Controls.Add(this.btnAddSerial);
             this.groupBox5.Controls.Add(this.label19);
             this.groupBox5.Controls.Add(this.label18);
             this.groupBox5.Controls.Add(this.txtSerialInstance);
             this.groupBox5.Controls.Add(this.txtSerialName);
-            this.groupBox5.Location = new System.Drawing.Point(189, 414);
+            this.groupBox5.Location = new System.Drawing.Point(187, 356);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(337, 93);
+            this.groupBox5.Size = new System.Drawing.Size(400, 144);
             this.groupBox5.TabIndex = 11;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Serial Numbers";
             this.groupBox5.Enter += new System.EventHandler(this.groupBox5_Enter);
             // 
-            // txtSerialInstance
+            // label21
             // 
-            this.txtSerialInstance.Location = new System.Drawing.Point(107, 45);
-            this.txtSerialInstance.Name = "txtSerialInstance";
-            this.txtSerialInstance.Size = new System.Drawing.Size(44, 20);
-            this.txtSerialInstance.TabIndex = 11;
-            this.txtSerialInstance.Text = "1";
-            this.txtSerialInstance.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(59, 70);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(105, 13);
+            this.label21.TabIndex = 24;
+            this.label21.Text = "Lookup Registry Val:";
             // 
-            // label18
+            // txtRegVal
             // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(50, 22);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(38, 13);
-            this.label18.TabIndex = 19;
-            this.label18.Text = "Name:";
+            this.txtRegVal.Location = new System.Drawing.Point(170, 67);
+            this.txtRegVal.Name = "txtRegVal";
+            this.txtRegVal.Size = new System.Drawing.Size(224, 20);
+            this.txtRegVal.TabIndex = 23;
             // 
-            // label19
+            // label20
             // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(10, 48);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(91, 13);
-            this.label19.TabIndex = 20;
-            this.label19.Text = "Instance Number:";
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(59, 48);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(108, 13);
+            this.label20.TabIndex = 22;
+            this.label20.Text = "Lookup Registry Key:";
+            // 
+            // txtRegKey
+            // 
+            this.txtRegKey.Location = new System.Drawing.Point(170, 41);
+            this.txtRegKey.Name = "txtRegKey";
+            this.txtRegKey.Size = new System.Drawing.Size(224, 20);
+            this.txtRegKey.TabIndex = 21;
             // 
             // btnAddSerial
             // 
             this.btnAddSerial.Enabled = false;
-            this.btnAddSerial.Location = new System.Drawing.Point(231, 59);
+            this.btnAddSerial.Location = new System.Drawing.Point(294, 106);
             this.btnAddSerial.Name = "btnAddSerial";
             this.btnAddSerial.Size = new System.Drawing.Size(100, 28);
             this.btnAddSerial.TabIndex = 19;
@@ -622,11 +636,49 @@ namespace Lanstaller_Management_Console
             this.btnAddSerial.UseVisualStyleBackColor = true;
             this.btnAddSerial.Click += new System.EventHandler(this.btnAddSerial_Click);
             // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(74, 109);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(91, 13);
+            this.label19.TabIndex = 20;
+            this.label19.Text = "Instance Number:";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(129, 18);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(38, 13);
+            this.label18.TabIndex = 19;
+            this.label18.Text = "Name:";
+            // 
+            // txtSerialInstance
+            // 
+            this.txtSerialInstance.Location = new System.Drawing.Point(170, 106);
+            this.txtSerialInstance.Name = "txtSerialInstance";
+            this.txtSerialInstance.Size = new System.Drawing.Size(44, 20);
+            this.txtSerialInstance.TabIndex = 11;
+            this.txtSerialInstance.Text = "1";
+            this.txtSerialInstance.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
+            // 
+            // btnRescanFileSize
+            // 
+            this.btnRescanFileSize.Location = new System.Drawing.Point(634, 262);
+            this.btnRescanFileSize.Name = "btnRescanFileSize";
+            this.btnRescanFileSize.Size = new System.Drawing.Size(120, 51);
+            this.btnRescanFileSize.TabIndex = 12;
+            this.btnRescanFileSize.Text = "Rescan File Size";
+            this.btnRescanFileSize.UseVisualStyleBackColor = true;
+            this.btnRescanFileSize.Click += new System.EventHandler(this.btnRescanFileSize_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1652, 625);
+            this.ClientSize = new System.Drawing.Size(780, 907);
+            this.Controls.Add(this.btnRescanFileSize);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
@@ -709,6 +761,11 @@ namespace Lanstaller_Management_Console
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.TextBox txtSerialInstance;
         private System.Windows.Forms.Button btnAddSerial;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TextBox txtRegKey;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.TextBox txtRegVal;
+        private System.Windows.Forms.Button btnRescanFileSize;
     }
 }
 

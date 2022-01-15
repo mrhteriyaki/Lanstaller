@@ -36,11 +36,10 @@ namespace Lanstaller
             InitializeComponent();
         }
 
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
-            
-            
             //Lanstaller Settings
             LanstallerSettings.GetSettings(); //Refresh settings from Registry.
             txtInstallDirectory.Text = LanstallerSettings.InstallDirectory;
@@ -110,6 +109,7 @@ namespace Lanstaller
                     lblStatus.Invoke((MethodInvoker)delegate
                     {
                         lblStatus.Text = SoftwareClass.GetStatus();
+                        pbInstall.Value = SoftwareClass.GetProgressPercentage();
                     });
                 }
                 catch (Exception ex)
@@ -193,10 +193,14 @@ namespace Lanstaller
             }
             EnableInstallControls(false);
 
+
+
+
+
             Thread InsTrd = new Thread(InstallThread);
             InsTrd.Start();
 
-            
+
 
         }
 
@@ -208,21 +212,13 @@ namespace Lanstaller
             //Check Install Directory Valid.
             if (LanstallerSettings.CheckInstallDirectoryValid() == false)
             {
-                if (LanstallerSettings.InstallDirectory == LanstallerSettings.defaultinstalldir)
-                {
-                    System.IO.Directory.CreateDirectory(LanstallerSettings.defaultinstalldir); //Generate Default C:\Install directory.
-                }
-                else
-                {
-                    MessageBox.Show("Invalid Install Path."); // Prompt if custom directory does not exist.
-                }
-
-                return;
+                System.IO.Directory.CreateDirectory(LanstallerSettings.InstallDirectory); //Generate
             }
+
             bool install_files = chkFiles.Checked;
             bool install_reg = chkRegistry.Checked;
             bool install_shortcut = chkShortcuts.Checked;
-
+            bool apply_firewallrules = chkFirewall.Checked;
 
             //Get Serials for All Software
             List<int> IDList = new List<int>();
@@ -232,11 +228,11 @@ namespace Lanstaller
             }
             SoftwareClass.GetSerials(IDList);
 
-           
+
             //Run Through install list and install software.
             foreach (int index in InstallList)
             {
-                SoftwareClass.Install(SList[index], install_files, install_reg, install_shortcut);
+                SoftwareClass.Install(SList[index], install_files, install_reg, install_shortcut, apply_firewallrules);
             }
 
             //Reset install list.
@@ -258,7 +254,7 @@ namespace Lanstaller
                 EnableInstallControls(true);
             });
 
-            
+
 
         }
 
@@ -362,6 +358,30 @@ namespace Lanstaller
             SQLConn.Close();
 
             txtChatSendMessage.Text = "";
+        }
+
+        private void cmbxSoftware_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbxSoftware.SelectedIndex == -1)
+            {
+                return;
+            }
+
+
+            long filesize = SoftwareClass.GetInstallSize(SList[cmbxSoftware.SelectedIndex].id);
+
+            double mbfilesize = (double)filesize / 1048576;
+            if (mbfilesize < 1000)
+            {
+                lblSpaceRequired.Text = "Space Required: " + Math.Round(mbfilesize, 2).ToString() + "MB";
+            }
+            else
+            {
+                double gbfilesize = filesize / 1073741824;
+                lblSpaceRequired.Text = "Space Required: " + Math.Round(gbfilesize, 2).ToString() + "GB";
+            }
+
+
         }
     }
 }
