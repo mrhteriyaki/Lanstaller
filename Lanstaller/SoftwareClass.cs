@@ -352,12 +352,28 @@ namespace Lanstaller
 
         public static void AddSerial(string name, int instancenumber, int softwareid, string regKey, string regVal)
         {
-            string QueryString = "INSERT into tblSerials ([name],[instance],[regKey],[regVal],[software_id]) VALUES (@name,@instancenumb,@regKey,@regVal,@softwareid)";
-
+            //Check no existing serial present with same software id and instance number.
+            string QueryString = "SELECT COUNT(instance) from tblSerials where [instance] = @instancenumb and [software_id] = @softwareid";
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
-            SQLConn.Open();
 
+            SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("instancenumb", instancenumber);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            int counter = (int)SQLCmd.ExecuteScalar();
+            SQLConn.Close();
+
+            if (counter != 0)
+            {
+                MessageBox.Show("A serial with the same instancen number already exists for this software.");
+                return;
+            }
+
+
+            QueryString = "INSERT into tblSerials ([name],[instance],[regKey],[regVal],[software_id]) VALUES (@name,@instancenumb,@regKey,@regVal,@softwareid)";
+            
+            SQLConn.Open();
+            SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("name", name);
             SQLCmd.Parameters.AddWithValue("instancenumb", instancenumber);
             SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
@@ -635,6 +651,9 @@ namespace Lanstaller
 
         static string ReplaceSerial(string data, int softwareid)
         {
+
+                        
+
             //Serial Numbers.
             //Check SerialList for matching serial number.
             string newdata = data;
@@ -650,6 +669,7 @@ namespace Lanstaller
 
                 foreach (SerialNumber SN in SerialList)
                 {
+
                     if (SN.softwareid == softwareid)
                     {
                         if (SN.instancenumber == SInstance)

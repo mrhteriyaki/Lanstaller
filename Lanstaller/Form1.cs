@@ -221,12 +221,15 @@ namespace Lanstaller
             bool apply_firewallrules = chkFirewall.Checked;
 
             //Get Serials for All Software
-            List<int> IDList = new List<int>();
-            foreach (int index in InstallList)
+            if (install_reg)
             {
-                IDList.Add(SList[index].id);
+                List<int> IDList = new List<int>();
+                foreach (int index in InstallList)
+                {
+                    IDList.Add(SList[index].id);
+                }
+                SoftwareClass.GetSerials(IDList);
             }
-            SoftwareClass.GetSerials(IDList);
 
 
             //Run Through install list and install software.
