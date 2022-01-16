@@ -88,11 +88,21 @@ namespace Lanstaller_Management_Console
             this.label18 = new System.Windows.Forms.Label();
             this.txtSerialInstance = new System.Windows.Forms.TextBox();
             this.btnRescanFileSize = new System.Windows.Forms.Button();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.btnAddPrefFile = new System.Windows.Forms.Button();
+            this.label22 = new System.Windows.Forms.Label();
+            this.txtPrefFilePath = new System.Windows.Forms.TextBox();
+            this.lblVariable = new System.Windows.Forms.Label();
+            this.txtReplace = new System.Windows.Forms.TextBox();
+            this.txtTarget = new System.Windows.Forms.TextBox();
+            this.label23 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
+            this.groupBox6.SuspendLayout();
             this.SuspendLayout();
             // 
             // lbxSoftware
@@ -540,7 +550,6 @@ namespace Lanstaller_Management_Console
             // 
             // btnFirewallRuleAdd
             // 
-            this.btnFirewallRuleAdd.Enabled = false;
             this.btnFirewallRuleAdd.Location = new System.Drawing.Point(289, 49);
             this.btnFirewallRuleAdd.Name = "btnFirewallRuleAdd";
             this.btnFirewallRuleAdd.Size = new System.Drawing.Size(100, 28);
@@ -673,11 +682,97 @@ namespace Lanstaller_Management_Console
             this.btnRescanFileSize.UseVisualStyleBackColor = true;
             this.btnRescanFileSize.Click += new System.EventHandler(this.btnRescanFileSize_Click);
             // 
+            // groupBox6
+            // 
+            this.groupBox6.Controls.Add(this.txtReplace);
+            this.groupBox6.Controls.Add(this.txtTarget);
+            this.groupBox6.Controls.Add(this.label23);
+            this.groupBox6.Controls.Add(this.label24);
+            this.groupBox6.Controls.Add(this.btnAddPrefFile);
+            this.groupBox6.Controls.Add(this.label22);
+            this.groupBox6.Controls.Add(this.txtPrefFilePath);
+            this.groupBox6.Location = new System.Drawing.Point(518, 506);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Size = new System.Drawing.Size(400, 158);
+            this.groupBox6.TabIndex = 19;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "Preference File:";
+            // 
+            // btnAddPrefFile
+            // 
+            this.btnAddPrefFile.Location = new System.Drawing.Point(289, 112);
+            this.btnAddPrefFile.Name = "btnAddPrefFile";
+            this.btnAddPrefFile.Size = new System.Drawing.Size(100, 28);
+            this.btnAddPrefFile.TabIndex = 17;
+            this.btnAddPrefFile.Text = "Add to Database";
+            this.btnAddPrefFile.UseVisualStyleBackColor = true;
+            this.btnAddPrefFile.Click += new System.EventHandler(this.btnAddPrefFile_Click);
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(8, 26);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(51, 13);
+            this.label22.TabIndex = 18;
+            this.label22.Text = "File Path:";
+            // 
+            // txtPrefFilePath
+            // 
+            this.txtPrefFilePath.Location = new System.Drawing.Point(75, 23);
+            this.txtPrefFilePath.Name = "txtPrefFilePath";
+            this.txtPrefFilePath.Size = new System.Drawing.Size(314, 20);
+            this.txtPrefFilePath.TabIndex = 17;
+            this.txtPrefFilePath.Text = "%INSTALLPATH%\\";
+            // 
+            // lblVariable
+            // 
+            this.lblVariable.AutoSize = true;
+            this.lblVariable.Location = new System.Drawing.Point(773, 30);
+            this.lblVariable.Name = "lblVariable";
+            this.lblVariable.Size = new System.Drawing.Size(69, 13);
+            this.lblVariable.TabIndex = 20;
+            this.lblVariable.Text = "Variable Info:";
+            // 
+            // txtReplace
+            // 
+            this.txtReplace.Location = new System.Drawing.Point(75, 77);
+            this.txtReplace.Name = "txtReplace";
+            this.txtReplace.Size = new System.Drawing.Size(237, 20);
+            this.txtReplace.TabIndex = 22;
+            // 
+            // txtTarget
+            // 
+            this.txtTarget.Location = new System.Drawing.Point(75, 49);
+            this.txtTarget.Name = "txtTarget";
+            this.txtTarget.Size = new System.Drawing.Size(237, 20);
+            this.txtTarget.TabIndex = 21;
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(13, 80);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(50, 13);
+            this.label23.TabIndex = 20;
+            this.label23.Text = "Replace:";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(22, 52);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(41, 13);
+            this.label24.TabIndex = 19;
+            this.label24.Text = "Target:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(780, 907);
+            this.ClientSize = new System.Drawing.Size(1264, 984);
+            this.Controls.Add(this.lblVariable);
+            this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.btnRescanFileSize);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
@@ -700,6 +795,8 @@ namespace Lanstaller_Management_Console
             this.groupBox4.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -766,6 +863,15 @@ namespace Lanstaller_Management_Console
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.TextBox txtRegVal;
         private System.Windows.Forms.Button btnRescanFileSize;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.Button btnAddPrefFile;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.TextBox txtPrefFilePath;
+        private System.Windows.Forms.Label lblVariable;
+        private System.Windows.Forms.TextBox txtReplace;
+        private System.Windows.Forms.TextBox txtTarget;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Label label24;
     }
 }
 

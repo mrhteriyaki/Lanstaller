@@ -39,6 +39,9 @@ namespace Lanstaller
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //testing
+            WindowsInstallerClass.CheckProgram();
+
 
             //Lanstaller Settings
             LanstallerSettings.GetSettings(); //Refresh settings from Registry.
@@ -193,13 +196,9 @@ namespace Lanstaller
             }
             EnableInstallControls(false);
 
-
-
-
-
+            //Run Installation.
             Thread InsTrd = new Thread(InstallThread);
             InsTrd.Start();
-
 
 
         }
@@ -219,6 +218,9 @@ namespace Lanstaller
             bool install_reg = chkRegistry.Checked;
             bool install_shortcut = chkShortcuts.Checked;
             bool apply_firewallrules = chkFirewall.Checked;
+            bool apply_preferences = chkPreferences.Checked;
+            bool install_redist = chkRedist.Checked;
+
 
             //Get Serials for All Software
             if (install_reg)
@@ -235,7 +237,7 @@ namespace Lanstaller
             //Run Through install list and install software.
             foreach (int index in InstallList)
             {
-                SoftwareClass.Install(SList[index], install_files, install_reg, install_shortcut, apply_firewallrules);
+                SoftwareClass.Install(SList[index], install_files, install_reg, install_shortcut, apply_firewallrules, apply_preferences, install_redist);
             }
 
             //Reset install list.

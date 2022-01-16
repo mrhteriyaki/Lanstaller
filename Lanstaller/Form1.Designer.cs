@@ -40,7 +40,7 @@ namespace Lanstaller
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.gbxActions = new System.Windows.Forms.GroupBox();
             this.chkFirewall = new System.Windows.Forms.CheckBox();
-            this.checkBox4 = new System.Windows.Forms.CheckBox();
+            this.chkPreferences = new System.Windows.Forms.CheckBox();
             this.chkShortcuts = new System.Windows.Forms.CheckBox();
             this.chkRegistry = new System.Windows.Forms.CheckBox();
             this.chkFiles = new System.Windows.Forms.CheckBox();
@@ -63,6 +63,7 @@ namespace Lanstaller
             this.cmbxTool = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.lblSpaceRequired = new System.Windows.Forms.Label();
+            this.chkRedist = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.gbxActions.SuspendLayout();
             this.gbxPref.SuspendLayout();
@@ -149,14 +150,15 @@ namespace Lanstaller
             // 
             // gbxActions
             // 
+            this.gbxActions.Controls.Add(this.chkRedist);
             this.gbxActions.Controls.Add(this.chkFirewall);
-            this.gbxActions.Controls.Add(this.checkBox4);
+            this.gbxActions.Controls.Add(this.chkPreferences);
             this.gbxActions.Controls.Add(this.chkShortcuts);
             this.gbxActions.Controls.Add(this.chkRegistry);
             this.gbxActions.Controls.Add(this.chkFiles);
-            this.gbxActions.Location = new System.Drawing.Point(319, 242);
+            this.gbxActions.Location = new System.Drawing.Point(319, 234);
             this.gbxActions.Name = "gbxActions";
-            this.gbxActions.Size = new System.Drawing.Size(121, 117);
+            this.gbxActions.Size = new System.Drawing.Size(121, 138);
             this.gbxActions.TabIndex = 8;
             this.gbxActions.TabStop = false;
             this.gbxActions.Text = "Actions:";
@@ -166,7 +168,6 @@ namespace Lanstaller
             this.chkFirewall.AutoSize = true;
             this.chkFirewall.Checked = true;
             this.chkFirewall.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkFirewall.Enabled = false;
             this.chkFirewall.Location = new System.Drawing.Point(5, 100);
             this.chkFirewall.Name = "chkFirewall";
             this.chkFirewall.Size = new System.Drawing.Size(91, 17);
@@ -174,18 +175,17 @@ namespace Lanstaller
             this.chkFirewall.Text = "Firewall Rules";
             this.chkFirewall.UseVisualStyleBackColor = true;
             // 
-            // checkBox4
+            // chkPreferences
             // 
-            this.checkBox4.AutoSize = true;
-            this.checkBox4.Checked = true;
-            this.checkBox4.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox4.Enabled = false;
-            this.checkBox4.Location = new System.Drawing.Point(5, 80);
-            this.checkBox4.Name = "checkBox4";
-            this.checkBox4.Size = new System.Drawing.Size(108, 17);
-            this.checkBox4.TabIndex = 3;
-            this.checkBox4.Text = "User Preferences";
-            this.checkBox4.UseVisualStyleBackColor = true;
+            this.chkPreferences.AutoSize = true;
+            this.chkPreferences.Checked = true;
+            this.chkPreferences.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkPreferences.Location = new System.Drawing.Point(5, 80);
+            this.chkPreferences.Name = "chkPreferences";
+            this.chkPreferences.Size = new System.Drawing.Size(108, 17);
+            this.chkPreferences.TabIndex = 3;
+            this.chkPreferences.Text = "User Preferences";
+            this.chkPreferences.UseVisualStyleBackColor = true;
             // 
             // chkShortcuts
             // 
@@ -303,16 +303,16 @@ namespace Lanstaller
             // 
             this.gbxStatus.Controls.Add(this.pbInstall);
             this.gbxStatus.Controls.Add(this.lblStatus);
-            this.gbxStatus.Location = new System.Drawing.Point(319, 365);
+            this.gbxStatus.Location = new System.Drawing.Point(319, 371);
             this.gbxStatus.Name = "gbxStatus";
-            this.gbxStatus.Size = new System.Drawing.Size(301, 98);
+            this.gbxStatus.Size = new System.Drawing.Size(301, 92);
             this.gbxStatus.TabIndex = 10;
             this.gbxStatus.TabStop = false;
             this.gbxStatus.Text = "Install Status:";
             // 
             // pbInstall
             // 
-            this.pbInstall.Location = new System.Drawing.Point(6, 50);
+            this.pbInstall.Location = new System.Drawing.Point(6, 46);
             this.pbInstall.Name = "pbInstall";
             this.pbInstall.Size = new System.Drawing.Size(289, 40);
             this.pbInstall.TabIndex = 1;
@@ -320,7 +320,7 @@ namespace Lanstaller
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(7, 20);
+            this.lblStatus.Location = new System.Drawing.Point(5, 16);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(74, 13);
             this.lblStatus.TabIndex = 0;
@@ -402,6 +402,18 @@ namespace Lanstaller
             this.lblSpaceRequired.TabIndex = 16;
             this.lblSpaceRequired.Text = "Space Required:";
             // 
+            // chkRedist
+            // 
+            this.chkRedist.AutoSize = true;
+            this.chkRedist.Checked = true;
+            this.chkRedist.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkRedist.Location = new System.Drawing.Point(5, 118);
+            this.chkRedist.Name = "chkRedist";
+            this.chkRedist.Size = new System.Drawing.Size(101, 17);
+            this.chkRedist.TabIndex = 5;
+            this.chkRedist.Text = "Redistributables";
+            this.chkRedist.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -452,7 +464,7 @@ namespace Lanstaller
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.GroupBox gbxActions;
-        private System.Windows.Forms.CheckBox checkBox4;
+        private System.Windows.Forms.CheckBox chkPreferences;
         private System.Windows.Forms.CheckBox chkShortcuts;
         private System.Windows.Forms.CheckBox chkRegistry;
         private System.Windows.Forms.CheckBox chkFiles;
@@ -476,6 +488,7 @@ namespace Lanstaller
         private System.Windows.Forms.Label lblSpaceRequired;
         private System.Windows.Forms.CheckBox chkFirewall;
         private System.Windows.Forms.ProgressBar pbInstall;
+        private System.Windows.Forms.CheckBox chkRedist;
     }
 }
 

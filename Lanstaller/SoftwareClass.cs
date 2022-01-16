@@ -12,6 +12,9 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions; //Regex
 using System.Diagnostics;
 
+using System.IO;
+
+
 namespace Lanstaller
 {
     public class SoftwareClass
@@ -74,7 +77,7 @@ namespace Lanstaller
             return idval;
         }
 
-        public static void Install(SoftwareClass SWI, bool installfiles, bool installregistry, bool installshortcuts, bool applyfirewallrules)
+        public static void Install(SoftwareClass SWI, bool installfiles, bool installregistry, bool installshortcuts, bool applyfirewallrules, bool apply_preferences, bool install_redist)
         {
             string ServerAddress = GetServers();
 
@@ -94,7 +97,7 @@ namespace Lanstaller
                 SetStatus("Indexing - " + SWI.Name);
                 GetFiles(SWI.id, ServerAddress);
                 InstallSize = GetInstallSize(SWI.id);
-                
+
                 SetStatus("Copying Files - " + SWI.Name);
                 GenerateFiles(SWI.Name);
             }
@@ -106,13 +109,24 @@ namespace Lanstaller
                 GenerateShortcuts();
             }
 
+            SetStatus("Adding firewall rules - " + SWI.Name);
             //firewall rules.
             if (applyfirewallrules)
             {
                 GenerateFirewallRules(SWI.id, SWI.Name);
             }
 
+            SetStatus("Applying Preferences - " + SWI.Name);
+            if (apply_preferences)
+            {
+                GeneratePreferenceFiles(SWI.id);
+            }
 
+            SetStatus("Installing Redistributables - " + SWI.Name);
+            if (install_redist)
+            {
+                CheckRedistributables(SWI.id);
+            }
 
             SetStatus("Install Complete - " + SWI.Name);
 
@@ -153,7 +167,7 @@ namespace Lanstaller
                     return 0;
                 }
                 double perc = ((double)InstalledSize / (double)InstallSize) * 100;
-                
+
                 return Convert.ToInt32(perc);
             }
         }
@@ -218,8 +232,26 @@ namespace Lanstaller
             SQLConn.Close();
         }
 
+        static void GeneratePreferenceFiles(int softwareid)
+        {
+            string QueryString = "select [filepath],[target],[replace] from tblPreferenceFiles WHERE software_id = @softwareid";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                ReplacePreferenceFile(SQLOutput[0].ToString(), SQLOutput[1].ToString(), SQLOutput[2].ToString());
+            }
+
+            SQLConn.Close();
+        }
+
         static void GenerateFirewallRules(int softwareid, string softwarename)
         {
+            //Software name used for Windows Firewall rule.
             FileCopyList.Clear();
 
             string QueryString = "select [filepath] from tblFirewallExceptions WHERE software_id = @softwareid";
@@ -231,12 +263,63 @@ namespace Lanstaller
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
-                AddFirewallRule(softwarename, SQLOutput[0].ToString());
+                string firewallpath = ReplaceVariable(SQLOutput[0].ToString()).ToLower();
+                AddFirewallRule(softwarename, firewallpath);
             }
 
             SQLConn.Close();
         }
 
+        static void CheckRedistributables(int softwareid)
+        {
+
+            //Get Required Redist ID for install.
+            string QueryString = "SELECT [redist_id] FROM tblRedistUsage WHERE software_id = @softwareid ORDER BY [install_order] ASC";
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            List<int> RedistList = new List<int>();
+            while (SQLOutput.Read())
+            {
+                RedistList.Add((int)SQLOutput[0]);
+            }
+            SQLConn.Close();
+
+            foreach (int i in RedistList)
+            {
+
+                QueryString = "SELECT [name],[path],[filecheck],[version] from tblRedist WHERE id = @softwareid";
+                SQLConn.Open();
+                SQLCmd = new SqlCommand(QueryString, SQLConn);
+                SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+                SQLOutput = SQLCmd.ExecuteReader();
+                while (SQLOutput.Read())
+                {
+                    
+
+                }
+                SQLConn.Close();
+
+            }
+
+            //Check filecheck, if blank, check name against windows installations.
+
+
+        }
+
+        class Redistributable
+        {
+            public string name;
+            public string path;
+            public string filecheck;
+            public string version;
+
+
+        }
+
+       
         public static void AddFile(string filename, string fullsource, string destination, long filesize, int softwareid)
         {
             string QueryString = "INSERT into tblFiles ([filename],[source],[destination],[filesize],[software_id]) VALUES (@filename,@sourcefile,@destinationfile,@filesize,@softwareid)";
@@ -252,6 +335,8 @@ namespace Lanstaller
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
         }
+
+
 
         public static void RescanFileSize()
         {
@@ -337,13 +422,30 @@ namespace Lanstaller
 
         public static void AddFirewallRule(string filepath, int softwareid)
         {
-            string QueryString = "INSERT into tblFirewallExceptions ([filepath],[software_id]) VALUES (@filepath,@software_id)";
+            string QueryString = "INSERT into tblFirewallExceptions ([filepath],[software_id]) VALUES (@filepath,@softwareid)";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
 
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("filepath", filepath);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.ExecuteNonQuery();
+
+            SQLConn.Close();
+        }
+
+        public static void AddPreferenceFile(string filepath, string target, string replace, int softwareid)
+        {
+            string QueryString = "INSERT into tblPreferenceFiles ([filepath],[target],[replace],[software_id]) VALUES (@filepath,@target,@replace,@softwareid)";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("filepath", filepath);
+            SQLCmd.Parameters.AddWithValue("target", target);
+            SQLCmd.Parameters.AddWithValue("replace", replace);
             SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
             SQLCmd.ExecuteNonQuery();
 
@@ -371,7 +473,7 @@ namespace Lanstaller
 
 
             QueryString = "INSERT into tblSerials ([name],[instance],[regKey],[regVal],[software_id]) VALUES (@name,@instancenumb,@regKey,@regVal,@softwareid)";
-            
+
             SQLConn.Open();
             SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("name", name);
@@ -426,6 +528,8 @@ namespace Lanstaller
                 }
 
             }
+
+
             SetStatus("Installing: " + softwarename + Environment.NewLine + "Status: Generating Directories");
 
             foreach (string dir in DirectoryList)
@@ -445,7 +549,7 @@ namespace Lanstaller
                 Pri.LongPath.File.Copy(FCO.source, FCO.destination, true);
                 statuscount++;
                 SetStatus("Installing: " + softwarename + Environment.NewLine + "Copying Files:" + statuscount + " / " + FileCopyList.Count);
-                
+
                 bytecounter += FCO.size;
                 SetProgress(bytecounter);
                 //Provision for hashing has been put into database table.
@@ -461,7 +565,7 @@ namespace Lanstaller
             FWNetSHProc.StartInfo.Arguments = "advfirewall firewall add rule name=\"" + RuleName + "\" dir=in action=allow program=\"" + ReplaceVariable(EXEPath) + "\" enable=yes";
             FWNetSHProc.StartInfo.UseShellExecute = false;
             FWNetSHProc.StartInfo.RedirectStandardOutput = true;
-
+            FWNetSHProc.StartInfo.CreateNoWindow = true;
             FWNetSHProc.Start();
 
 
@@ -643,6 +747,8 @@ namespace Lanstaller
             updateline = updateline.Replace("%WIDTH%", LanstallerSettings.ScreenWidth.ToString());
             updateline = updateline.Replace("%HEIGHT%", LanstallerSettings.ScreenHeight.ToString());
 
+            //Username
+            updateline = updateline.Replace("%USERNAME%", LanstallerSettings.Username);
 
             return updateline;
 
@@ -652,7 +758,7 @@ namespace Lanstaller
         static string ReplaceSerial(string data, int softwareid)
         {
 
-                        
+
 
             //Serial Numbers.
             //Check SerialList for matching serial number.
@@ -685,6 +791,64 @@ namespace Lanstaller
 
 
             return newdata;
+        }
+
+
+        public static void ReplacePreferenceFile(string filename, string target, string replace)
+        {
+            filename = ReplaceVariable(filename); //Adjust for any variables in filename.
+
+            if (!Pri.LongPath.File.Exists(filename))
+            {
+                MessageBox.Show("Preference File Missing  - " + filename);
+                return;
+            }
+
+
+
+            //Read existing file.
+            StreamReader SR = new StreamReader(filename, true);
+            Encoding EncodingType = SR.CurrentEncoding; //Record encoding type.
+            string configfiledata = SR.ReadToEnd();
+            SR.Close();
+
+
+            if (EncodingType == Encoding.UTF8)
+            {
+                //If UTF-8 Check for Byte Order Mark.
+                FileStream fs = new FileStream(filename, FileMode.Open); //Open File for read.
+                byte[] bits = new byte[3];
+                fs.Read(bits, 0, 3); //Read 3 bytes.
+                fs.Close();
+                // UTF8 byte order mark is: 0xEF,0xBB,0xBF
+                if (bits[0] != 0xEF && bits[1] != 0xBB && bits[2] != 0xBF)
+                {
+                    //No Byte Order Mark.
+                    EncodingType = new UTF8Encoding(false);
+                }
+
+            }
+
+
+
+            //Process config file data.
+            replace = ReplaceVariable(replace); //Update replacement variables with user preferences.
+            configfiledata = configfiledata.Replace(target, replace); //Apply replacement to target in file data.
+
+            //Move Existing File.
+            Pri.LongPath.File.Move(filename, filename + ".bak");
+
+            //Write New file.
+            FileStream FS = new FileStream(filename, FileMode.Create);
+            StreamWriter SW = new StreamWriter(FS, EncodingType);
+
+            SW.Write(configfiledata); //Write new data.
+            SW.Close();
+
+
+            //Delete Backup of Existing File.
+            Pri.LongPath.File.Delete(filename + ".bak");
+
         }
 
 

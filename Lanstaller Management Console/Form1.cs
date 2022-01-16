@@ -28,6 +28,9 @@ namespace Lanstaller_Management_Console
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            lblVariable.Text = "%INSTALLPATH% = Base Install Directory (Default C:\\Games)" + Environment.NewLine + "%USERPROFILE% = User Profile Path (Default C:\\Users\\<Username>)" + Environment.NewLine + "%WIDTH% = Resolution Preference X" + Environment.NewLine + "%HEIGHT% = Resolution Preference Y" + Environment.NewLine + "%USERNAME% = Username Preference";
+
+
             RefreshSoftware();
 
 
@@ -126,6 +129,15 @@ namespace Lanstaller_Management_Console
             }
 
             string destination = txtDestination.Text;
+
+            if (destination.EndsWith("\\"))
+            {
+                MessageBox.Show("Destination cannot end with Backslash (\\)");
+                return;
+            }
+                
+
+
             string basefolder = txtBaseFolder.Text;
             string servershare = txtServerShare.Text;
             foreach (string filename in filelist)
@@ -307,8 +319,7 @@ namespace Lanstaller_Management_Console
 
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)
         {
-            string firewallpath = txtFirewallPath.Text.ToLower(); //convert to lower, firewall prompts seem to always show lower case - avoid possible mismatch.
-            SoftwareClass.AddFirewallRule(firewallpath, selectedsoftwareid);
+            SoftwareClass.AddFirewallRule(txtFirewallPath.Text, selectedsoftwareid);
 
         }
 
@@ -338,6 +349,16 @@ namespace Lanstaller_Management_Console
             btnRescanFileSize.Enabled = false;
             SoftwareClass.RescanFileSize();
             btnRescanFileSize.Enabled = true;
+        }
+
+        private void btnAddPrefFile_Click(object sender, EventArgs e)
+        {
+            if (selectedsoftwareid == -1)
+            {
+                MessageBox.Show("Select Software");
+                return;
+            }
+            SoftwareClass.AddPreferenceFile(txtPrefFilePath.Text, txtTarget.Text, txtReplace.Text, selectedsoftwareid);
         }
     }
 }
