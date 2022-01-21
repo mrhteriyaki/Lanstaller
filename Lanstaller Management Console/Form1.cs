@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -108,8 +109,41 @@ namespace Lanstaller_Management_Console
             txtSerialName.Text = SoftwareList[lbxSoftware.SelectedIndex].Name;
             txtSerialInstance.Text = "1";
 
+            //Get info for install./
+
+
+            string info = "";
+            //GetScalarInfo("WHERE software_id = @softwareid", selectedsoftwareid);
+            int filecount = GetScalarInfo("SELECT COUNT(id) from tblFiles where software_id = @softwareid", selectedsoftwareid);
+            info += "File Copies: " + filecount.ToString() + Environment.NewLine;
+
+            int firewallcount = GetScalarInfo("SELECT COUNT(id) from tblFirewallExceptions WHERE software_id = @softwareid", selectedsoftwareid);
+            info += "Firewall Rules: " + firewallcount.ToString() + Environment.NewLine;
+
+            int registrycount = GetScalarInfo("SELECT COUNT(id) from tblRegistry WHERE software_id = @softwareid", selectedsoftwareid);
+            info += "Registry Operations: " + registrycount.ToString() + Environment.NewLine;
+
+            int shortcutcount = GetScalarInfo("SELECT COUNT(id) from [tblShortcut] WHERE software_id = @softwareid", selectedsoftwareid);
+            info += "Shortcuts: " + shortcutcount.ToString() + Environment.NewLine;
+
+            lblInstallInfo.Text = "Installation Info:" + Environment.NewLine + info;
 
         }
+
+        static int GetScalarInfo(string Query, int softwareid)
+        {
+            
+            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(Query, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            int scalarval = (int)SQLCmd.ExecuteScalar();
+            SQLConn.Close();
+            return scalarval;
+        }
+
+        
+
 
         private void btnAddFolder_Click(object sender, EventArgs e)
         {

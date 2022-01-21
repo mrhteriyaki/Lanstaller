@@ -89,14 +89,15 @@ namespace Lanstaller_Management_Console
             this.txtSerialInstance = new System.Windows.Forms.TextBox();
             this.btnRescanFileSize = new System.Windows.Forms.Button();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.btnAddPrefFile = new System.Windows.Forms.Button();
-            this.label22 = new System.Windows.Forms.Label();
-            this.txtPrefFilePath = new System.Windows.Forms.TextBox();
-            this.lblVariable = new System.Windows.Forms.Label();
             this.txtReplace = new System.Windows.Forms.TextBox();
             this.txtTarget = new System.Windows.Forms.TextBox();
             this.label23 = new System.Windows.Forms.Label();
             this.label24 = new System.Windows.Forms.Label();
+            this.btnAddPrefFile = new System.Windows.Forms.Button();
+            this.label22 = new System.Windows.Forms.Label();
+            this.txtPrefFilePath = new System.Windows.Forms.TextBox();
+            this.lblVariable = new System.Windows.Forms.Label();
+            this.lblInstallInfo = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -698,6 +699,38 @@ namespace Lanstaller_Management_Console
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "Preference File:";
             // 
+            // txtReplace
+            // 
+            this.txtReplace.Location = new System.Drawing.Point(75, 77);
+            this.txtReplace.Name = "txtReplace";
+            this.txtReplace.Size = new System.Drawing.Size(237, 20);
+            this.txtReplace.TabIndex = 22;
+            // 
+            // txtTarget
+            // 
+            this.txtTarget.Location = new System.Drawing.Point(75, 49);
+            this.txtTarget.Name = "txtTarget";
+            this.txtTarget.Size = new System.Drawing.Size(237, 20);
+            this.txtTarget.TabIndex = 21;
+            // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(13, 80);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(50, 13);
+            this.label23.TabIndex = 20;
+            this.label23.Text = "Replace:";
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(22, 52);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(41, 13);
+            this.label24.TabIndex = 19;
+            this.label24.Text = "Target:";
+            // 
             // btnAddPrefFile
             // 
             this.btnAddPrefFile.Location = new System.Drawing.Point(289, 112);
@@ -734,43 +767,21 @@ namespace Lanstaller_Management_Console
             this.lblVariable.TabIndex = 20;
             this.lblVariable.Text = "Variable Info:";
             // 
-            // txtReplace
+            // lblInstallInfo
             // 
-            this.txtReplace.Location = new System.Drawing.Point(75, 77);
-            this.txtReplace.Name = "txtReplace";
-            this.txtReplace.Size = new System.Drawing.Size(237, 20);
-            this.txtReplace.TabIndex = 22;
-            // 
-            // txtTarget
-            // 
-            this.txtTarget.Location = new System.Drawing.Point(75, 49);
-            this.txtTarget.Name = "txtTarget";
-            this.txtTarget.Size = new System.Drawing.Size(237, 20);
-            this.txtTarget.TabIndex = 21;
-            // 
-            // label23
-            // 
-            this.label23.AutoSize = true;
-            this.label23.Location = new System.Drawing.Point(13, 80);
-            this.label23.Name = "label23";
-            this.label23.Size = new System.Drawing.Size(50, 13);
-            this.label23.TabIndex = 20;
-            this.label23.Text = "Replace:";
-            // 
-            // label24
-            // 
-            this.label24.AutoSize = true;
-            this.label24.Location = new System.Drawing.Point(22, 52);
-            this.label24.Name = "label24";
-            this.label24.Size = new System.Drawing.Size(41, 13);
-            this.label24.TabIndex = 19;
-            this.label24.Text = "Target:";
+            this.lblInstallInfo.AutoSize = true;
+            this.lblInstallInfo.Location = new System.Drawing.Point(776, 141);
+            this.lblInstallInfo.Name = "lblInstallInfo";
+            this.lblInstallInfo.Size = new System.Drawing.Size(81, 13);
+            this.lblInstallInfo.TabIndex = 21;
+            this.lblInstallInfo.Text = "Installation Info:";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1264, 984);
+            this.Controls.Add(this.lblInstallInfo);
             this.Controls.Add(this.lblVariable);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.btnRescanFileSize);
@@ -872,6 +883,7 @@ namespace Lanstaller_Management_Console
         private System.Windows.Forms.TextBox txtTarget;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.Label lblInstallInfo;
     }
 }
 
