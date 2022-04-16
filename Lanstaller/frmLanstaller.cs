@@ -13,13 +13,14 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using Microsoft.VisualBasic;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace Lanstaller
 {
 
 
 
-    public partial class Form1 : Form
+    public partial class frmLanstaller : Form
     {
         List<SoftwareClass> SList; //List of Software.
         List<int> InstallList = new List<int>();
@@ -28,18 +29,23 @@ namespace Lanstaller
 
         Thread MThread; //Status Monitor Thread
         Thread CThread; //Chat Thread
+        Thread InsTrd; //installer thread.
 
         bool shutdown = false;
 
-        public Form1()
+        public frmLanstaller()
         {
             InitializeComponent();
         }
 
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void frmLanstaller_Load(object sender, EventArgs e)
         {
-            //testing
+            
+            //Hide progress bar.
+            pbInstall.Visible = false;
+
+            //Get list of installed programs.
             WindowsInstallerClass.CheckProgram();
 
 
@@ -60,14 +66,16 @@ namespace Lanstaller
             {
                 cmbxSoftware.Items.Add(Sw.Name);
             }
-
+            
+            //Start installation progress bar thread.
             MThread = new Thread(StatusMonitorThread);
             MThread.Start();
 
-
+            //Start Chat thread.
             CThread = new Thread(ChatThread);
             CThread.Start();
 
+            //Update list of tools.
             GetTools();
 
         }
@@ -104,21 +112,19 @@ namespace Lanstaller
         {
             while (shutdown == false)
             {
-                //Wait 300 ms before next update.
-                System.Threading.Thread.Sleep(100);
+                
+                lblStatus.Invoke((MethodInvoker)delegate
+                 {
+                     lblStatus.Text = SoftwareClass.GetStatus();
+                 });
 
-                try
+                pbInstall.Invoke((MethodInvoker)delegate
                 {
-                    lblStatus.Invoke((MethodInvoker)delegate
-                    {
-                        lblStatus.Text = SoftwareClass.GetStatus();
-                        pbInstall.Value = SoftwareClass.GetProgressPercentage();
-                    });
-                }
-                catch (Exception ex)
-                {
-                    return;
-                }
+                    pbInstall.Value = SoftwareClass.GetProgressPercentage();
+                });
+
+                //Wait 100 ms before next update.
+                System.Threading.Thread.Sleep(100);
 
             }
 
@@ -149,19 +155,12 @@ namespace Lanstaller
                 if (lastid != currentid)
                 {
                     currentid = lastid;
-                    try
-                    {
                         txtChatMessages.Invoke((MethodInvoker)delegate
                         {
                             txtChatMessages.Text = message;
                             txtChatMessages.SelectionStart = txtChatMessages.Text.Length;
                             txtChatMessages.ScrollToCaret();
                         });
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
                 }
                 Thread.Sleep(1000);
             }
@@ -197,7 +196,7 @@ namespace Lanstaller
             EnableInstallControls(false);
 
             //Run Installation.
-            Thread InsTrd = new Thread(InstallThread);
+            InsTrd = new Thread(InstallThread);
             InsTrd.Start();
 
 
@@ -217,7 +216,7 @@ namespace Lanstaller
             bool install_files = chkFiles.Checked;
             bool install_reg = chkRegistry.Checked;
             bool install_shortcut = chkShortcuts.Checked;
-            bool apply_firewallrules = chkFirewall.Checked;
+            bool apply_windowssettings = chkWindowsSettings.Checked;
             bool apply_preferences = chkPreferences.Checked;
             bool install_redist = chkRedist.Checked;
 
@@ -233,11 +232,16 @@ namespace Lanstaller
                 SoftwareClass.GetSerials(IDList);
             }
 
+            //Enable progress bar.
+            pbInstall.Invoke((MethodInvoker)delegate
+            {
+                pbInstall.Visible = true;
+            });
 
             //Run Through install list and install software.
             foreach (int index in InstallList)
             {
-                SoftwareClass.Install(SList[index], install_files, install_reg, install_shortcut, apply_firewallrules, apply_preferences, install_redist);
+                SoftwareClass.Install(SList[index], install_files, install_reg, install_shortcut, apply_windowssettings, apply_preferences, install_redist);
             }
 
             //Reset install list.
@@ -259,12 +263,16 @@ namespace Lanstaller
                 EnableInstallControls(true);
             });
 
-
+            pbInstall.Invoke((MethodInvoker)delegate
+            {
+                pbInstall.Visible = false;
+            });
 
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
+           
             if (cmbxSoftware.SelectedIndex == -1)
             {
                 MessageBox.Show("Nothing Selected");
@@ -319,8 +327,18 @@ namespace Lanstaller
             LanstallerSettings.SetUsername(txtUsername.Text);
         }
 
-        private void Form1_Closing(object sender, FormClosingEventArgs e)
+        private void frmLanstaller_Closing(object sender, FormClosingEventArgs e)
         {
+            //Shutdown Threads.
+            MThread.Abort();
+            CThread.Abort();
+            
+            if (InsTrd != null)
+            {
+                InsTrd.Abort();
+            }
+            
+
             shutdown = true;
         }
 
@@ -388,5 +406,34 @@ namespace Lanstaller
 
 
         }
+
+
+        public const int WM_NCLBUTTONDOWN = 0xA1;
+        public const int HT_CAPTION = 0x2;
+
+        [DllImportAttribute("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd,
+                         int Msg, int wParam, int lParam);
+        [DllImportAttribute("user32.dll")]
+        public static extern bool ReleaseCapture();
+
+        private void Caption_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                if ((e.Clicks == 1) && (this.WindowState != FormWindowState.Maximized))
+                {
+                    ReleaseCapture();
+                    SendMessage(this.Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+                }
+            }
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+      
     }
 }

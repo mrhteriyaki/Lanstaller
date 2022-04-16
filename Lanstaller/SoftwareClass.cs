@@ -77,7 +77,7 @@ namespace Lanstaller
             return idval;
         }
 
-        public static void Install(SoftwareClass SWI, bool installfiles, bool installregistry, bool installshortcuts, bool applyfirewallrules, bool apply_preferences, bool install_redist)
+        public static void Install(SoftwareClass SWI, bool installfiles, bool installregistry, bool installshortcuts, bool apply_windowssettings, bool apply_preferences, bool install_redist)
         {
             string ServerAddress = GetServers();
 
@@ -111,9 +111,11 @@ namespace Lanstaller
 
             SetStatus("Adding firewall rules - " + SWI.Name);
             //firewall rules.
-            if (applyfirewallrules)
+            if (apply_windowssettings)
             {
                 GenerateFirewallRules(SWI.id, SWI.Name);
+
+                GenerateCompatibility(SWI.id);
             }
 
             SetStatus("Applying Preferences - " + SWI.Name);
@@ -128,7 +130,7 @@ namespace Lanstaller
                 CheckRedistributables(SWI.id);
             }
 
-            SetStatus("Install Complete - " + SWI.Name);
+            SetStatus("Install Complete - " + Environment.NewLine + SWI.Name);
 
         }
 
@@ -252,8 +254,6 @@ namespace Lanstaller
         static void GenerateFirewallRules(int softwareid, string softwarename)
         {
             //Software name used for Windows Firewall rule.
-            FileCopyList.Clear();
-
             string QueryString = "select [filepath] from tblFirewallExceptions WHERE software_id = @softwareid";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
@@ -268,6 +268,27 @@ namespace Lanstaller
             }
 
             SQLConn.Close();
+        }
+
+        static void GenerateCompatibility(int softwareid)
+        {
+            //Set compatibility flags in registry.
+
+            string QueryString = "select filename,compat_type from tblCompatibility where software_id = @softwareid";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+
+            while (SQLOutput.Read())
+            {
+                AddCompatiblity(SQLOutput[0].ToString(), (int)SQLOutput[1]);
+            }
+
+            SQLConn.Close();
+
         }
 
         static void CheckRedistributables(int softwareid)
@@ -571,6 +592,18 @@ namespace Lanstaller
 
         }
 
+
+        public static void AddCompatiblity(string filename, int compat_type)
+        {
+            //compat_types:
+            if (compat_type == 1)
+            {
+                //1 = Run as admin.
+                Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers", true).SetValue(ReplaceVariable(filename), "~ RUNASADMIN");
+            }
+
+        }
+
         //Gets Serial Requirements for Queued Installs.
         public static void GetSerials(List<int> SoftwareIDList)
         {
@@ -607,7 +640,8 @@ namespace Lanstaller
 
                 frmSerial SF = new frmSerial();
                 SF.TopMost = true;
-                SF.Text = "Serial: " + SN.name;
+                SF.Text = "Serial Number Prompt";
+                SF.lblTitle.Text = "Input Serial Number for " + SN.name;
                 SF.FormBorderStyle = FormBorderStyle.FixedSingle;
 
                 if (!SN.regKey.Equals(""))
@@ -616,6 +650,7 @@ namespace Lanstaller
                 }
                 SF.ShowDialog();
 
+               
 
                 SN.serialnumber = SF.txtSerial.Text;
 
@@ -623,6 +658,8 @@ namespace Lanstaller
             }
 
         }
+
+       
 
         static void GetRegistry(int SoftwareID)
         {

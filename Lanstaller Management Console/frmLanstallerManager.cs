@@ -16,18 +16,18 @@ using Microsoft.Win32;
 
 namespace Lanstaller_Management_Console
 {
-    public partial class Form1 : Form
+    public partial class frmLanstallerMmanager : Form
     {
         int selectedsoftwareid = -1;
         List<SoftwareClass> SoftwareList = new List<SoftwareClass>();
         static string status = "Status: Ready";
 
-        public Form1()
+        public frmLanstallerMmanager()
         {
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void frmLanstallerMmanager_Load(object sender, EventArgs e)
         {
             lblVariable.Text = "%INSTALLPATH% = Base Install Directory (Default C:\\Games)" + Environment.NewLine + "%USERPROFILE% = User Profile Path (Default C:\\Users\\<Username>)" + Environment.NewLine + "%WIDTH% = Resolution Preference X" + Environment.NewLine + "%HEIGHT% = Resolution Preference Y" + Environment.NewLine + "%USERNAME% = Username Preference";
 
@@ -85,13 +85,13 @@ namespace Lanstaller_Management_Console
         {
             btnScan.Enabled = false;
             string scanfolder = txtScanfolder.Text;
-            lblFolderStatus.Text = "Status: Scanning";
             if (Pri.LongPath.Directory.Exists(scanfolder) == false)
             {
-                MessageBox.Show("Invalid directory");
+                MessageBox.Show("Scan Folder - Invalid");
+                btnScan.Enabled = true;
                 return;
             }
-
+            lblFolderStatus.Text = "Status: Scanning";
             filelist = Pri.LongPath.Directory.GetFiles(scanfolder, "*", System.IO.SearchOption.AllDirectories);
             lblFolderStatus.Text = "Status: Scanned Files: " + filelist.Count();
             btnAddFolder.Enabled = true;
@@ -210,7 +210,7 @@ namespace Lanstaller_Management_Console
 
 
             lblSource.Text = "Source: " + txtScanfolder.Text.Substring(txtServerShare.Text.Length);
-
+            UpdateLabels();
 
         }
 
@@ -348,7 +348,7 @@ namespace Lanstaller_Management_Console
             {
                 dest = "%INSTALLPATH%";
             }
-            lblDestination.Text = "Full Destination: " + dest + filename;
+            lblDestination.Text = "Client Install Path: " + dest + filename;
         }
 
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)

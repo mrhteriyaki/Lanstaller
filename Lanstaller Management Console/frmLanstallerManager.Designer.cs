@@ -1,7 +1,7 @@
 ﻿
 namespace Lanstaller_Management_Console
 {
-    partial class Form1
+    partial class frmLanstallerMmanager
     {
         /// <summary>
         /// Required designer variable.
@@ -98,6 +98,7 @@ namespace Lanstaller_Management_Console
             this.txtPrefFilePath = new System.Windows.Forms.TextBox();
             this.lblVariable = new System.Windows.Forms.Label();
             this.lblInstallInfo = new System.Windows.Forms.Label();
+            this.label25 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -136,16 +137,16 @@ namespace Lanstaller_Management_Console
             // 
             // txtScanfolder
             // 
-            this.txtScanfolder.Location = new System.Drawing.Point(75, 21);
+            this.txtScanfolder.Location = new System.Drawing.Point(83, 21);
             this.txtScanfolder.Name = "txtScanfolder";
-            this.txtScanfolder.Size = new System.Drawing.Size(481, 20);
+            this.txtScanfolder.Size = new System.Drawing.Size(476, 20);
             this.txtScanfolder.TabIndex = 3;
             this.txtScanfolder.TextChanged += new System.EventHandler(this.txtScanfolder_TextChanged);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 24);
+            this.label2.Location = new System.Drawing.Point(16, 24);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(67, 13);
             this.label2.TabIndex = 4;
@@ -154,7 +155,7 @@ namespace Lanstaller_Management_Console
             // lblFolderStatus
             // 
             this.lblFolderStatus.AutoSize = true;
-            this.lblFolderStatus.Location = new System.Drawing.Point(46, 205);
+            this.lblFolderStatus.Location = new System.Drawing.Point(54, 205);
             this.lblFolderStatus.Name = "lblFolderStatus";
             this.lblFolderStatus.Size = new System.Drawing.Size(40, 13);
             this.lblFolderStatus.TabIndex = 5;
@@ -162,6 +163,7 @@ namespace Lanstaller_Management_Console
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.label25);
             this.groupBox1.Controls.Add(this.btnAddFolder);
             this.groupBox1.Controls.Add(this.btnScan);
             this.groupBox1.Controls.Add(this.lblDestination);
@@ -208,7 +210,7 @@ namespace Lanstaller_Management_Console
             // lblDestination
             // 
             this.lblDestination.AutoSize = true;
-            this.lblDestination.Location = new System.Drawing.Point(4, 180);
+            this.lblDestination.Location = new System.Drawing.Point(12, 180);
             this.lblDestination.Name = "lblDestination";
             this.lblDestination.Size = new System.Drawing.Size(82, 13);
             this.lblDestination.TabIndex = 16;
@@ -217,7 +219,7 @@ namespace Lanstaller_Management_Console
             // lblFilename
             // 
             this.lblFilename.AutoSize = true;
-            this.lblFilename.Location = new System.Drawing.Point(34, 165);
+            this.lblFilename.Location = new System.Drawing.Point(42, 165);
             this.lblFilename.Name = "lblFilename";
             this.lblFilename.Size = new System.Drawing.Size(52, 13);
             this.lblFilename.TabIndex = 15;
@@ -226,7 +228,7 @@ namespace Lanstaller_Management_Console
             // lblSource
             // 
             this.lblSource.AutoSize = true;
-            this.lblSource.Location = new System.Drawing.Point(42, 150);
+            this.lblSource.Location = new System.Drawing.Point(50, 150);
             this.lblSource.Name = "lblSource";
             this.lblSource.Size = new System.Drawing.Size(44, 13);
             this.lblSource.TabIndex = 14;
@@ -234,16 +236,16 @@ namespace Lanstaller_Management_Console
             // 
             // txtBaseFolder
             // 
-            this.txtBaseFolder.Location = new System.Drawing.Point(75, 44);
+            this.txtBaseFolder.Location = new System.Drawing.Point(83, 44);
             this.txtBaseFolder.Name = "txtBaseFolder";
-            this.txtBaseFolder.Size = new System.Drawing.Size(481, 20);
+            this.txtBaseFolder.Size = new System.Drawing.Size(476, 20);
             this.txtBaseFolder.TabIndex = 12;
             this.txtBaseFolder.TextChanged += new System.EventHandler(this.txtBaseFolder_TextChanged);
             // 
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(8, 47);
+            this.label16.Location = new System.Drawing.Point(16, 47);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(66, 13);
             this.label16.TabIndex = 13;
@@ -252,7 +254,7 @@ namespace Lanstaller_Management_Console
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(-5, 96);
+            this.label4.Location = new System.Drawing.Point(3, 96);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(72, 13);
             this.label4.TabIndex = 11;
@@ -260,16 +262,16 @@ namespace Lanstaller_Management_Console
             // 
             // txtServerShare
             // 
-            this.txtServerShare.Location = new System.Drawing.Point(71, 93);
+            this.txtServerShare.Location = new System.Drawing.Point(79, 93);
             this.txtServerShare.Name = "txtServerShare";
-            this.txtServerShare.Size = new System.Drawing.Size(481, 20);
+            this.txtServerShare.Size = new System.Drawing.Size(302, 20);
             this.txtServerShare.TabIndex = 10;
             this.txtServerShare.TextChanged += new System.EventHandler(this.txtServerShare_TextChanged);
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(4, 120);
+            this.label3.Location = new System.Drawing.Point(12, 120);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(63, 13);
             this.label3.TabIndex = 8;
@@ -277,9 +279,9 @@ namespace Lanstaller_Management_Console
             // 
             // txtDestination
             // 
-            this.txtDestination.Location = new System.Drawing.Point(71, 117);
+            this.txtDestination.Location = new System.Drawing.Point(79, 117);
             this.txtDestination.Name = "txtDestination";
-            this.txtDestination.Size = new System.Drawing.Size(481, 20);
+            this.txtDestination.Size = new System.Drawing.Size(480, 20);
             this.txtDestination.TabIndex = 7;
             this.txtDestination.TextChanged += new System.EventHandler(this.txtDestination_TextChanged);
             // 
@@ -776,7 +778,16 @@ namespace Lanstaller_Management_Console
             this.lblInstallInfo.TabIndex = 21;
             this.lblInstallInfo.Text = "Installation Info:";
             // 
-            // Form1
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(387, 96);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(146, 13);
+            this.label25.TabIndex = 22;
+            this.label25.Text = "(Base share location of Scan)";
+            // 
+            // frmLanstallerMmanager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -793,9 +804,9 @@ namespace Lanstaller_Management_Console
             this.Controls.Add(this.btnNew);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lbxSoftware);
-            this.Name = "Form1";
+            this.Name = "frmLanstallerMmanager";
             this.Text = "Lanstaller Management";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Load += new System.EventHandler(this.frmLanstallerMmanager_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -884,6 +895,7 @@ namespace Lanstaller_Management_Console
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label24;
         private System.Windows.Forms.Label lblInstallInfo;
+        private System.Windows.Forms.Label label25;
     }
 }
 
