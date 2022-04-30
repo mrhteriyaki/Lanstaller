@@ -257,7 +257,7 @@ namespace Lanstaller
             CF.TopMost = true;
             CF.FormBorderStyle = FormBorderStyle.None;
             CF.ShowDialog();
-
+            
             btnInstall.Invoke((MethodInvoker)delegate
             {
                 EnableInstallControls(true);
@@ -434,6 +434,9 @@ namespace Lanstaller
             this.Close();
         }
 
-      
+        private void OnPaint(object sender, PaintEventArgs e)
+        {
+            ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.White, ButtonBorderStyle.Solid);
+        }
     }
 }

@@ -164,5 +164,8 @@
   <ItemGroup>
     <None Include="Lanstaller.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="LanstallerThin.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

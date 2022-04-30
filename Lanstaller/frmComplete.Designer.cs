@@ -56,6 +56,7 @@ namespace Lanstaller
             this.ClientSize = new System.Drawing.Size(433, 110);
             this.Controls.Add(this.button1);
             this.Name = "frmComplete";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Install Complete";
             this.ResumeLayout(false);
 

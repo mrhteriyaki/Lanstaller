@@ -562,19 +562,33 @@ namespace Lanstaller
 
             }
 
-            int statuscount = 0;
+            int copycount = 0;
             long bytecounter = 0;
             //Copy Files.
-            foreach (FileCopyOperation FCO in FileCopyList)
+            while (copycount < FileCopyList.Count)
             {
-                Pri.LongPath.File.Copy(FCO.source, FCO.destination, true);
-                statuscount++;
-                SetStatus("Installing: " + softwarename + Environment.NewLine + "Copying Files:" + statuscount + " / " + FileCopyList.Count);
+                FileCopyOperation FCO = FileCopyList[copycount];
+                int copycount2 = (copycount + 1);
+                SetStatus("Installing: " + softwarename + Environment.NewLine + "Copying Files:" + copycount2 + " / " + FileCopyList.Count);
+                try
+                {
+                    Pri.LongPath.File.Copy(FCO.source, FCO.destination, true);
+                    copycount++;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Failure to copy file:" + FCO.source + Environment.NewLine + "TO:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
+                    SetStatus("Error:" + ex.ToString());
+                    return; //Exit - terminate.
+                }
 
+                
                 bytecounter += FCO.size;
                 SetProgress(bytecounter);
-                //Provision for hashing has been put into database table.
+
+               //Provision for hashing has been put into database table.
             }
+
         }
 
 
@@ -646,7 +660,14 @@ namespace Lanstaller
 
                 if (!SN.regKey.Equals(""))
                 {
-                    SF.txtSerial.Text = Microsoft.Win32.Registry.GetValue(SN.regKey, SN.regVal, "").ToString();
+                    try
+                    {
+                        SF.txtSerial.Text = Microsoft.Win32.Registry.GetValue(SN.regKey, SN.regVal, "").ToString();
+                    }catch (Exception ex)
+                    {
+                        //occurs on null exception due to missing key.
+                    }
+                    
                 }
                 SF.ShowDialog();
 
