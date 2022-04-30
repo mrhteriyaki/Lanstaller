@@ -45,7 +45,6 @@ namespace Lanstaller
             this.chkFiles = new System.Windows.Forms.CheckBox();
             this.gbxPref = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.txtHeight = new System.Windows.Forms.TextBox();
             this.txtWidth = new System.Windows.Forms.TextBox();
@@ -55,23 +54,22 @@ namespace Lanstaller
             this.pbInstall = new System.Windows.Forms.ProgressBar();
             this.lblStatus = new System.Windows.Forms.Label();
             this.txtChatMessages = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.txtChatSendMessage = new System.Windows.Forms.TextBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.btnOpenTool = new System.Windows.Forms.Button();
             this.cmbxTool = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
             this.lblSpaceRequired = new System.Windows.Forms.Label();
-            this.PBtitlebar = new System.Windows.Forms.PictureBox();
+            this.pbTitleExpanded = new System.Windows.Forms.PictureBox();
             this.btnExit = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pbTitle = new System.Windows.Forms.PictureBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.gbxActions.SuspendLayout();
             this.gbxPref.SuspendLayout();
             this.gbxStatus.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PBtitlebar)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbTitleExpanded)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbTitle)).BeginInit();
             this.SuspendLayout();
             // 
             // cmbxSoftware
@@ -101,9 +99,9 @@ namespace Lanstaller
             this.btnInstall.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnInstall.ForeColor = System.Drawing.Color.White;
-            this.btnInstall.Location = new System.Drawing.Point(446, 184);
+            this.btnInstall.Location = new System.Drawing.Point(446, 189);
             this.btnInstall.Name = "btnInstall";
-            this.btnInstall.Size = new System.Drawing.Size(174, 138);
+            this.btnInstall.Size = new System.Drawing.Size(174, 139);
             this.btnInstall.TabIndex = 2;
             this.btnInstall.Text = "Install";
             this.btnInstall.UseVisualStyleBackColor = true;
@@ -113,7 +111,7 @@ namespace Lanstaller
             // 
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdd.ForeColor = System.Drawing.Color.White;
-            this.btnAdd.Location = new System.Drawing.Point(10, 203);
+            this.btnAdd.Location = new System.Drawing.Point(11, 203);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(111, 26);
             this.btnAdd.TabIndex = 3;
@@ -125,7 +123,7 @@ namespace Lanstaller
             // 
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClear.ForeColor = System.Drawing.Color.White;
-            this.btnClear.Location = new System.Drawing.Point(127, 203);
+            this.btnClear.Location = new System.Drawing.Point(128, 203);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(111, 26);
             this.btnClear.TabIndex = 4;
@@ -162,7 +160,7 @@ namespace Lanstaller
             this.gbxActions.Controls.Add(this.chkRegistry);
             this.gbxActions.Controls.Add(this.chkFiles);
             this.gbxActions.ForeColor = System.Drawing.Color.White;
-            this.gbxActions.Location = new System.Drawing.Point(319, 178);
+            this.gbxActions.Location = new System.Drawing.Point(319, 183);
             this.gbxActions.Name = "gbxActions";
             this.gbxActions.Size = new System.Drawing.Size(121, 146);
             this.gbxActions.TabIndex = 8;
@@ -250,45 +248,33 @@ namespace Lanstaller
             // gbxPref
             // 
             this.gbxPref.Controls.Add(this.label5);
-            this.gbxPref.Controls.Add(this.label4);
             this.gbxPref.Controls.Add(this.label3);
             this.gbxPref.Controls.Add(this.txtHeight);
             this.gbxPref.Controls.Add(this.txtWidth);
             this.gbxPref.Controls.Add(this.label2);
             this.gbxPref.Controls.Add(this.txtUsername);
             this.gbxPref.ForeColor = System.Drawing.Color.White;
-            this.gbxPref.Location = new System.Drawing.Point(319, 94);
+            this.gbxPref.Location = new System.Drawing.Point(319, 103);
             this.gbxPref.Name = "gbxPref";
-            this.gbxPref.Size = new System.Drawing.Size(301, 84);
+            this.gbxPref.Size = new System.Drawing.Size(301, 74);
             this.gbxPref.TabIndex = 9;
             this.gbxPref.TabStop = false;
-            this.gbxPref.Text = "User Preferences";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
             this.label5.ForeColor = System.Drawing.Color.White;
-            this.label5.Location = new System.Drawing.Point(109, 55);
+            this.label5.Location = new System.Drawing.Point(183, 48);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(41, 13);
+            this.label5.Size = new System.Drawing.Size(14, 13);
             this.label5.TabIndex = 6;
-            this.label5.Text = "Height:";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.ForeColor = System.Drawing.Color.White;
-            this.label4.Location = new System.Drawing.Point(7, 55);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(38, 13);
-            this.label4.TabIndex = 5;
-            this.label4.Text = "Width:";
+            this.label5.Text = "X";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location = new System.Drawing.Point(6, 36);
+            this.label3.Location = new System.Drawing.Point(24, 48);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(97, 13);
             this.label3.TabIndex = 4;
@@ -298,7 +284,7 @@ namespace Lanstaller
             // 
             this.txtHeight.BackColor = System.Drawing.Color.Black;
             this.txtHeight.ForeColor = System.Drawing.Color.White;
-            this.txtHeight.Location = new System.Drawing.Point(156, 52);
+            this.txtHeight.Location = new System.Drawing.Point(197, 45);
             this.txtHeight.Name = "txtHeight";
             this.txtHeight.Size = new System.Drawing.Size(55, 20);
             this.txtHeight.TabIndex = 3;
@@ -308,7 +294,7 @@ namespace Lanstaller
             // 
             this.txtWidth.BackColor = System.Drawing.Color.Black;
             this.txtWidth.ForeColor = System.Drawing.Color.White;
-            this.txtWidth.Location = new System.Drawing.Point(48, 52);
+            this.txtWidth.Location = new System.Drawing.Point(127, 45);
             this.txtWidth.Name = "txtWidth";
             this.txtWidth.Size = new System.Drawing.Size(55, 20);
             this.txtWidth.TabIndex = 2;
@@ -318,7 +304,7 @@ namespace Lanstaller
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.White;
-            this.label2.Location = new System.Drawing.Point(6, 16);
+            this.label2.Location = new System.Drawing.Point(63, 21);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(58, 13);
             this.label2.TabIndex = 1;
@@ -328,9 +314,9 @@ namespace Lanstaller
             // 
             this.txtUsername.BackColor = System.Drawing.Color.Black;
             this.txtUsername.ForeColor = System.Drawing.Color.White;
-            this.txtUsername.Location = new System.Drawing.Point(66, 14);
+            this.txtUsername.Location = new System.Drawing.Point(127, 19);
             this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(229, 20);
+            this.txtUsername.Size = new System.Drawing.Size(125, 20);
             this.txtUsername.TabIndex = 0;
             this.txtUsername.TextChanged += new System.EventHandler(this.txtUsername_TextChanged);
             // 
@@ -339,9 +325,9 @@ namespace Lanstaller
             this.gbxStatus.Controls.Add(this.pbInstall);
             this.gbxStatus.Controls.Add(this.lblStatus);
             this.gbxStatus.ForeColor = System.Drawing.Color.White;
-            this.gbxStatus.Location = new System.Drawing.Point(319, 326);
+            this.gbxStatus.Location = new System.Drawing.Point(319, 331);
             this.gbxStatus.Name = "gbxStatus";
-            this.gbxStatus.Size = new System.Drawing.Size(301, 95);
+            this.gbxStatus.Size = new System.Drawing.Size(301, 90);
             this.gbxStatus.TabIndex = 10;
             this.gbxStatus.TabStop = false;
             this.gbxStatus.Text = "Install Status:";
@@ -349,9 +335,9 @@ namespace Lanstaller
             // pbInstall
             // 
             this.pbInstall.Enabled = false;
-            this.pbInstall.Location = new System.Drawing.Point(6, 48);
+            this.pbInstall.Location = new System.Drawing.Point(5, 54);
             this.pbInstall.Name = "pbInstall";
-            this.pbInstall.Size = new System.Drawing.Size(289, 40);
+            this.pbInstall.Size = new System.Drawing.Size(289, 30);
             this.pbInstall.TabIndex = 1;
             // 
             // lblStatus
@@ -367,54 +353,30 @@ namespace Lanstaller
             // 
             this.txtChatMessages.BackColor = System.Drawing.Color.Black;
             this.txtChatMessages.ForeColor = System.Drawing.Color.White;
-            this.txtChatMessages.Location = new System.Drawing.Point(6, 19);
+            this.txtChatMessages.Location = new System.Drawing.Point(626, 108);
             this.txtChatMessages.Multiline = true;
             this.txtChatMessages.Name = "txtChatMessages";
             this.txtChatMessages.ReadOnly = true;
             this.txtChatMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtChatMessages.Size = new System.Drawing.Size(278, 276);
+            this.txtChatMessages.Size = new System.Drawing.Size(288, 286);
             this.txtChatMessages.TabIndex = 11;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.txtChatSendMessage);
-            this.groupBox1.Controls.Add(this.txtChatMessages);
-            this.groupBox1.ForeColor = System.Drawing.Color.White;
-            this.groupBox1.Location = new System.Drawing.Point(623, 94);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(290, 327);
-            this.groupBox1.TabIndex = 12;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Chat";
             // 
             // txtChatSendMessage
             // 
             this.txtChatSendMessage.BackColor = System.Drawing.Color.Black;
             this.txtChatSendMessage.ForeColor = System.Drawing.Color.White;
-            this.txtChatSendMessage.Location = new System.Drawing.Point(6, 301);
+            this.txtChatSendMessage.Location = new System.Drawing.Point(626, 400);
             this.txtChatSendMessage.Name = "txtChatSendMessage";
-            this.txtChatSendMessage.Size = new System.Drawing.Size(278, 20);
+            this.txtChatSendMessage.Size = new System.Drawing.Size(288, 20);
             this.txtChatSendMessage.TabIndex = 12;
             this.txtChatSendMessage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtChatSendMessage_KeyUp);
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.btnOpenTool);
-            this.groupBox2.Controls.Add(this.cmbxTool);
-            this.groupBox2.ForeColor = System.Drawing.Color.White;
-            this.groupBox2.Location = new System.Drawing.Point(11, 373);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(301, 48);
-            this.groupBox2.TabIndex = 14;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Tools:";
             // 
             // btnOpenTool
             // 
             this.btnOpenTool.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnOpenTool.Location = new System.Drawing.Point(220, 17);
+            this.btnOpenTool.Location = new System.Drawing.Point(238, 388);
             this.btnOpenTool.Name = "btnOpenTool";
-            this.btnOpenTool.Size = new System.Drawing.Size(75, 23);
+            this.btnOpenTool.Size = new System.Drawing.Size(75, 32);
             this.btnOpenTool.TabIndex = 1;
             this.btnOpenTool.Text = "Open";
             this.btnOpenTool.UseVisualStyleBackColor = true;
@@ -425,16 +387,16 @@ namespace Lanstaller
             this.cmbxTool.BackColor = System.Drawing.Color.Black;
             this.cmbxTool.ForeColor = System.Drawing.Color.White;
             this.cmbxTool.FormattingEnabled = true;
-            this.cmbxTool.Location = new System.Drawing.Point(6, 19);
+            this.cmbxTool.Location = new System.Drawing.Point(11, 393);
             this.cmbxTool.Name = "cmbxTool";
-            this.cmbxTool.Size = new System.Drawing.Size(208, 21);
+            this.cmbxTool.Size = new System.Drawing.Size(220, 21);
             this.cmbxTool.TabIndex = 0;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.Color.White;
-            this.label6.Location = new System.Drawing.Point(8, 187);
+            this.label6.Location = new System.Drawing.Point(9, 185);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(111, 13);
             this.label6.TabIndex = 15;
@@ -450,18 +412,17 @@ namespace Lanstaller
             this.lblSpaceRequired.TabIndex = 16;
             this.lblSpaceRequired.Text = "Space Required:";
             // 
-            // PBtitlebar
+            // pbTitleExpanded
             // 
-            this.PBtitlebar.BackColor = System.Drawing.Color.Transparent;
-            this.PBtitlebar.ErrorImage = null;
-            this.PBtitlebar.InitialImage = null;
-            this.PBtitlebar.Location = new System.Drawing.Point(7, 4);
-            this.PBtitlebar.Name = "PBtitlebar";
-            this.PBtitlebar.Size = new System.Drawing.Size(922, 22);
-            this.PBtitlebar.TabIndex = 17;
-            this.PBtitlebar.TabStop = false;
-            this.PBtitlebar.Visible = false;
-            this.PBtitlebar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Caption_MouseDown);
+            this.pbTitleExpanded.BackColor = System.Drawing.Color.Transparent;
+            this.pbTitleExpanded.ErrorImage = null;
+            this.pbTitleExpanded.InitialImage = null;
+            this.pbTitleExpanded.Location = new System.Drawing.Point(-12, -9);
+            this.pbTitleExpanded.Name = "pbTitleExpanded";
+            this.pbTitleExpanded.Size = new System.Drawing.Size(941, 99);
+            this.pbTitleExpanded.TabIndex = 17;
+            this.pbTitleExpanded.TabStop = false;
+            this.pbTitleExpanded.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Caption_MouseDown);
             // 
             // btnExit
             // 
@@ -476,17 +437,47 @@ namespace Lanstaller
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
-            // pictureBox1
+            // pbTitle
             // 
-            this.pictureBox1.BackgroundImage = global::Lanstaller.Properties.Resources.LanstallerThin;
-            this.pictureBox1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox1.InitialImage = null;
-            this.pictureBox1.Location = new System.Drawing.Point(8, 7);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(886, 83);
-            this.pictureBox1.TabIndex = 7;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Caption_MouseDown);
+            this.pbTitle.BackgroundImage = global::Lanstaller.Properties.Resources.LanstallerThin;
+            this.pbTitle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.pbTitle.InitialImage = null;
+            this.pbTitle.Location = new System.Drawing.Point(8, 7);
+            this.pbTitle.Name = "pbTitle";
+            this.pbTitle.Size = new System.Drawing.Size(886, 83);
+            this.pbTitle.TabIndex = 7;
+            this.pbTitle.TabStop = false;
+            this.pbTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Caption_MouseDown);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.ForeColor = System.Drawing.Color.White;
+            this.label4.Location = new System.Drawing.Point(624, 94);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(32, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Chat:";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.ForeColor = System.Drawing.Color.White;
+            this.label7.Location = new System.Drawing.Point(8, 378);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(36, 13);
+            this.label7.TabIndex = 19;
+            this.label7.Text = "Tools:";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.ForeColor = System.Drawing.Color.White;
+            this.label8.Location = new System.Drawing.Point(316, 93);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(92, 13);
+            this.label8.TabIndex = 20;
+            this.label8.Text = "User Preferences:";
             // 
             // frmLanstaller
             // 
@@ -494,23 +485,28 @@ namespace Lanstaller
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(920, 426);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.btnOpenTool);
+            this.Controls.Add(this.cmbxTool);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.txtChatSendMessage);
+            this.Controls.Add(this.txtChatMessages);
             this.Controls.Add(this.btnExit);
-            this.Controls.Add(this.PBtitlebar);
+            this.Controls.Add(this.pbTitle);
             this.Controls.Add(this.lblSpaceRequired);
             this.Controls.Add(this.label6);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.gbxStatus);
             this.Controls.Add(this.gbxPref);
             this.Controls.Add(this.gbxActions);
             this.Controls.Add(this.lbxInstallList);
-            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtInstallDirectory);
             this.Controls.Add(this.btnClear);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.btnInstall);
             this.Controls.Add(this.cmbxSoftware);
+            this.Controls.Add(this.pbTitleExpanded);
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "frmLanstaller";
@@ -524,11 +520,8 @@ namespace Lanstaller
             this.gbxPref.PerformLayout();
             this.gbxStatus.ResumeLayout(false);
             this.gbxStatus.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.PBtitlebar)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbTitleExpanded)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbTitle)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -543,7 +536,7 @@ namespace Lanstaller
         private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.TextBox txtInstallDirectory;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pbTitle;
         private System.Windows.Forms.GroupBox gbxActions;
         private System.Windows.Forms.CheckBox chkPreferences;
         private System.Windows.Forms.CheckBox chkShortcuts;
@@ -551,7 +544,6 @@ namespace Lanstaller
         private System.Windows.Forms.CheckBox chkFiles;
         private System.Windows.Forms.GroupBox gbxPref;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtHeight;
         private System.Windows.Forms.TextBox txtWidth;
@@ -560,9 +552,7 @@ namespace Lanstaller
         private System.Windows.Forms.GroupBox gbxStatus;
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.TextBox txtChatMessages;
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TextBox txtChatSendMessage;
-        private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button btnOpenTool;
         private System.Windows.Forms.ComboBox cmbxTool;
         private System.Windows.Forms.Label label6;
@@ -570,8 +560,11 @@ namespace Lanstaller
         private System.Windows.Forms.CheckBox chkWindowsSettings;
         private System.Windows.Forms.ProgressBar pbInstall;
         private System.Windows.Forms.CheckBox chkRedist;
-        private System.Windows.Forms.PictureBox PBtitlebar;
+        private System.Windows.Forms.PictureBox pbTitleExpanded;
         private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
     }
 }
 

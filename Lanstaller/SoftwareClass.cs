@@ -99,7 +99,7 @@ namespace Lanstaller
                 InstallSize = GetInstallSize(SWI.id);
 
                 SetStatus("Copying Files - " + SWI.Name);
-                GenerateFiles(SWI.Name);
+                CopyFiles(SWI.Name);
             }
 
             if (installshortcuts)
@@ -508,7 +508,7 @@ namespace Lanstaller
         }
 
 
-        static void GenerateFiles(string softwarename)
+        static void CopyFiles(string softwarename)
         {
             //Generate Directories.
             List<string> DirectoryList = new List<string>();

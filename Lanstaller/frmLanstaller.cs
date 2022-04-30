@@ -162,7 +162,7 @@ namespace Lanstaller
                             txtChatMessages.ScrollToCaret();
                         });
                 }
-                Thread.Sleep(1000);
+                Thread.Sleep(300);
             }
 
 
@@ -438,5 +438,7 @@ namespace Lanstaller
         {
             ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.White, ButtonBorderStyle.Solid);
         }
+
+      
     }
 }
