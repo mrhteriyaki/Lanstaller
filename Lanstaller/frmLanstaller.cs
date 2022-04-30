@@ -41,7 +41,9 @@ namespace Lanstaller
 
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
-            
+            btnInstall.Text = "Start" + Environment.NewLine + "Install";
+            lblSpaceRequired.Text = "";
+
             //Hide progress bar.
             pbInstall.Visible = false;
 
@@ -172,9 +174,39 @@ namespace Lanstaller
         void EnableInstallControls(bool state)
         {
             btnInstall.Enabled = state;
+            btnInstall.Visible = state;
+            
             btnAdd.Enabled = state;
+            btnAdd.Visible = state;
+
             btnClear.Enabled = state;
-        }
+            btnClear.Visible = state;
+
+            lbxInstallList.Enabled = state;
+
+            /*
+            chkFiles.Enabled = state;
+            chkRegistry.Enabled = state;
+            chkShortcuts.Enabled = state;
+            chkPreferences.Enabled = state;
+            chkWindowsSettings.Enabled = state;
+            chkRedist.Enabled = state;
+            */
+
+            if (state == false)
+            {
+                //Install running.
+                lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y - 30);
+                lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height + 30);
+            }
+            else if (state == true)
+            {
+                //install normal.
+                lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y + 30);
+                lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height - 30);
+            }
+
+       }
 
 
         private void btnInstall_Click(object sender, EventArgs e)
@@ -329,17 +361,18 @@ namespace Lanstaller
 
         private void frmLanstaller_Closing(object sender, FormClosingEventArgs e)
         {
+            shutdown = true;
             //Shutdown Threads.
             MThread.Abort();
             CThread.Abort();
-            
+
             if (InsTrd != null)
             {
                 InsTrd.Abort();
             }
             
 
-            shutdown = true;
+            
         }
 
         private void btnOpenTool_Click(object sender, EventArgs e)
@@ -437,6 +470,32 @@ namespace Lanstaller
         private void OnPaint(object sender, PaintEventArgs e)
         {
             ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.White, ButtonBorderStyle.Solid);
+        }
+
+       
+
+        private void cmbxTool_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.F12)
+            {
+                string debuginfo = "Debug Info: ";
+
+                if (InsTrd == null)
+                { 
+                    debuginfo = "Installer Thread status: not initalised"; //null reference - no install started.
+                }
+                else if (InsTrd.IsAlive)
+                {
+                    debuginfo += "Installer Thread status: alive"; //install thread running.
+                }
+                else
+                {
+                    debuginfo += "Installer Thread status: not running"; //thread not running / crashed.
+                }
+
+                MessageBox.Show(debuginfo);
+
+            }
         }
 
       

@@ -91,7 +91,7 @@ namespace Lanstaller
             this.lbxInstallList.FormattingEnabled = true;
             this.lbxInstallList.Location = new System.Drawing.Point(11, 235);
             this.lbxInstallList.Name = "lbxInstallList";
-            this.lbxInstallList.Size = new System.Drawing.Size(302, 134);
+            this.lbxInstallList.Size = new System.Drawing.Size(302, 147);
             this.lbxInstallList.TabIndex = 1;
             // 
             // btnInstall
@@ -103,7 +103,6 @@ namespace Lanstaller
             this.btnInstall.Name = "btnInstall";
             this.btnInstall.Size = new System.Drawing.Size(174, 139);
             this.btnInstall.TabIndex = 2;
-            this.btnInstall.Text = "Install";
             this.btnInstall.UseVisualStyleBackColor = true;
             this.btnInstall.Click += new System.EventHandler(this.btnInstall_Click);
             // 
@@ -111,7 +110,7 @@ namespace Lanstaller
             // 
             this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAdd.ForeColor = System.Drawing.Color.White;
-            this.btnAdd.Location = new System.Drawing.Point(11, 203);
+            this.btnAdd.Location = new System.Drawing.Point(11, 183);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(111, 26);
             this.btnAdd.TabIndex = 3;
@@ -123,7 +122,7 @@ namespace Lanstaller
             // 
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClear.ForeColor = System.Drawing.Color.White;
-            this.btnClear.Location = new System.Drawing.Point(128, 203);
+            this.btnClear.Location = new System.Drawing.Point(128, 183);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(111, 26);
             this.btnClear.TabIndex = 4;
@@ -173,7 +172,7 @@ namespace Lanstaller
             this.chkRedist.Checked = true;
             this.chkRedist.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkRedist.ForeColor = System.Drawing.Color.White;
-            this.chkRedist.Location = new System.Drawing.Point(5, 118);
+            this.chkRedist.Location = new System.Drawing.Point(5, 120);
             this.chkRedist.Name = "chkRedist";
             this.chkRedist.Size = new System.Drawing.Size(101, 17);
             this.chkRedist.TabIndex = 5;
@@ -343,7 +342,7 @@ namespace Lanstaller
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(5, 15);
+            this.lblStatus.Location = new System.Drawing.Point(5, 13);
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(74, 13);
             this.lblStatus.TabIndex = 0;
@@ -387,16 +386,17 @@ namespace Lanstaller
             this.cmbxTool.BackColor = System.Drawing.Color.Black;
             this.cmbxTool.ForeColor = System.Drawing.Color.White;
             this.cmbxTool.FormattingEnabled = true;
-            this.cmbxTool.Location = new System.Drawing.Point(11, 393);
+            this.cmbxTool.Location = new System.Drawing.Point(11, 399);
             this.cmbxTool.Name = "cmbxTool";
             this.cmbxTool.Size = new System.Drawing.Size(220, 21);
             this.cmbxTool.TabIndex = 0;
+            this.cmbxTool.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbxTool_KeyDown);
             // 
             // label6
             // 
             this.label6.AutoSize = true;
             this.label6.ForeColor = System.Drawing.Color.White;
-            this.label6.Location = new System.Drawing.Point(9, 185);
+            this.label6.Location = new System.Drawing.Point(11, 215);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(111, 13);
             this.label6.TabIndex = 15;
@@ -463,7 +463,7 @@ namespace Lanstaller
             // 
             this.label7.AutoSize = true;
             this.label7.ForeColor = System.Drawing.Color.White;
-            this.label7.Location = new System.Drawing.Point(8, 378);
+            this.label7.Location = new System.Drawing.Point(8, 385);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(36, 13);
             this.label7.TabIndex = 19;

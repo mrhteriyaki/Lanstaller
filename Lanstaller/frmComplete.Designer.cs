@@ -58,6 +58,8 @@ namespace Lanstaller
             this.Name = "frmComplete";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Install Complete";
+            this.Load += new System.EventHandler(this.frmComplete_Load);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.OnPaint);
             this.ResumeLayout(false);
 
         }

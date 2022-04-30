@@ -96,10 +96,12 @@ namespace Lanstaller
             {
                 SetStatus("Indexing - " + SWI.Name);
                 GetFiles(SWI.id, ServerAddress);
+
+                InstalledSize = 0; //reset install size.
                 InstallSize = GetInstallSize(SWI.id);
 
                 SetStatus("Copying Files - " + SWI.Name);
-                CopyFiles(SWI.Name);
+                CopyFiles(SWI.id);
             }
 
             if (installshortcuts)
@@ -130,7 +132,7 @@ namespace Lanstaller
                 CheckRedistributables(SWI.id);
             }
 
-            SetStatus("Install Complete - " + Environment.NewLine + SWI.Name);
+            SetStatus("Install Complete:" + Environment.NewLine + SWI.Name);
 
         }
 
@@ -139,7 +141,7 @@ namespace Lanstaller
         {
             lock (_statuslock)
             {
-                status = "Status: " + message;
+                status = "Status: " + message.Replace("&","&&");
 
             }
         }
@@ -190,11 +192,28 @@ namespace Lanstaller
 
         }
 
+        static string GetSoftwareName(int softwareid)
+        {
+            //ServerList.Clear();
+            string QueryString = "SELECT TOP(1) [name] FROM [tblSoftware] WHERE id = @sid";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("sid", softwareid);
+            string softwarename = SQLCmd.ExecuteScalar().ToString();
+
+            SQLConn.Close();
+
+            return softwarename;
+
+        }
+
         static void GetFiles(int softwareid, string ServerAddress)
         {
             FileCopyList.Clear();
 
-            string QueryString = "select [filename],[source],[destination],[filesize] from tblFiles WHERE software_id = @softwareid";
+            string QueryString = "select [filename],[source],[destination],[filesize] from tblFiles WHERE software_id = @softwareid ORDER BY filesize ASC";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -508,8 +527,16 @@ namespace Lanstaller
         }
 
 
-        static void CopyFiles(string softwarename)
+        static void CopyFiles(int softwareid)
         {
+            //Get Software Name.
+            string softwarename = GetSoftwareName(softwareid);
+            
+            //Calculate total copy size.
+            long totalbytes = GetInstallSize(softwareid);
+            double totalgbytes = (double)totalbytes / 1073741824;
+
+
             //Generate Directories.
             List<string> DirectoryList = new List<string>();
             foreach (FileCopyOperation FCO in FileCopyList)
@@ -569,11 +596,34 @@ namespace Lanstaller
             {
                 FileCopyOperation FCO = FileCopyList[copycount];
                 int copycount2 = (copycount + 1);
-                SetStatus("Installing: " + softwarename + Environment.NewLine + "Copying Files:" + copycount2 + " / " + FileCopyList.Count);
+
+                //double mbfilesize = (double)FCO.size / 1048576;
+                double gbsize = (double)bytecounter / 1073741824;
+
+                string sizestring = "";
+                if (FCO.size > 1073741824) //Larger than 1GB.
+                {
+                    double currentgbsize = (double)FCO.size / 1073741824;
+                    sizestring = " (Current File Size " + Math.Round(currentgbsize, 2).ToString() + "GB)";
+                }
+                else if (FCO.size > 1048576) //larger than 1MB
+                {
+                    double currentmbsize = (double)FCO.size / 1048576;
+                    sizestring = " (Current File Size " +  Math.Round(currentmbsize,0).ToString() + "MB)";
+                }
+
+                SetStatus("Installing: " + softwarename + Environment.NewLine + 
+                    "Copying File:" + copycount2 + " / " + FileCopyList.Count + sizestring + Environment.NewLine +
+                    "Copied (GB): " + Math.Round(gbsize,2) + " / " + Math.Round(totalgbytes,2));
                 try
                 {
                     Pri.LongPath.File.Copy(FCO.source, FCO.destination, true);
                     copycount++;
+                }
+                catch (System.Threading.ThreadAbortException ex)
+                {
+                    SetStatus("File copy stopped - thread Abort Exception");
+                    return;
                 }
                 catch (Exception ex)
                 {

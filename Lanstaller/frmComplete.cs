@@ -22,5 +22,16 @@ namespace Lanstaller
             this.Close();
 
         }
+
+        private void frmComplete_Load(object sender, EventArgs e)
+        {
+
+        }
+        private void OnPaint(object sender, PaintEventArgs e)
+        {
+            
+            ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.White, ButtonBorderStyle.Solid);
+        }
+
     }
 }
