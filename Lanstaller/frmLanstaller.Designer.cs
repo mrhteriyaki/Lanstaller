@@ -57,7 +57,7 @@ namespace Lanstaller
             this.txtChatSendMessage = new System.Windows.Forms.TextBox();
             this.btnOpenTool = new System.Windows.Forms.Button();
             this.cmbxTool = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
+            this.lblMIQ = new System.Windows.Forms.Label();
             this.lblSpaceRequired = new System.Windows.Forms.Label();
             this.pbTitleExpanded = new System.Windows.Forms.PictureBox();
             this.btnExit = new System.Windows.Forms.Button();
@@ -392,15 +392,15 @@ namespace Lanstaller
             this.cmbxTool.TabIndex = 0;
             this.cmbxTool.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbxTool_KeyDown);
             // 
-            // label6
+            // lblMIQ
             // 
-            this.label6.AutoSize = true;
-            this.label6.ForeColor = System.Drawing.Color.White;
-            this.label6.Location = new System.Drawing.Point(11, 215);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(111, 13);
-            this.label6.TabIndex = 15;
-            this.label6.Text = "Multiple Install Queue:";
+            this.lblMIQ.AutoSize = true;
+            this.lblMIQ.ForeColor = System.Drawing.Color.White;
+            this.lblMIQ.Location = new System.Drawing.Point(11, 215);
+            this.lblMIQ.Name = "lblMIQ";
+            this.lblMIQ.Size = new System.Drawing.Size(111, 13);
+            this.lblMIQ.TabIndex = 15;
+            this.lblMIQ.Text = "Multiple Install Queue:";
             // 
             // lblSpaceRequired
             // 
@@ -495,7 +495,7 @@ namespace Lanstaller
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.pbTitle);
             this.Controls.Add(this.lblSpaceRequired);
-            this.Controls.Add(this.label6);
+            this.Controls.Add(this.lblMIQ);
             this.Controls.Add(this.gbxStatus);
             this.Controls.Add(this.gbxPref);
             this.Controls.Add(this.gbxActions);
@@ -555,7 +555,7 @@ namespace Lanstaller
         private System.Windows.Forms.TextBox txtChatSendMessage;
         private System.Windows.Forms.Button btnOpenTool;
         private System.Windows.Forms.ComboBox cmbxTool;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lblMIQ;
         private System.Windows.Forms.Label lblSpaceRequired;
         private System.Windows.Forms.CheckBox chkWindowsSettings;
         private System.Windows.Forms.ProgressBar pbInstall;

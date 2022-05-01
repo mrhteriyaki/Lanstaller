@@ -85,6 +85,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cryptographic.cs" />
     <Compile Include="frmLanstaller.cs">
       <SubType>Form</SubType>
     </Compile>

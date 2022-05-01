@@ -29,8 +29,9 @@ namespace Lanstaller_Management_Console
 
         private void frmLanstallerMmanager_Load(object sender, EventArgs e)
         {
+            
             lblVariable.Text = "%INSTALLPATH% = Base Install Directory (Default C:\\Games)" + Environment.NewLine + "%USERPROFILE% = User Profile Path (Default C:\\Users\\<Username>)" + Environment.NewLine + "%WIDTH% = Resolution Preference X" + Environment.NewLine + "%HEIGHT% = Resolution Preference Y" + Environment.NewLine + "%USERNAME% = Username Preference";
-
+            lblCopyActionInfo.Text = "";
 
             RefreshSoftware();
 
@@ -83,17 +84,50 @@ namespace Lanstaller_Management_Console
         string[] filelist;
         private void btnScan_Click(object sender, EventArgs e)
         {
+            
+           
+            //Cleanup path ends.
+            if (!(txtScanfolder.Text.EndsWith("\\")))
+            {
+                MessageBox.Show("Scan path must end with backslash.");
+                return;
+            }
+
+            if (!(txtSubFolder.Text.EndsWith("\\")))
+            {
+                MessageBox.Show("Sub folder path must end with backslash.");
+                return;
+            }
+            if (txtSubFolder.Text.StartsWith("\\"))
+            {
+                MessageBox.Show("Sub Folder path cannot start with backslash");
+                return;
+            }
+           
+            if (txtServerShare.Text != "" && !(txtServerShare.Text.EndsWith("\\")))
+            {
+                txtServerShare.Text = txtServerShare.Text + "\\"; //append backslash to server share location..
+            }
+            //check server share location matches start of scan path.
+            if (!(txtScanfolder.Text.ToLower().StartsWith(txtServerShare.Text.ToLower())))
+            {
+                MessageBox.Show("Scan folder not located within share path");
+                return;
+            }
+
             btnScan.Enabled = false;
             string scanfolder = txtScanfolder.Text;
+            
             if (Pri.LongPath.Directory.Exists(scanfolder) == false)
             {
                 MessageBox.Show("Scan Folder - Invalid");
                 btnScan.Enabled = true;
                 return;
             }
-            lblFolderStatus.Text = "Status: Scanning";
+
+            lblCopyActionInfo.Text = "Status: Scanning";
             filelist = Pri.LongPath.Directory.GetFiles(scanfolder, "*", System.IO.SearchOption.AllDirectories);
-            lblFolderStatus.Text = "Status: Scanned Files: " + filelist.Count();
+            lblCopyActionInfo.Text = "Status: Scanned Files: " + filelist.Count();
             btnAddFolder.Enabled = true;
         }
 
@@ -132,7 +166,7 @@ namespace Lanstaller_Management_Console
 
         static int GetScalarInfo(string Query, int softwareid)
         {
-            
+
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(Query, SQLConn);
@@ -142,7 +176,7 @@ namespace Lanstaller_Management_Console
             return scalarval;
         }
 
-        
+
 
 
         private void btnAddFolder_Click(object sender, EventArgs e)
@@ -156,31 +190,53 @@ namespace Lanstaller_Management_Console
 
             btnAddFolder.Enabled = false;
 
-            if (txtScanfolder.Text.StartsWith(txtBaseFolder.Text) == false)
+            if (txtScanfolder.Text.ToLower().StartsWith(txtServerShare.Text.ToLower() + txtSubFolder.Text.ToLower()) == false)
             {
                 MessageBox.Show("Base folder must be part of scan folder.");
                 return;
             }
 
             string destination = txtDestination.Text;
-
-            if (destination.EndsWith("\\"))
+            if (destination == "")
             {
-                MessageBox.Show("Destination cannot end with Backslash (\\)");
+                destination = "%INSTALLPATH%\\";
+            }
+
+            if (!(destination.EndsWith("\\")))
+            {
+                MessageBox.Show("Destination must end with Backslash (\\)");
                 return;
             }
-                
 
 
-            string basefolder = txtBaseFolder.Text;
+
+            
             string servershare = txtServerShare.Text;
+            string subfolder = servershare + txtSubFolder.Text;
+
+            //Loop through each file from .getfiles.
             foreach (string filename in filelist)
             {
                 //Trim Base Line + last \
+                
+
+                //Scan folder: \\mrh-nas1\games\Games Source\CNC3\CNC3KW
+                //Base folder: \\mrh-nas1\games\Games Source\CNC3
+                //Server share: \\mrh-nas1\Games\Games Source
+
+                //Example:
+                //filename = \\mrh-nas1\games\Games Source\CNC3\CNC3KW\test.exe
+                //dst = CNC3KW\test.exe
+                //src = CNC3\CNC3KW\test.exe
+
+                string src = filename.Substring(servershare.Length);
+                string dst = destination + filename.Substring(subfolder.Length);
+
+                MessageBox.Show(src + Environment.NewLine + dst);
+
                 Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(filename);
-                SoftwareClass.AddFile(filename.Substring(basefolder.Length + 1), filename.Substring(servershare.Length + 1), destination, FI.Length, selectedsoftwareid);
-                
-                
+                SoftwareClass.AddFile(src, dst, FI.Length, selectedsoftwareid);
+
             }
 
         }
@@ -192,14 +248,22 @@ namespace Lanstaller_Management_Console
 
         private void txtScanfolder_TextChanged(object sender, EventArgs e)
         {
-
-            if (txtScanfolder.Text.Contains("\\"))
+           
+            if (txtScanfolder.Text.Contains("\\") && txtServerShare.Text != "")
             {
-                txtBaseFolder.Text = txtScanfolder.Text.Substring(0, txtScanfolder.Text.LastIndexOf("\\"));
+                //sub-directory path inbetween server-share and scan folder.
+                string scanpath = txtScanfolder.Text;
+                if (scanpath.EndsWith("\\"))
+                {
+                    scanpath = scanpath.Substring(0, scanpath.Length - 1);  
+                }
+
+                string scanroot = txtScanfolder.Text.Substring(0, scanpath.LastIndexOf("\\") + 1); //offset +1 to include \
+                txtSubFolder.Text = (scanroot).Substring(txtServerShare.Text.Length);
 
             }
 
-            if (txtBaseFolder.Text == "")
+            if (txtSubFolder.Text == "")
             {
                 btnScan.Enabled = false;
             }
@@ -207,9 +271,6 @@ namespace Lanstaller_Management_Console
             {
                 btnScan.Enabled = true;
             }
-
-
-            lblSource.Text = "Source: " + txtScanfolder.Text.Substring(txtServerShare.Text.Length);
             UpdateLabels();
 
         }
@@ -329,26 +390,25 @@ namespace Lanstaller_Management_Console
         }
 
 
+        
         void UpdateLabels()
         {
-            string filename = "error";
-            try
+           
+            string destdir = txtDestination.Text;
+            if (txtDestination.Text.Equals(""))
             {
-                filename = txtScanfolder.Text.Substring(txtBaseFolder.Text.Length);
+                destdir = "%INSTALLPATH%\\";
             }
-            catch (Exception ex)
-            {
 
-            }
-            
-            lblFilename.Text = "Filename: " + filename + "\\ExampleFile.txt";
+            string dstpath = txtScanfolder.Text.Substring(txtServerShare.TextLength + txtSubFolder.TextLength);
 
-            string dest = txtDestination.Text;
-            if (dest.Equals(""))
-            {
-                dest = "%INSTALLPATH%";
-            }
-            lblDestination.Text = "Client Install Path: " + dest + filename;
+            string srcpath = txtScanfolder.Text + "example.exe";
+            string dstfile = destdir + dstpath + "example.exe";
+
+
+            lblCopyActionInfo.Text = "Copy files from: " + srcpath + Environment.NewLine + 
+                "to: " + dstfile;
+
         }
 
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)
@@ -364,12 +424,12 @@ namespace Lanstaller_Management_Console
 
         private void textBox2_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void btnAddSerial_Click(object sender, EventArgs e)
         {
-            SoftwareClass.AddSerial(txtSerialName.Text, int.Parse(txtSerialInstance.Text), selectedsoftwareid, txtRegKey.Text,txtRegVal.Text);
+            SoftwareClass.AddSerial(txtSerialName.Text, int.Parse(txtSerialInstance.Text), selectedsoftwareid, txtRegKey.Text, txtRegVal.Text);
         }
 
         private void txtSerialName_TextChanged(object sender, EventArgs e)
@@ -393,6 +453,19 @@ namespace Lanstaller_Management_Console
                 return;
             }
             SoftwareClass.AddPreferenceFile(txtPrefFilePath.Text, txtTarget.Text, txtReplace.Text, selectedsoftwareid);
+        }
+
+      
+
+        private void btnRescanFileHash_Click(object sender, EventArgs e)
+        {
+            SoftwareClass.RescanFileHashes(true);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
+            SoftwareClass.RescanFileHashes(false);
         }
     }
 }

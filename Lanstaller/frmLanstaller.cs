@@ -41,6 +41,7 @@ namespace Lanstaller
 
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
+
             btnInstall.Text = "Start" + Environment.NewLine + "Install";
             lblSpaceRequired.Text = "";
 
@@ -198,12 +199,15 @@ namespace Lanstaller
                 //Install running.
                 lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y - 30);
                 lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height + 30);
+                lblMIQ.Location = new Point(lblMIQ.Location.X,lblMIQ.Location.Y - 30);
             }
             else if (state == true)
             {
                 //install normal.
+                
                 lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y + 30);
                 lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height - 30);
+                lblMIQ.Location = new Point(lblMIQ.Location.X, lblMIQ.Location.Y + 30);
             }
 
        }

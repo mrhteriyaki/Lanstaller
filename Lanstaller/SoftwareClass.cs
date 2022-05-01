@@ -213,7 +213,7 @@ namespace Lanstaller
         {
             FileCopyList.Clear();
 
-            string QueryString = "select [filename],[source],[destination],[filesize] from tblFiles WHERE software_id = @softwareid ORDER BY filesize ASC";
+            string QueryString = "select [source],[destination],[filesize] from tblFiles WHERE software_id = @softwareid ORDER BY filesize ASC";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -223,28 +223,11 @@ namespace Lanstaller
             while (SQLOutput.Read())
             {
                 //Prepare full source and destination locations for transfer process.
-                string Sfilename = SQLOutput[0].ToString();
-                string Ssource = SQLOutput[1].ToString();
-                string Sdestination = SQLOutput[2].ToString();
-                long filesize = (long)SQLOutput[3];
 
                 FileCopyOperation tFCO = new FileCopyOperation();
-                tFCO.source = ServerAddress + "\\" + Ssource;
-                tFCO.size = filesize;
-
-                //Determine file destination.
-                if (SQLOutput[2].ToString().Equals(""))
-                {
-                    //Empty Destination - Uses Install Directory.
-                    tFCO.destination = LanstallerSettings.InstallDirectory + "\\" + Sfilename;
-                }
-                else
-                {
-                    //Use static path.
-                    string destination = Sdestination + "\\" + Sfilename;
-                    //Replace any variables in static destination path.
-                    tFCO.destination = ReplaceVariable(destination);
-                }
+                tFCO.fileinfo.source = ServerAddress + "\\" + SQLOutput[0].ToString();
+                tFCO.destination = ReplaceVariable(SQLOutput[1].ToString());
+                tFCO.fileinfo.size = (long)SQLOutput[2];
 
                 //Add copy operation to list.
                 FileCopyList.Add(tFCO);
@@ -356,19 +339,17 @@ namespace Lanstaller
             public string filecheck;
             public string version;
 
-
         }
 
        
-        public static void AddFile(string filename, string fullsource, string destination, long filesize, int softwareid)
+        public static void AddFile(string source, string destination, long filesize, int softwareid)
         {
-            string QueryString = "INSERT into tblFiles ([filename],[source],[destination],[filesize],[software_id]) VALUES (@filename,@sourcefile,@destinationfile,@filesize,@softwareid)";
+            string QueryString = "INSERT into tblFiles ([source],[destination],[filesize],[software_id]) VALUES (@sourcefile,@destinationfile,@filesize,@softwareid)";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("filename", filename);
-            SQLCmd.Parameters.AddWithValue("sourcefile", fullsource);
+            SQLCmd.Parameters.AddWithValue("sourcefile", source);
             SQLCmd.Parameters.AddWithValue("destinationfile", destination);
             SQLCmd.Parameters.AddWithValue("filesize", filesize);
             SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
@@ -394,10 +375,10 @@ namespace Lanstaller
             while (SR.Read())
             {
                 FileCopyOperation tmpFCO = new FileCopyOperation();
-                tmpFCO.id = (int)SR[0];
-                tmpFCO.source = SR[1].ToString();
+                tmpFCO.fileinfo.id = (int)SR[0];
+                tmpFCO.fileinfo.source = SR[1].ToString();
                 Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(SA + "\\" + SR[1].ToString());
-                tmpFCO.size = FI.Length;
+                tmpFCO.fileinfo.size = FI.Length;
                 FileList.Add(tmpFCO);
             }
             SQLConn.Close();
@@ -408,8 +389,8 @@ namespace Lanstaller
                 SQLConn = new SqlConnection(ConnectionString);
                 SQLConn.Open();
                 SQLCmd = new SqlCommand(QueryString, SQLConn);
-                SQLCmd.Parameters.AddWithValue("filesize", FCO.size);
-                SQLCmd.Parameters.AddWithValue("fileid", FCO.id);
+                SQLCmd.Parameters.AddWithValue("filesize", FCO.fileinfo.size);
+                SQLCmd.Parameters.AddWithValue("fileid", FCO.fileinfo.id);
                 SQLCmd.ExecuteNonQuery();
                 SQLConn.Close();
             }
@@ -417,7 +398,54 @@ namespace Lanstaller
 
         }
 
+        public static void RescanFileHashes(bool fullrescan)
+        {
+            string SA = GetServers();
 
+            string QueryString = "SELECT [id],[source],[hash_md5] from tblFiles";
+            if (fullrescan == false)
+            {
+                QueryString += " WHERE [hash_md5] is null";
+            }
+
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SqlDataReader SR = SQLCmd.ExecuteReader();
+
+            List<FileInfoClass> FileHashList = new List<FileInfoClass>();
+
+            while (SR.Read())
+            {
+                FileInfoClass tmpFH = new FileInfoClass();
+                tmpFH.id = (int)SR[0];
+                tmpFH.source = SR[1].ToString();
+                tmpFH.hash = SR[2].ToString();
+                FileHashList.Add(tmpFH);
+            }
+            SQLConn.Close();
+
+
+            QueryString = "UPDATE tblFiles SET [hash_md5] = @hash WHERE id = @fileid";
+
+            //RescanFileHashes
+
+            foreach (FileInfoClass FH in FileHashList)
+            {
+                FH.hash = Cryptographic.MD5file(SA + "\\" + FH.source);
+                SQLConn = new SqlConnection(ConnectionString);
+                SQLCmd = new SqlCommand(QueryString, SQLConn);
+                SQLCmd.Parameters.AddWithValue("fileid", FH.id);
+                SQLCmd.Parameters.AddWithValue("hash", FH.hash);
+
+                SQLConn.Open();
+                SQLCmd.ExecuteNonQuery();
+                SQLConn.Close();
+            }
+
+
+        }
 
         public static void AddRegistry(int softwareid, int hkey, string subkey, string value, int regtype, string data)
         {
@@ -601,14 +629,14 @@ namespace Lanstaller
                 double gbsize = (double)bytecounter / 1073741824;
 
                 string sizestring = "";
-                if (FCO.size > 1073741824) //Larger than 1GB.
+                if (FCO.fileinfo.size > 1073741824) //Larger than 1GB.
                 {
-                    double currentgbsize = (double)FCO.size / 1073741824;
+                    double currentgbsize = (double)FCO.fileinfo.size / 1073741824;
                     sizestring = " (Current File Size " + Math.Round(currentgbsize, 2).ToString() + "GB)";
                 }
-                else if (FCO.size > 1048576) //larger than 1MB
+                else if (FCO.fileinfo.size > 1048576) //larger than 1MB
                 {
-                    double currentmbsize = (double)FCO.size / 1048576;
+                    double currentmbsize = (double)FCO.fileinfo.size / 1048576;
                     sizestring = " (Current File Size " +  Math.Round(currentmbsize,0).ToString() + "MB)";
                 }
 
@@ -617,7 +645,7 @@ namespace Lanstaller
                     "Copied (GB): " + Math.Round(gbsize,2) + " / " + Math.Round(totalgbytes,2));
                 try
                 {
-                    Pri.LongPath.File.Copy(FCO.source, FCO.destination, true);
+                    Pri.LongPath.File.Copy(FCO.fileinfo.source, FCO.destination, true);
                     copycount++;
                 }
                 catch (System.Threading.ThreadAbortException ex)
@@ -627,16 +655,15 @@ namespace Lanstaller
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Failure to copy file:" + FCO.source + Environment.NewLine + "TO:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
+                    MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "TO:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
                     SetStatus("Error:" + ex.ToString());
                     return; //Exit - terminate.
                 }
 
                 
-                bytecounter += FCO.size;
+                bytecounter += FCO.fileinfo.size;
                 SetProgress(bytecounter);
 
-               //Provision for hashing has been put into database table.
             }
 
         }
@@ -965,18 +992,21 @@ namespace Lanstaller
     }
 
 
+    class FileInfoClass
+    {
+        public int id;
+        public long size;
+        public string hash;
+        public string source;
+    }
 
     class FileCopyOperation
     {
-        public int id;
-        public string source;
+        public FileInfoClass fileinfo;
         public string destination;
-        public string filename;
-        public long size;
     }
 
-
-
+  
 
     class RegistryOperation
     {
