@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -41,6 +42,20 @@ namespace Lanstaller
 
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
+            //Load Config File.
+            if (!File.Exists("config.ini"))
+            {
+                MessageBox.Show("Missing config file - no database information");
+            }
+
+
+            foreach (string line in System.IO.File.ReadAllLines("config.ini"))
+            {
+                if (line.StartsWith("Data Source="))
+                {
+                    SoftwareClass.ConnectionString = line;
+                }
+            }
 
             btnInstall.Text = "Start" + Environment.NewLine + "Install";
             lblSpaceRequired.Text = "";
@@ -80,6 +95,10 @@ namespace Lanstaller
 
             //Update list of tools.
             GetTools();
+
+
+           
+            
 
         }
 

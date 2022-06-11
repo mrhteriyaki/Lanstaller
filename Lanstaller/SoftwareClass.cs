@@ -19,7 +19,7 @@ namespace Lanstaller
 {
     public class SoftwareClass
     {
-        public static string ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;user=lanstaller;password=LanJoekf192!";
+        public static string ConnectionString;
 
         public int id;
         public string Name;
