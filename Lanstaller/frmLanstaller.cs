@@ -15,6 +15,7 @@ using System.Diagnostics;
 using Microsoft.VisualBasic;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using Lanstaller_Shared;
 
 namespace Lanstaller
 {
@@ -53,7 +54,7 @@ namespace Lanstaller
             {
                 if (line.StartsWith("Data Source="))
                 {
-                    SoftwareClass.ConnectionString = line;
+                    ClientSoftwareClass.ConnectionString = line;
                 }
             }
 
@@ -80,6 +81,8 @@ namespace Lanstaller
 
             //Load software list from Server.
             SList = SoftwareClass.LoadSoftware();
+
+
             foreach (SoftwareClass Sw in SList)
             {
                 cmbxSoftware.Items.Add(Sw.Name);
@@ -112,7 +115,7 @@ namespace Lanstaller
         {
             string QueryString = "SELECT [name],[path] FROM tblTools";
 
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(ClientSoftwareClass.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SqlDataReader SR = SQLCmd.ExecuteReader();
@@ -137,12 +140,12 @@ namespace Lanstaller
                 
                 lblStatus.Invoke((MethodInvoker)delegate
                  {
-                     lblStatus.Text = SoftwareClass.GetStatus();
+                     lblStatus.Text = ClientSoftwareClass.GetStatus();
                  });
 
                 pbInstall.Invoke((MethodInvoker)delegate
                 {
-                    pbInstall.Value = SoftwareClass.GetProgressPercentage();
+                    pbInstall.Value = ClientSoftwareClass.GetProgressPercentage();
                 });
 
                 //Wait 100 ms before next update.
@@ -156,10 +159,10 @@ namespace Lanstaller
         void ChatThread()
         {
             string QueryString = "SELECT [id],[timestamp],[message] from tblMessages WHERE [timestamp] > DATEADD(HOUR, -1, GETDATE()) ORDER BY [timestamp] ASC";
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(ClientSoftwareClass.ConnectionString);
             int lastid = 0;
             int currentid = 0;
-            bool newmsg = false;
+            //bool newmsg = false;
 
             while (shutdown == false)
             {
@@ -284,7 +287,7 @@ namespace Lanstaller
                 {
                     IDList.Add(SList[index].id);
                 }
-                SoftwareClass.GetSerials(IDList);
+                ClientSoftwareClass.GetSerials(IDList);
             }
 
             //Enable progress bar.
@@ -296,7 +299,7 @@ namespace Lanstaller
             //Run Through install list and install software.
             foreach (int index in InstallList)
             {
-                SoftwareClass.Install(SList[index], install_files, install_reg, install_shortcut, apply_windowssettings, apply_preferences, install_redist);
+                ClientSoftwareClass.Install(SList[index], install_files, install_reg, install_shortcut, apply_windowssettings, apply_preferences, install_redist);
             }
 
             //Reset install list.
@@ -429,7 +432,7 @@ namespace Lanstaller
         {
             string QueryString = "INSERT INTO tblMessages ([message],[timestamp]) VALUES (@message,GETDATE())";
 
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(ClientSoftwareClass.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("message", txtUsername.Text + " - " + Message);
@@ -447,7 +450,7 @@ namespace Lanstaller
             }
 
 
-            long filesize = SoftwareClass.GetInstallSize(SList[cmbxSoftware.SelectedIndex].id);
+            long filesize = ClientSoftwareClass.GetInstallSize(SList[cmbxSoftware.SelectedIndex].id);
 
             double mbfilesize = (double)filesize / 1048576;
             if (mbfilesize < 1000)

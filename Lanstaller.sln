@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanstaller", "Lanstaller\La
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanstaller Management Console", "Lanstaller Management Console\Lanstaller Management Console.csproj", "{982EC2B2-53D0-48BC-91A5-49176056DBA6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LanstallerAPI", "LanstallerAPI\LanstallerAPI.csproj", "{564255A4-BA91-4EF1-986E-6B51CF4C118B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanstaller Shared", "Lanstaller Shared\Lanstaller Shared.csproj", "{6E28D0C4-FC93-415C-B8BF-F4AED62F74BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{982EC2B2-53D0-48BC-91A5-49176056DBA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{982EC2B2-53D0-48BC-91A5-49176056DBA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{982EC2B2-53D0-48BC-91A5-49176056DBA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{564255A4-BA91-4EF1-986E-6B51CF4C118B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{564255A4-BA91-4EF1-986E-6B51CF4C118B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{564255A4-BA91-4EF1-986E-6B51CF4C118B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{564255A4-BA91-4EF1-986E-6B51CF4C118B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E28D0C4-FC93-415C-B8BF-F4AED62F74BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E28D0C4-FC93-415C-B8BF-F4AED62F74BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E28D0C4-FC93-415C-B8BF-F4AED62F74BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E28D0C4-FC93-415C-B8BF-F4AED62F74BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

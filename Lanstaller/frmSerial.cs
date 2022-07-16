@@ -71,6 +71,7 @@ namespace Lanstaller
             }
             catch (Exception exception)
             {
+                Console.WriteLine(exception.Message);
                 return string.Empty;
             }
         }

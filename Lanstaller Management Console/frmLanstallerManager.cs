@@ -9,7 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using Lanstaller;
+//using Lanstaller;
+using Lanstaller_Shared;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
 
@@ -20,7 +21,7 @@ namespace Lanstaller_Management_Console
     {
         int selectedsoftwareid = -1;
         List<SoftwareClass> SoftwareList = new List<SoftwareClass>();
-        static string status = "Status: Ready";
+        //static string status = "Status: Ready";
 
         public frmLanstallerMmanager()
         {
