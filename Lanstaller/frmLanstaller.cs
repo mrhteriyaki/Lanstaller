@@ -24,10 +24,11 @@ namespace Lanstaller
 
     public partial class frmLanstaller : Form
     {
-        List<SoftwareClass> SList; //List of Software.
-        List<int> InstallList = new List<int>();
-
+        List<SoftwareClass.SoftwareInfo> SList; //List of Software.
+        List<ClientSoftwareClass> InstallList = new List<ClientSoftwareClass>();
         List<Tool> ToolList = new List<Tool>();
+
+
 
         Thread MThread; //Status Monitor Thread
         Thread CThread; //Chat Thread
@@ -83,11 +84,11 @@ namespace Lanstaller
             SList = SoftwareClass.LoadSoftware();
 
 
-            foreach (SoftwareClass Sw in SList)
+            foreach (SoftwareClass.SoftwareInfo Sw in SList)
             {
                 cmbxSoftware.Items.Add(Sw.Name);
             }
-            
+
             //Start installation progress bar thread.
             MThread = new Thread(StatusMonitorThread);
             MThread.Start();
@@ -100,8 +101,8 @@ namespace Lanstaller
             GetTools();
 
 
-           
-            
+
+
 
         }
 
@@ -137,7 +138,7 @@ namespace Lanstaller
         {
             while (shutdown == false)
             {
-                
+
                 lblStatus.Invoke((MethodInvoker)delegate
                  {
                      lblStatus.Text = ClientSoftwareClass.GetStatus();
@@ -180,12 +181,12 @@ namespace Lanstaller
                 if (lastid != currentid)
                 {
                     currentid = lastid;
-                        txtChatMessages.Invoke((MethodInvoker)delegate
-                        {
-                            txtChatMessages.Text = message;
-                            txtChatMessages.SelectionStart = txtChatMessages.Text.Length;
-                            txtChatMessages.ScrollToCaret();
-                        });
+                    txtChatMessages.Invoke((MethodInvoker)delegate
+                    {
+                        txtChatMessages.Text = message;
+                        txtChatMessages.SelectionStart = txtChatMessages.Text.Length;
+                        txtChatMessages.ScrollToCaret();
+                    });
                 }
                 Thread.Sleep(300);
             }
@@ -198,7 +199,7 @@ namespace Lanstaller
         {
             btnInstall.Enabled = state;
             btnInstall.Visible = state;
-            
+
             btnAdd.Enabled = state;
             btnAdd.Visible = state;
 
@@ -221,18 +222,18 @@ namespace Lanstaller
                 //Install running.
                 lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y - 30);
                 lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height + 30);
-                lblMIQ.Location = new Point(lblMIQ.Location.X,lblMIQ.Location.Y - 30);
+                lblMIQ.Location = new Point(lblMIQ.Location.X, lblMIQ.Location.Y - 30);
             }
             else if (state == true)
             {
                 //install normal.
-                
+
                 lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y + 30);
                 lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height - 30);
                 lblMIQ.Location = new Point(lblMIQ.Location.X, lblMIQ.Location.Y + 30);
             }
 
-       }
+        }
 
 
         private void btnInstall_Click(object sender, EventArgs e)
@@ -248,8 +249,11 @@ namespace Lanstaller
                     MessageBox.Show("Nothing Selected");
                     return;
                 }
-
-                InstallList.Add(cmbxSoftware.SelectedIndex);
+                
+                //Nothing queued in gui, add currently selected software to queue for install (single entry).
+                ClientSoftwareClass currentsw = new ClientSoftwareClass();
+                currentsw.Identity = SList[cmbxSoftware.SelectedIndex];
+                InstallList.Add(currentsw);
             }
             EnableInstallControls(false);
 
@@ -282,12 +286,12 @@ namespace Lanstaller
             //Get Serials for All Software
             if (install_reg)
             {
-                List<int> IDList = new List<int>();
-                foreach (int index in InstallList)
+                foreach (ClientSoftwareClass CSW in InstallList)
                 {
-                    IDList.Add(SList[index].id);
+                    CSW.GetSerials();
+                    CSW.GenerateSerials();
                 }
-                ClientSoftwareClass.GetSerials(IDList);
+
             }
 
             //Enable progress bar.
@@ -297,9 +301,9 @@ namespace Lanstaller
             });
 
             //Run Through install list and install software.
-            foreach (int index in InstallList)
+            foreach (ClientSoftwareClass CSW in InstallList)
             {
-                ClientSoftwareClass.Install(SList[index], install_files, install_reg, install_shortcut, apply_windowssettings, apply_preferences, install_redist);
+                CSW.Install(install_files, install_reg, install_shortcut, apply_windowssettings, apply_preferences, install_redist);
             }
 
             //Reset install list.
@@ -315,7 +319,7 @@ namespace Lanstaller
             CF.TopMost = true;
             CF.FormBorderStyle = FormBorderStyle.None;
             CF.ShowDialog();
-            
+
             btnInstall.Invoke((MethodInvoker)delegate
             {
                 EnableInstallControls(true);
@@ -330,7 +334,7 @@ namespace Lanstaller
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-           
+
             if (cmbxSoftware.SelectedIndex == -1)
             {
                 MessageBox.Show("Nothing Selected");
@@ -338,9 +342,9 @@ namespace Lanstaller
             }
 
             int index = cmbxSoftware.SelectedIndex;
-            foreach (int SoftwareID in InstallList)
+            foreach (ClientSoftwareClass CSW in InstallList)
             {
-                if (SList[index].id == SoftwareID)
+                if (SList[index].id == CSW.Identity.id)
                 {
                     //Duplicate entry.
                     MessageBox.Show("Entry already in install list.");
@@ -351,7 +355,10 @@ namespace Lanstaller
 
             //add item to installation list.
             lbxInstallList.Items.Add(SList[index].Name);
-            InstallList.Add(index);
+
+            ClientSoftwareClass currentsw = new ClientSoftwareClass();
+            currentsw.Identity = SList[index];
+            InstallList.Add(currentsw);
 
         }
 
@@ -396,9 +403,9 @@ namespace Lanstaller
             {
                 InsTrd.Abort();
             }
-            
 
-            
+
+
         }
 
         private void btnOpenTool_Click(object sender, EventArgs e)
@@ -498,7 +505,7 @@ namespace Lanstaller
             ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.White, ButtonBorderStyle.Solid);
         }
 
-       
+
 
         private void cmbxTool_KeyDown(object sender, KeyEventArgs e)
         {
@@ -507,7 +514,7 @@ namespace Lanstaller
                 string debuginfo = "Debug Info: ";
 
                 if (InsTrd == null)
-                { 
+                {
                     debuginfo = "Installer Thread status: not initalised"; //null reference - no install started.
                 }
                 else if (InsTrd.IsAlive)
@@ -524,6 +531,6 @@ namespace Lanstaller
             }
         }
 
-      
+
     }
 }

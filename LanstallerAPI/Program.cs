@@ -1,3 +1,5 @@
+using Lanstaller_Shared;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -22,5 +24,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+SoftwareClass.ConnectionString = app.Configuration.GetValue<string>("ConnectionString");
 
 app.Run();

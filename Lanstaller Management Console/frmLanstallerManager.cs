@@ -20,7 +20,7 @@ namespace Lanstaller_Management_Console
     public partial class frmLanstallerMmanager : Form
     {
         int selectedsoftwareid = -1;
-        List<SoftwareClass> SoftwareList = new List<SoftwareClass>();
+        List<SoftwareClass.SoftwareInfo> SoftwareList = new List<SoftwareClass.SoftwareInfo>();
         //static string status = "Status: Ready";
 
         public frmLanstallerMmanager()
@@ -55,7 +55,7 @@ namespace Lanstaller_Management_Console
         {
             SoftwareList = SoftwareClass.LoadSoftware();
             lbxSoftware.Items.Clear();
-            foreach (SoftwareClass SW in SoftwareList)
+            foreach (SoftwareClass.SoftwareInfo SW in SoftwareList)
             {
                 lbxSoftware.Items.Add(SW.Name);
             }
@@ -71,7 +71,7 @@ namespace Lanstaller_Management_Console
 
             RefreshSoftware();
             int index = 0;
-            foreach (SoftwareClass SW in SoftwareList)
+            foreach (SoftwareClass.SoftwareInfo SW in SoftwareList)
             {
                 if (SW.id == newid)
                 {

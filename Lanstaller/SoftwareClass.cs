@@ -26,7 +26,7 @@ namespace Lanstaller
         static long InstalledSize; //Progres of current install.
 
         //List<Servers> ServerList = new List<Servers>();
-        
+
 
         //Locks.
         static readonly object _statuslock = new object();
@@ -35,64 +35,63 @@ namespace Lanstaller
 
 
 
-        public static void Install(SoftwareClass SWI, bool installfiles, bool installregistry, bool installshortcuts, bool apply_windowssettings, bool apply_preferences, bool install_redist)
+        public void Install(bool installfiles, bool installregistry, bool installshortcuts, bool apply_windowssettings, bool apply_preferences, bool install_redist)
         {
             string ServerAddress = GetServers();
-            
+
             //Run Installation
 
             if (installregistry)
             {
-                SetStatus("Applying Registry - " + SWI.Name);
-                GetRegistry(SWI.id);
+                SetStatus("Applying Registry - " + Identity.Name);
+                GetRegistry();
                 GenerateRegistry();
             }
 
 
             if (installfiles)
             {
-                SetStatus("Indexing - " + SWI.Name);
-                GetFiles(SWI.id, ServerAddress);
+                SetStatus("Indexing - " + Identity.Name);
+                GetFiles();
 
                 InstalledSize = 0; //reset install size.
-                InstallSize = GetInstallSize(SWI.id);
+                InstallSize = GetInstallSize(Identity.id);
 
-                SetStatus("Copying Files - " + SWI.Name);
-                CopyFiles(SWI.id);
+                SetStatus("Copying Files - " + Identity.Name);
+                CopyFiles();
             }
 
             if (installshortcuts)
             {
-                SetStatus("Generating Shortcuts - " + SWI.Name);
-                GetShortcuts(SWI.id);
+                SetStatus("Generating Shortcuts - " + Identity.Name);
+                GetShortcuts();
                 GenerateShortcuts();
             }
 
-            SetStatus("Adding firewall rules - " + SWI.Name);
+            SetStatus("Adding firewall rules - " + Identity.Name);
             //firewall rules.
             if (apply_windowssettings)
             {
-                GetFirewallRules(SWI.id);
+                GetFirewallRules();
                 GenerateFirewallRules();
-
-                GenerateCompatibility(SWI.id);
+                GenerateCompatibility();
             }
 
-            SetStatus("Applying Preferences - " + SWI.Name);
+            SetStatus("Applying Preferences - " + Identity.Name);
             if (apply_preferences)
             {
-                GetPreferenceFiles(SWI.id);
+                GetPreferenceFiles();
                 GeneratePreferenceFiles();
             }
 
-            SetStatus("Installing Redistributables - " + SWI.Name);
+            SetStatus("Installing Redistributables - " + Identity.Name);
             if (install_redist)
             {
-                GetRedistributables(SWI.id);
+                GetRedistributables();
                 GenerateRedistributables();
             }
 
-            SetStatus("Install Complete:" + Environment.NewLine + SWI.Name);
+            SetStatus("Install Complete:" + Environment.NewLine + Identity.Name);
 
         }
 
@@ -101,7 +100,7 @@ namespace Lanstaller
         {
             lock (_statuslock)
             {
-                status = "Status: " + message.Replace("&","&&");
+                status = "Status: " + message.Replace("&", "&&");
 
             }
         }
@@ -136,12 +135,12 @@ namespace Lanstaller
             }
         }
 
-       
 
-        
-        static void GeneratePreferenceFiles()
+
+
+        void GeneratePreferenceFiles()
         {
-            foreach(PreferenceOperation PO in PreferenceOperationList)
+            foreach (PreferenceOperation PO in PreferenceOperationList)
             {
                 ReplacePreferenceFile(PO.filename, PO.target, PO.replace);
             }
@@ -149,7 +148,7 @@ namespace Lanstaller
 
 
 
-        static void GenerateFirewallRules()
+        void GenerateFirewallRules()
         {
             //FirewallRule
             foreach (FirewallRule fwr in FirewallRuleList)
@@ -162,10 +161,10 @@ namespace Lanstaller
                 FWNetSHProc.StartInfo.RedirectStandardOutput = true;
                 FWNetSHProc.StartInfo.CreateNoWindow = true;
                 FWNetSHProc.Start();
-            }          
+            }
         }
 
-        static void GenerateCompatibility(int softwareid)
+        void GenerateCompatibility()
         {
             //Set compatibility flags in registry.
 
@@ -174,7 +173,7 @@ namespace Lanstaller
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
 
             while (SQLOutput.Read())
@@ -186,7 +185,7 @@ namespace Lanstaller
 
         }
 
-        public static void GenerateRedistributables() //Incomplete.
+        public void GenerateRedistributables() //Incomplete.
         {
             foreach (Redistributable Redist in RedistributableList)
             {
@@ -196,14 +195,45 @@ namespace Lanstaller
             //Check filecheck, if blank, check name against windows installations.
         }
 
-
-        static void CopyFiles(int softwareid)
+        public void GenerateSerials()
         {
-            //Get Software Name.
-            string softwarename = GetSoftwareName(softwareid);
-            
+            foreach (SerialNumber SN in SerialList)
+            {
+                //Prompt user to enter serial numbers.
+                //string prom = SN.name + Environment.NewLine + "(Note: spaces and dashes will be removed automatically.)";
+                //SN.serialnumber = Microsoft.VisualBasic.Interaction.InputBox(prom, SN.name).Replace(" ","").Replace("-",""); //Strip whitespace.
+
+                frmSerial SF = new frmSerial();
+                SF.TopMost = true;
+                SF.Text = "Serial Number Prompt";
+                SF.lblTitle.Text = "Input Serial Number for " + SN.name;
+                SF.FormBorderStyle = FormBorderStyle.FixedSingle;
+
+                if (!SN.regKey.Equals(""))
+                {
+                    try
+                    {
+                        SF.txtSerial.Text = Microsoft.Win32.Registry.GetValue(SN.regKey, SN.regVal, "").ToString();
+                    }
+                    catch (Exception ex)
+                    {
+                        //occurs on null exception due to missing key.
+                        Console.WriteLine(ex.Message);
+                    }
+
+                }
+                SF.ShowDialog();
+                SN.serialnumber = SF.txtSerial.Text;
+            }
+        }
+
+
+
+        void CopyFiles()
+        {
+
             //Calculate total copy size.
-            long totalbytes = GetInstallSize(softwareid);
+            long totalbytes = GetInstallSize();
             double totalgbytes = (double)totalbytes / 1073741824;
 
 
@@ -251,7 +281,7 @@ namespace Lanstaller
             }
 
 
-            SetStatus("Installing: " + softwarename + Environment.NewLine + "Status: Generating Directories");
+            SetStatus("Installing: " + Identity.Name + Environment.NewLine + "Status: Generating Directories");
 
             foreach (string dir in DirectoryList)
             {
@@ -261,6 +291,8 @@ namespace Lanstaller
                 }
 
             }
+
+            string ServerAddress = GetServers();
 
             int copycount = 0;
             long bytecounter = 0;
@@ -282,15 +314,15 @@ namespace Lanstaller
                 else if (FCO.fileinfo.size > 1048576) //larger than 1MB
                 {
                     double currentmbsize = (double)FCO.fileinfo.size / 1048576;
-                    sizestring = " (Current File Size " +  Math.Round(currentmbsize,0).ToString() + "MB)";
+                    sizestring = " (Current File Size " + Math.Round(currentmbsize, 0).ToString() + "MB)";
                 }
 
-                SetStatus("Installing: " + softwarename + Environment.NewLine + 
+                SetStatus("Installing: " + Identity.Name + Environment.NewLine +
                     "Copying File:" + copycount2 + " / " + FileCopyList.Count + sizestring + Environment.NewLine +
-                    "Copied (GB): " + Math.Round(gbsize,2) + " / " + Math.Round(totalgbytes,2));
+                    "Copied (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
                 try
                 {
-                    Pri.LongPath.File.Copy(FCO.fileinfo.source, FCO.destination, true);
+                    Pri.LongPath.File.Copy(ServerAddress + "\\" + FCO.fileinfo.source, FCO.destination, true);
                     copycount++;
                 }
                 catch (System.Threading.ThreadAbortException ex)
@@ -306,7 +338,7 @@ namespace Lanstaller
                     return; //Exit - terminate.
                 }
 
-                
+
                 bytecounter += FCO.fileinfo.size;
                 SetProgress(bytecounter);
 
@@ -315,7 +347,7 @@ namespace Lanstaller
         }
 
 
-     
+
 
         public static void GenerateCompatiblity(string filename, int compat_type)
         {
@@ -328,97 +360,8 @@ namespace Lanstaller
 
         }
 
-        //Gets Serial Requirements for Queued Installs.
-        public static void GetSerials(List<int> SoftwareIDList)
-        {
-            SerialList.Clear();
-            foreach (int SoftwareID in SoftwareIDList)
-            {
 
-
-                string QueryString = "select [name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid";
-
-                SqlConnection SQLConn = new SqlConnection(ConnectionString);
-                SQLConn.Open();
-                SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-                SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
-                SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
-                while (SQLOutput.Read())
-                {
-                    SerialNumber tSerial = new SerialNumber();
-                    tSerial.softwareid = SoftwareID;
-                    tSerial.name = SQLOutput[0].ToString();
-                    tSerial.instancenumber = (int)SQLOutput[1];
-                    tSerial.regKey = SQLOutput[2].ToString();
-                    tSerial.regVal = SQLOutput[3].ToString();
-                    SerialList.Add(tSerial);
-                }
-                SQLConn.Close();
-            }
-
-            foreach (SerialNumber SN in SerialList)
-            {
-                //Prompt user to enter serial numbers.
-                //string prom = SN.name + Environment.NewLine + "(Note: spaces and dashes will be removed automatically.)";
-                //SN.serialnumber = Microsoft.VisualBasic.Interaction.InputBox(prom, SN.name).Replace(" ","").Replace("-",""); //Strip whitespace.
-
-                frmSerial SF = new frmSerial();
-                SF.TopMost = true;
-                SF.Text = "Serial Number Prompt";
-                SF.lblTitle.Text = "Input Serial Number for " + SN.name;
-                SF.FormBorderStyle = FormBorderStyle.FixedSingle;
-
-                if (!SN.regKey.Equals(""))
-                {
-                    try
-                    {
-                        SF.txtSerial.Text = Microsoft.Win32.Registry.GetValue(SN.regKey, SN.regVal, "").ToString();
-                    }catch (Exception ex)
-                    {
-                        //occurs on null exception due to missing key.
-                        Console.WriteLine(ex.Message);  
-                    }
-                    
-                }
-                SF.ShowDialog();
-
-               
-
-                SN.serialnumber = SF.txtSerial.Text;
-
-
-            }
-
-        }
-
-       
-
-        static void GetRegistry(int SoftwareID)
-        {
-            RegistryList.Clear();
-
-            string QueryString = "select [hkey],[subkey],[value],[type],[data] from [tblRegistry] WHERE software_id = @softwareid";
-
-            SqlConnection SQLConn = new SqlConnection(ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
-            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
-            while (SQLOutput.Read())
-            {
-                RegistryOperation tReg = new RegistryOperation();
-                tReg.hkey = ((int)SQLOutput[0]); //Hive Key.
-                tReg.subkey = SQLOutput[1].ToString(); //Sub Key.
-                tReg.value = SQLOutput[2].ToString();
-                tReg.regtype = ((int)SQLOutput[3]);
-                tReg.data = ReplaceSerial(ReplaceVariable(SQLOutput[4].ToString()), SoftwareID); //Includes ReplaceSerial to check for Serial number.
-
-                RegistryList.Add(tReg);
-            }
-            SQLConn.Close();
-        }
-
-        static void GenerateRegistry()
+        void GenerateRegistry()
         {
             foreach (RegistryOperation REGOP in RegistryList)
             {
@@ -439,16 +382,17 @@ namespace Lanstaller
                     Registry.Users.CreateSubKey(REGOP.subkey, true);
                     HKEY = Registry.Users.OpenSubKey(REGOP.subkey, true);
                 }
+                if ((RegistryValueKind)REGOP.regtype == RegistryValueKind.String || (RegistryValueKind)REGOP.regtype == RegistryValueKind.ExpandString)
+                {
+                    //Update data with variable for string.
+                    REGOP.data = ReplaceVariable(REGOP.data);
+                }
+
                 HKEY.SetValue(REGOP.value, REGOP.data, (RegistryValueKind)REGOP.regtype);
             }
         }
 
-        
-               
-
-        
-
-        static void GenerateShortcuts()
+        void GenerateShortcuts()
         {
             foreach (ShortcutOperation SCO in ShortcutList)
             {
@@ -466,14 +410,19 @@ namespace Lanstaller
 
         }
 
-        public static long GetInstallSize(int softwareid)
+        public long GetInstallSize()
+        {
+           return GetInstallSize(Identity.id);
+        }
+
+        public static long GetInstallSize(int SoftwareID)
         {
             string QueryString = "SELECT SUM(filesize) FROM tblFiles where software_id = @softwareid";
 
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
             long filesize = (long)SQLCmd.ExecuteScalar();
             SQLConn.Close();
             return filesize;
@@ -502,43 +451,7 @@ namespace Lanstaller
         }
 
 
-        static string ReplaceSerial(string data, int softwareid)
-        {
 
-
-
-            //Serial Numbers.
-            //Check SerialList for matching serial number.
-            string newdata = data;
-
-            //check if %SERIALx%
-            Regex rx = new Regex("[%SERIAL]\\d[%]");
-
-
-            if (rx.Matches(data).Count > 0)
-            {
-                int SInstance = int.Parse(rx.Match(data).Value.ToString().Substring(1, 1)); //Get Serial Instance Number.
-                string replacestring = "%SERIAL" + SInstance.ToString() + "%";
-
-                foreach (SerialNumber SN in SerialList)
-                {
-
-                    if (SN.softwareid == softwareid)
-                    {
-                        if (SN.instancenumber == SInstance)
-                        {
-                            newdata = newdata.Replace(replacestring, SN.serialnumber); //update serial number.
-                        }
-
-                    }
-                }
-
-            }
-
-
-
-            return newdata;
-        }
 
 
         public static void ReplacePreferenceFile(string filename, string target, string replace)
@@ -604,11 +517,11 @@ namespace Lanstaller
     }
 
 
-    
-
-  
 
 
 
-    
+
+
+
+
 }

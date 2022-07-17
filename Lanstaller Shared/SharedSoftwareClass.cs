@@ -21,17 +21,23 @@ namespace Lanstaller_Shared
     {
         public static string ConnectionString;
 
-        public int id;
-        public string Name;
+        public SoftwareInfo Identity = new SoftwareInfo();
 
-        public static List<FileCopyOperation> FileCopyList = new List<FileCopyOperation>();
-        public static List<RegistryOperation> RegistryList = new List<RegistryOperation>();
-        public static List<ShortcutOperation> ShortcutList = new List<ShortcutOperation>();
-        public static List<SerialNumber> SerialList = new List<SerialNumber>();
+        public List<FileCopyOperation> FileCopyList = new List<FileCopyOperation>();
+        public List<RegistryOperation> RegistryList = new List<RegistryOperation>();
+        public List<ShortcutOperation> ShortcutList = new List<ShortcutOperation>();
+        public List<SerialNumber> SerialList = new List<SerialNumber>();
 
-        public static List<FirewallRule> FirewallRuleList = new List<FirewallRule>();
-        public static List<PreferenceOperation> PreferenceOperationList = new List<PreferenceOperation>();
-        public static List<Redistributable> RedistributableList = new List<Redistributable>();
+        public List<FirewallRule> FirewallRuleList = new List<FirewallRule>();
+        public List<PreferenceOperation> PreferenceOperationList = new List<PreferenceOperation>();
+        public List<Redistributable> RedistributableList = new List<Redistributable>();
+
+
+        public class SoftwareInfo
+        {
+            public int id;
+            public string Name;
+        }
 
 
         public class FileInfoClass
@@ -40,11 +46,12 @@ namespace Lanstaller_Shared
             public long size;
             public string hash;
             public string source;
+
         }
 
         public class FileCopyOperation
         {
-            public FileInfoClass fileinfo;
+            public FileInfoClass fileinfo = new FileInfoClass();
             public string destination;
         }
 
@@ -112,9 +119,9 @@ namespace Lanstaller_Shared
         }
 
 
-        public static List<SoftwareClass> LoadSoftware()
+        public static List<SoftwareInfo> LoadSoftware()
         {
-            List<SoftwareClass> tmpList = new List<SoftwareClass>();
+            List<SoftwareInfo> tmpList = new List<SoftwareInfo>();
 
             //Get List of Software from Server
             string QueryString = "SELECT [id],[name] from tblSoftware order by [name]";
@@ -125,7 +132,7 @@ namespace Lanstaller_Shared
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
-                SoftwareClass tmpSoftware = new SoftwareClass();
+                SoftwareInfo tmpSoftware = new SoftwareInfo();
                 tmpSoftware.id = (int)SQLOutput[0];
                 tmpSoftware.Name = SQLOutput[1].ToString();
                 tmpList.Add(tmpSoftware);
@@ -183,34 +190,108 @@ namespace Lanstaller_Shared
 
         }
 
-        public static void GetFiles(int softwareid, string ServerAddress)
+        public void GetFiles()
         {
             FileCopyList.Clear();
 
-            string QueryString = "select [source],[destination],[filesize] from tblFiles WHERE software_id = @softwareid ORDER BY filesize ASC";
+            string QueryString = "SELECT [id],[source],[destination],[filesize],[hash_md5] from tblFiles WHERE software_id = @softwareid ORDER BY filesize ASC";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
                 //Prepare full source and destination locations for transfer process.
-
                 FileCopyOperation tFCO = new FileCopyOperation();
-                tFCO.fileinfo.source = ServerAddress + "\\" + SQLOutput[0].ToString();
-                tFCO.destination = SQLOutput[1].ToString();
-                tFCO.fileinfo.size = (long)SQLOutput[2];
+                tFCO.fileinfo.id = (int)SQLOutput[0];
+                tFCO.fileinfo.source = SQLOutput[1].ToString();
+                tFCO.destination = SQLOutput[2].ToString();
+                tFCO.fileinfo.size = (long)SQLOutput[3];
+                tFCO.fileinfo.hash = SQLOutput[4].ToString();
 
                 //Add copy operation to list.
                 FileCopyList.Add(tFCO);
-
             }
             SQLConn.Close();
         }
 
-        public static void GetShortcuts(int SoftwareID)
+        public void GetRegistry()
+        {
+            RegistryList.Clear();
+
+            string QueryString = "select [hkey],[subkey],[value],[type],[data] from [tblRegistry] WHERE software_id = @softwareid";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                RegistryOperation tReg = new RegistryOperation();
+                tReg.hkey = ((int)SQLOutput[0]); //Hive Key.
+                tReg.subkey = SQLOutput[1].ToString(); //Sub Key.
+                tReg.value = SQLOutput[2].ToString();
+                tReg.regtype = ((int)SQLOutput[3]);
+                tReg.data = ReplaceSerial(SQLOutput[4].ToString()); //Includes ReplaceSerial to check for Serial number.
+
+                RegistryList.Add(tReg);
+            }
+            SQLConn.Close();
+        }
+
+        //Gets Serial Requirements for Queued Installs.
+        public void GetSerials()
+        {
+            SerialList.Clear();
+                string QueryString = "select [name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid";
+
+                SqlConnection SQLConn = new SqlConnection(ConnectionString);
+                SQLConn.Open();
+                SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+                SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
+                SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+                while (SQLOutput.Read())
+                {
+                    SerialNumber tSerial = new SerialNumber();
+                    tSerial.softwareid = Identity.id;
+                    tSerial.name = SQLOutput[0].ToString();
+                    tSerial.instancenumber = (int)SQLOutput[1];
+                    tSerial.regKey = SQLOutput[2].ToString();
+                    tSerial.regVal = SQLOutput[3].ToString();
+                    SerialList.Add(tSerial);
+                }
+                SQLConn.Close();
+        }
+
+        string ReplaceSerial(string data)
+        {
+            //Serial Numbers.
+            //Check SerialList for matching serial number.
+            string newdata = data;
+            //check if %SERIALx%
+            Regex rx = new Regex("[%SERIAL]\\d[%]");
+
+            if (rx.Matches(data).Count > 0)
+            {
+                int SInstance = int.Parse(rx.Match(data).Value.ToString().Substring(1, 1)); //Get Serial Instance Number.
+                string replacestring = "%SERIAL" + SInstance.ToString() + "%";
+
+                foreach (SerialNumber SN in SerialList)
+                {
+                        if (SN.instancenumber == SInstance)
+                        {
+                            newdata = newdata.Replace(replacestring, SN.serialnumber); //update serial number.
+                        }
+                }
+
+            }
+            return newdata;
+        }
+
+        public void GetShortcuts()
         {
             ShortcutList.Clear();
 
@@ -219,7 +300,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -236,14 +317,14 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
-        public static void GetPreferenceFiles(int softwareid)
+        public void GetPreferenceFiles()
         {
             string QueryString = "select [filepath],[target],[replace] from tblPreferenceFiles WHERE software_id = @softwareid";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -257,10 +338,10 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
-        public static void GetFirewallRules(int softwareid)
+        public void GetFirewallRules()
         {
             //Software name used for Windows Firewall rule.
-            string softwarename = GetSoftwareName(softwareid);
+            string softwarename = GetSoftwareName(Identity.id);
 
             FirewallRuleList.Clear(); //Reset list.
 
@@ -268,7 +349,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -280,7 +361,7 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
-        public static void GetRedistributables(int softwareid)
+        public void GetRedistributables()
         {
 
             //Get Required Redist ID for install.
@@ -288,7 +369,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
