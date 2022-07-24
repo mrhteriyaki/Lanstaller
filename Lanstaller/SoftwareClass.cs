@@ -13,8 +13,11 @@ using System.Text.RegularExpressions; //Regex
 using System.Diagnostics;
 
 using System.IO;
+using System.Net;
 
 using Lanstaller_Shared;
+
+using Newtonsoft.Json;
 
 
 namespace Lanstaller
@@ -32,13 +35,31 @@ namespace Lanstaller
         static readonly object _statuslock = new object();
         static readonly object _progresslock = new object();
 
+        public static string Server = "";
+        static string _authkey = "";
+        public static Server FileServer;
 
+        static WebClient WC = new System.Net.WebClient();
+        
+        public static void SetAuthKey(string authkey)
+        {
+            _authkey = authkey;
+            WC.Headers.Add("authorization", _authkey);
+        }
 
+        public static Server GetFileServerFromAPI()
+        {
+            return (Server)JsonConvert.DeserializeObject(WC.DownloadString(Server + "InstallationList/Server"));
+        }
+      
+        public static List<SoftwareClass.SoftwareInfo> GetSoftwareList()
+        {
+            return (List<SoftwareClass.SoftwareInfo>)JsonConvert.DeserializeObject(WC.DownloadString(Server + "InstallationList/Software"));
+        }
+        
 
         public void Install(bool installfiles, bool installregistry, bool installshortcuts, bool apply_windowssettings, bool apply_preferences, bool install_redist)
         {
-            string ServerAddress = GetServers();
-
             //Run Installation
 
             if (installregistry)
@@ -292,7 +313,8 @@ namespace Lanstaller
 
             }
 
-            string ServerAddress = GetServers();
+            Server FileServer = GetFileServer();
+            
 
             int copycount = 0;
             long bytecounter = 0;
@@ -322,7 +344,18 @@ namespace Lanstaller
                     "Copied (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
                 try
                 {
-                    Pri.LongPath.File.Copy(ServerAddress + "\\" + FCO.fileinfo.source, FCO.destination, true);
+                    if (FileServer.protocol == "web")
+                    {
+                        //Web mode.
+                        //MessageBox.Show("http://lanstallerfiles.mrhsystems.com/Games%20Source/" + FCO.fileinfo.source);
+                        WC.DownloadFile(FileServer.path + FCO.fileinfo.source, FCO.destination);
+                    }
+                    else if (FileServer.protocol == "smb")
+                    {
+                        //SMB mode.
+                        Pri.LongPath.File.Copy(FileServer.path + "\\" + FCO.fileinfo.source, FCO.destination, true);
+                        //System.IO.File.Copy(ServerAddress + "\\" + FCO.fileinfo.source, FCO.destination, true);
+                    }
                     copycount++;
                 }
                 catch (System.Threading.ThreadAbortException ex)

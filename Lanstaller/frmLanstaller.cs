@@ -26,9 +26,7 @@ namespace Lanstaller
     {
         List<SoftwareClass.SoftwareInfo> SList; //List of Software.
         List<ClientSoftwareClass> InstallList = new List<ClientSoftwareClass>();
-        List<Tool> ToolList = new List<Tool>();
-
-
+        List<SoftwareClass.Tool> ToolList = new List<SoftwareClass.Tool>();
 
         Thread MThread; //Status Monitor Thread
         Thread CThread; //Chat Thread
@@ -57,6 +55,14 @@ namespace Lanstaller
                 {
                     ClientSoftwareClass.ConnectionString = line;
                 }
+                else if (line.StartsWith("authkey="))
+                {
+                    ClientSoftwareClass.SetAuthKey(line.Substring(8));
+                }
+                else if (line.StartsWith("server="))
+                {
+                    ClientSoftwareClass.Server = "http://" + line.Substring(7) + "/";
+                }
             }
 
             btnInstall.Text = "Start" + Environment.NewLine + "Install";
@@ -81,9 +87,10 @@ namespace Lanstaller
 
 
             //Load software list from Server.
+
             SList = SoftwareClass.LoadSoftware();
-
-
+            //Web api replacememnt - debug required.
+            //SList = ClientSoftwareClass.GetSoftwareList();
             foreach (SoftwareClass.SoftwareInfo Sw in SList)
             {
                 cmbxSoftware.Items.Add(Sw.Name);
@@ -101,38 +108,16 @@ namespace Lanstaller
             GetTools();
 
 
-
-
-
-        }
-
-        class Tool
-        {
-            public string name;
-            public string filepath;
         }
 
         void GetTools()
         {
-            string QueryString = "SELECT [name],[path] FROM tblTools";
-
-            SqlConnection SQLConn = new SqlConnection(ClientSoftwareClass.ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SqlDataReader SR = SQLCmd.ExecuteReader();
-            while (SR.Read())
+            foreach (SoftwareClass.Tool TL in SoftwareClass.GetTools())
             {
-                Tool tmpTool = new Tool();
-                tmpTool.name = SR[0].ToString();
-                tmpTool.filepath = SR[1].ToString();
-                ToolList.Add(tmpTool);
-
-                cmbxTool.Items.Add(tmpTool.name);
+                ToolList.Add(TL);
+                cmbxTool.Items.Add(TL.Name);
             }
-            SQLConn.Close();
         }
-
-
 
         void StatusMonitorThread()
         {
@@ -190,9 +175,6 @@ namespace Lanstaller
                 }
                 Thread.Sleep(300);
             }
-
-
-
         }
 
         void EnableInstallControls(bool state)
@@ -416,7 +398,7 @@ namespace Lanstaller
             }
             try
             {
-                Process.Start(ToolList[cmbxTool.SelectedIndex].filepath);
+                Process.Start(ToolList[cmbxTool.SelectedIndex].path);
             }
             catch (Exception ex)
             {
@@ -459,14 +441,14 @@ namespace Lanstaller
 
             long filesize = ClientSoftwareClass.GetInstallSize(SList[cmbxSoftware.SelectedIndex].id);
 
-            double mbfilesize = (double)filesize / 1048576;
+            double mbfilesize = (double)filesize / (double)1048576;
             if (mbfilesize < 1000)
             {
                 lblSpaceRequired.Text = "Space Required: " + Math.Round(mbfilesize, 2).ToString() + "MB";
             }
             else
             {
-                double gbfilesize = filesize / 1073741824;
+                double gbfilesize = filesize / (double)1073741824;
                 lblSpaceRequired.Text = "Space Required: " + Math.Round(gbfilesize, 2).ToString() + "GB";
             }
 
@@ -531,6 +513,9 @@ namespace Lanstaller
             }
         }
 
+        private void txtChatSendMessage_TextChanged(object sender, EventArgs e)
+        {
 
+        }
     }
 }

@@ -64,6 +64,7 @@
     <Compile Include="frmLanstallerManager.Designer.cs">
       <DependentUpon>frmLanstallerManager.cs</DependentUpon>
     </Compile>
+    <Compile Include="LanstallerManagement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmLanstallerManager.resx">

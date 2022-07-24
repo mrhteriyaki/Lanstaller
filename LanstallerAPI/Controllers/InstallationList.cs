@@ -14,13 +14,33 @@ namespace LanstallerAPI.Controllers
         [Route("Software")]
         public string Software()
         {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
             return JsonConvert.SerializeObject(SoftwareClass.LoadSoftware());
+        }
+
+        //Get Servers.
+        [Route("Server")]
+        public string Server()
+        {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+            return JsonConvert.SerializeObject(SoftwareClass.GetFileServer());
         }
 
         //GetFiles
         [Route("Files")]
         public string Files(int swid)
         {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+
             SoftwareClass SWC = new SoftwareClass();
             SWC.Identity.id = swid;
             SWC.GetFiles();
@@ -32,6 +52,11 @@ namespace LanstallerAPI.Controllers
         [Route("Registry")]
         public string Registry(int swid)
         {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+
             SoftwareClass SWC = new SoftwareClass();
             SWC.Identity.id = swid;
             SWC.GetRegistry();
@@ -42,6 +67,11 @@ namespace LanstallerAPI.Controllers
         [Route("Shortcuts")]
         public string Shortcuts(int swid)
         {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+
             SoftwareClass SWC = new SoftwareClass();
             SWC.Identity.id = swid;
             SWC.GetShortcuts();
@@ -51,6 +81,11 @@ namespace LanstallerAPI.Controllers
         [Route("Firewall")]
         public string Firewall(int swid)
         {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+
             SoftwareClass SWC = new SoftwareClass();
             SWC.Identity.id = swid;
             SWC.GetFirewallRules();
@@ -60,6 +95,11 @@ namespace LanstallerAPI.Controllers
         [Route("Preferences")]
         public string Preferences(int swid)
         {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+
             SoftwareClass SWC = new SoftwareClass();
             SWC.Identity.id = swid;
             SWC.GetPreferenceFiles();
@@ -69,6 +109,11 @@ namespace LanstallerAPI.Controllers
         [Route("Redistributables")]
         public string Redistributables(int swid)
         {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+
             SoftwareClass SWC = new SoftwareClass();
             SWC.Identity.id = swid;
             SWC.GetRedistributables();
@@ -79,6 +124,11 @@ namespace LanstallerAPI.Controllers
         [Route("Serials")]
         public string Serials(int swid)
         {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+
             SoftwareClass SWC = new SoftwareClass();
             SWC.Identity.id = swid;
             SWC.GetSerials();

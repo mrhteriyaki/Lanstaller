@@ -442,7 +442,7 @@ namespace Lanstaller_Management_Console
         private void btnRescanFileSize_Click(object sender, EventArgs e)
         {
             btnRescanFileSize.Enabled = false;
-            SoftwareClass.RescanFileSize();
+            LanstallerManagement.RescanFileSize();
             btnRescanFileSize.Enabled = true;
         }
 

@@ -39,6 +39,13 @@ namespace Lanstaller_Shared
             public string Name;
         }
 
+        public class Tool
+        {
+            public int id;
+            public string Name;
+            public string path;
+        }
+
 
         public class FileInfoClass
         {
@@ -96,6 +103,11 @@ namespace Lanstaller_Shared
             public string version;
         }
 
+        public class Server
+        {
+            public string path;
+            public string protocol;
+        }
 
         public class RegistryOperation
         {
@@ -140,6 +152,26 @@ namespace Lanstaller_Shared
             SQLConn.Close();
 
             return tmpList;
+        }
+
+        public static List<Tool> GetTools()
+        {
+            List<Tool> tmpList = new List<Tool>();
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand("SELECT id,[name],[path] from tblTools", SQLConn);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                Tool tmpTool = new Tool();
+                tmpTool.id = (int)SQLOutput[0];
+                tmpTool.Name = SQLOutput[1].ToString();
+                tmpTool.path = SQLOutput[2].ToString();
+                tmpList.Add(tmpTool);
+            }
+            SQLConn.Close();
+
+            return tmpList;
 
         }
 
@@ -157,20 +189,35 @@ namespace Lanstaller_Shared
             return idval;
         }
 
-        public static string GetServers()
+        public static Server GetFileServer()
+        {
+            return GetFileServer("");
+        }
+
+        public static Server GetFileServer(string servertype)
         {
             //ServerList.Clear();
-            string QueryString = "SELECT TOP(1) [address] FROM [tblServers]";
-
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
+
+            SQLCmd.CommandText = "SELECT TOP (1) [address],[type] FROM [tblServers] ORDER BY [Priority] ASC";
+            if (servertype != "")
+            {
+                SQLCmd.CommandText = "SELECT TOP (1) [address],[type] FROM [tblServers] WHERE [type] = @servertype ORDER BY [Priority] ASC";
+                SQLCmd.Parameters.AddWithValue("servertype", servertype);
+            }
+
             SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            string servadd = SQLCmd.ExecuteScalar().ToString();
-
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            Server tmpServ = new Server();
+            while (SQLOutput.Read())
+            {
+                tmpServ.path = SQLOutput[0].ToString();
+                tmpServ.protocol = SQLOutput[1].ToString();
+            }          
             SQLConn.Close();
-
-            return servadd;
-
+            return tmpServ;
         }
 
         public static string GetSoftwareName(int softwareid)
@@ -246,24 +293,24 @@ namespace Lanstaller_Shared
         public void GetSerials()
         {
             SerialList.Clear();
-                string QueryString = "select [name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid";
+            string QueryString = "select [name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid";
 
-                SqlConnection SQLConn = new SqlConnection(ConnectionString);
-                SQLConn.Open();
-                SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-                SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
-                SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
-                while (SQLOutput.Read())
-                {
-                    SerialNumber tSerial = new SerialNumber();
-                    tSerial.softwareid = Identity.id;
-                    tSerial.name = SQLOutput[0].ToString();
-                    tSerial.instancenumber = (int)SQLOutput[1];
-                    tSerial.regKey = SQLOutput[2].ToString();
-                    tSerial.regVal = SQLOutput[3].ToString();
-                    SerialList.Add(tSerial);
-                }
-                SQLConn.Close();
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                SerialNumber tSerial = new SerialNumber();
+                tSerial.softwareid = Identity.id;
+                tSerial.name = SQLOutput[0].ToString();
+                tSerial.instancenumber = (int)SQLOutput[1];
+                tSerial.regKey = SQLOutput[2].ToString();
+                tSerial.regVal = SQLOutput[3].ToString();
+                SerialList.Add(tSerial);
+            }
+            SQLConn.Close();
         }
 
         string ReplaceSerial(string data)
@@ -281,10 +328,10 @@ namespace Lanstaller_Shared
 
                 foreach (SerialNumber SN in SerialList)
                 {
-                        if (SN.instancenumber == SInstance)
-                        {
-                            newdata = newdata.Replace(replacestring, SN.serialnumber); //update serial number.
-                        }
+                    if (SN.instancenumber == SInstance)
+                    {
+                        newdata = newdata.Replace(replacestring, SN.serialnumber); //update serial number.
+                    }
                 }
 
             }
@@ -516,48 +563,11 @@ namespace Lanstaller_Shared
         }
 
 
-        public static void RescanFileSize()
-        {
-            string SA = GetServers();
 
-            string QueryString = "SELECT [id],[source] from tblFiles";
-
-            SqlConnection SQLConn = new SqlConnection(ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SqlDataReader SR = SQLCmd.ExecuteReader();
-
-            List<FileCopyOperation> FileList = new List<FileCopyOperation>();
-
-            while (SR.Read())
-            {
-                FileCopyOperation tmpFCO = new FileCopyOperation();
-                tmpFCO.fileinfo.id = (int)SR[0];
-                tmpFCO.fileinfo.source = SR[1].ToString();
-                Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(SA + "\\" + SR[1].ToString());
-                tmpFCO.fileinfo.size = FI.Length;
-                FileList.Add(tmpFCO);
-            }
-            SQLConn.Close();
-
-            QueryString = "UPDATE tblFiles SET filesize = @filesize WHERE id = @fileid";
-            foreach (FileCopyOperation FCO in FileList)
-            {
-                SQLConn = new SqlConnection(ConnectionString);
-                SQLConn.Open();
-                SQLCmd = new SqlCommand(QueryString, SQLConn);
-                SQLCmd.Parameters.AddWithValue("filesize", FCO.fileinfo.size);
-                SQLCmd.Parameters.AddWithValue("fileid", FCO.fileinfo.id);
-                SQLCmd.ExecuteNonQuery();
-                SQLConn.Close();
-            }
-
-
-        }
 
         public static void RescanFileHashes(bool fullrescan)
         {
-            string SA = GetServers();
+            Server SA = GetFileServer("smb");
 
             string QueryString = "SELECT [id],[source],[hash_md5] from tblFiles";
             if (fullrescan == false)
@@ -590,7 +600,7 @@ namespace Lanstaller_Shared
 
             foreach (FileInfoClass FH in FileHashList)
             {
-                FH.hash = CalculateMD5(SA + "\\" + FH.source);
+                FH.hash = CalculateMD5(SA.path + "\\" + FH.source);
                 SQLConn = new SqlConnection(ConnectionString);
                 SQLCmd = new SqlCommand(QueryString, SQLConn);
                 SQLCmd.Parameters.AddWithValue("fileid", FH.id);
@@ -616,5 +626,23 @@ namespace Lanstaller_Shared
             }
         }
 
+        public static bool CheckSecurityToken(string token)
+        {
+            //tblSecurityTokens
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand("SELECT COUNT(token) FROM tblSecurityTokens WHERE token = @tkval", SQLConn);
+            SQLCmd.Parameters.AddWithValue("tkval",token);
+
+            int tokencount = 0;
+            SQLConn.Open();
+            tokencount = (int)SQLCmd.ExecuteScalar();
+            SQLConn.Close();
+
+            if (tokencount > 0)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

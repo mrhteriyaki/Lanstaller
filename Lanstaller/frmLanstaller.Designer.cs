@@ -368,6 +368,7 @@ namespace Lanstaller
             this.txtChatSendMessage.Name = "txtChatSendMessage";
             this.txtChatSendMessage.Size = new System.Drawing.Size(288, 20);
             this.txtChatSendMessage.TabIndex = 12;
+            this.txtChatSendMessage.TextChanged += new System.EventHandler(this.txtChatSendMessage_TextChanged);
             this.txtChatSendMessage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtChatSendMessage_KeyUp);
             // 
             // btnOpenTool
