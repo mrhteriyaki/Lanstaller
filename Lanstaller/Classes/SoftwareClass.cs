@@ -18,7 +18,7 @@ using System.Net;
 using Lanstaller_Shared;
 
 using Newtonsoft.Json;
-
+using Newtonsoft.Json.Linq;
 
 namespace Lanstaller
 {
@@ -51,12 +51,37 @@ namespace Lanstaller
         {
             return (Server)JsonConvert.DeserializeObject(WC.DownloadString(Server + "InstallationList/Server"));
         }
-      
-        public static List<SoftwareClass.SoftwareInfo> GetSoftwareList()
+
+        public static List<SoftwareClass.SoftwareInfo> GetSoftwareListFromAPI()
         {
-            return (List<SoftwareClass.SoftwareInfo>)JsonConvert.DeserializeObject(WC.DownloadString(Server + "InstallationList/Software"));
+            List<SoftwareClass.SoftwareInfo> SWL = new List<SoftwareClass.SoftwareInfo>();
+            JArray SoftwareArray = JArray.Parse(WC.DownloadString(Server + "InstallationList/Software"));
+            foreach (var SW in SoftwareArray)
+            {
+                SWL.Add(SW.ToObject<SoftwareClass.SoftwareInfo>());
+            }
+            return SWL;
+                     
         }
-        
+
+        public static List<SoftwareClass.Tool> GetToolsListFromAPI()
+        {
+            //List<Tool> GetTools
+            List<Tool> TLL = new List<Tool>();
+            JArray ToolArray = JArray.Parse(WC.DownloadString(Server + "Tools"));
+            foreach (var TL in ToolArray)
+            {
+                TLL.Add(TL.ToObject<Tool>());
+            }
+            return TLL;
+        }
+
+
+
+
+
+
+
 
         public void Install(bool installfiles, bool installregistry, bool installshortcuts, bool apply_windowssettings, bool apply_preferences, bool install_redist)
         {
