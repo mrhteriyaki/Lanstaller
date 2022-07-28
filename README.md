@@ -8,3 +8,6 @@ Include Updates and Mods not provided by original release.
 - Preset in-game settings (Resolution, Username)
 - Automatically add firewall rules.
 - Installs pre-requisite software.
+
+
+![Lanstaller](Docs/Lanstaller.png)
