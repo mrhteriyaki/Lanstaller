@@ -109,8 +109,8 @@ namespace Lanstaller
             MThread.Start();
 
             //Start Chat thread.
-            CThread = new Thread(ChatThread);
-            CThread.Start();
+            //CThread = new Thread(ChatThread);
+            //CThread.Start();
 
 
 
