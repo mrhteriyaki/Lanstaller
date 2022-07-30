@@ -91,6 +91,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\APIClient.cs" />
     <Compile Include="Classes\ChatClient.cs" />
     <Compile Include="Classes\Cryptographic.cs" />
     <Compile Include="frmLanstaller.cs">
@@ -114,7 +115,7 @@
     <Compile Include="frmSerial.Designer.cs">
       <DependentUpon>frmSerial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\SoftwareClass.cs" />
+    <Compile Include="Classes\ClientSoftwareClass.cs" />
     <Compile Include="Classes\WindowsInstallerClass.cs" />
     <EmbeddedResource Include="frmLanstaller.resx">
       <DependentUpon>frmLanstaller.cs</DependentUpon>

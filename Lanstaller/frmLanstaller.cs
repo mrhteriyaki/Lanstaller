@@ -1,22 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 using System.Windows.Forms;
 using System.Threading;
-using System.Data.SqlClient;
 using System.Diagnostics;
-using Microsoft.VisualBasic;
-using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using Lanstaller_Shared;
-
+using Lanstaller.Classes;
 
 namespace Lanstaller
 {
@@ -58,14 +51,14 @@ namespace Lanstaller
                 }
                 else if (line.StartsWith("authkey="))
                 {
-                    ClientSoftwareClass.SetAuthKey(line.Substring(8));
+                    APIClient.SetAuthKey(line.Split('=')[1]);
                 }
-                else if (line.StartsWith("server="))
+                else if (line.StartsWith("apiserver="))
                 {
-                    ClientSoftwareClass.Server = line.Substring(7);
-                    if (!ClientSoftwareClass.Server.EndsWith("/"))
+                    APIClient.APIServer = line.Split('=')[1];
+                    if (!APIClient.APIServer.EndsWith("/"))
                     {
-                        ClientSoftwareClass.Server = ClientSoftwareClass.Server + "/";
+                        APIClient.APIServer = APIClient.APIServer + "/";
                     }
                 }
             }
@@ -98,7 +91,7 @@ namespace Lanstaller
 
 
             //Web API
-            SList = ClientSoftwareClass.GetSoftwareListFromAPI();
+            SList = APIClient.GetSoftwareListFromAPI();
             foreach (SoftwareClass.SoftwareInfo Sw in SList)
             {
                 cmbxSoftware.Items.Add(Sw.Name);
@@ -109,8 +102,8 @@ namespace Lanstaller
             MThread.Start();
 
             //Start Chat thread.
-            //CThread = new Thread(ChatThread);
-            //CThread.Start();
+            CThread = new Thread(ChatThread);
+            //CThread.Start(); //Disabled until code update.
 
 
 
@@ -123,7 +116,7 @@ namespace Lanstaller
             }
             */
 
-            foreach (SoftwareClass.Tool TL in ClientSoftwareClass.GetToolsListFromAPI())
+            foreach (SoftwareClass.Tool TL in APIClient.GetToolsListFromAPI())
             {
                 ToolList.Add(TL);
                 cmbxTool.Items.Add(TL.Name);
@@ -187,268 +180,284 @@ namespace Lanstaller
 
 
         void EnableInstallControls(bool state)
+        {
+            btnInstall.Enabled = state;
+            btnInstall.Visible = state;
+
+            btnAdd.Enabled = state;
+            btnAdd.Visible = state;
+
+            btnClear.Enabled = state;
+            btnClear.Visible = state;
+
+            lbxInstallList.Enabled = state;
+
+            /*
+            chkFiles.Enabled = state;
+            chkRegistry.Enabled = state;
+            chkShortcuts.Enabled = state;
+            chkPreferences.Enabled = state;
+            chkWindowsSettings.Enabled = state;
+            chkRedist.Enabled = state;
+            */
+
+            if (state == false)
             {
-                btnInstall.Enabled = state;
-                btnInstall.Visible = state;
+                //Install running.
+                lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y - 30);
+                lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height + 30);
+                lblMIQ.Location = new Point(lblMIQ.Location.X, lblMIQ.Location.Y - 30);
+            }
+            else if (state == true)
+            {
+                //install normal.
 
-                btnAdd.Enabled = state;
-                btnAdd.Visible = state;
-
-                btnClear.Enabled = state;
-                btnClear.Visible = state;
-
-                lbxInstallList.Enabled = state;
-
-                /*
-                chkFiles.Enabled = state;
-                chkRegistry.Enabled = state;
-                chkShortcuts.Enabled = state;
-                chkPreferences.Enabled = state;
-                chkWindowsSettings.Enabled = state;
-                chkRedist.Enabled = state;
-                */
-
-                if (state == false)
-                {
-                    //Install running.
-                    lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y - 30);
-                    lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height + 30);
-                    lblMIQ.Location = new Point(lblMIQ.Location.X, lblMIQ.Location.Y - 30);
-                }
-                else if (state == true)
-                {
-                    //install normal.
-
-                    lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y + 30);
-                    lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height - 30);
-                    lblMIQ.Location = new Point(lblMIQ.Location.X, lblMIQ.Location.Y + 30);
-                }
-
+                lbxInstallList.Location = new Point(lbxInstallList.Location.X, lbxInstallList.Location.Y + 30);
+                lbxInstallList.Size = new Size(lbxInstallList.Width, lbxInstallList.Height - 30);
+                lblMIQ.Location = new Point(lblMIQ.Location.X, lblMIQ.Location.Y + 30);
             }
 
+        }
 
-            private void btnInstall_Click(object sender, EventArgs e)
+
+        private void btnInstall_Click(object sender, EventArgs e)
+        {
+
+
+            //Check for single install, add selected item to install list.
+            if (lbxInstallList.Items.Count == 0)
             {
-
-
-                //Check for single install, add selected item to install list.
-                if (lbxInstallList.Items.Count == 0)
-                {
-                    //Single install - Use CMBX Selection.
-                    if (cmbxSoftware.SelectedIndex == -1)
-                    {
-                        MessageBox.Show("Nothing Selected");
-                        return;
-                    }
-
-                    //Nothing queued in gui, add currently selected software to queue for install (single entry).
-                    ClientSoftwareClass currentsw = new ClientSoftwareClass();
-                    currentsw.Identity = SList[cmbxSoftware.SelectedIndex];
-                    InstallList.Add(currentsw);
-                }
-                EnableInstallControls(false);
-
-                //Run Installation.
-                InsTrd = new Thread(InstallThread);
-                InsTrd.Start();
-
-
-            }
-
-
-
-            void InstallThread()
-            {
-
-                //Check Install Directory Valid.
-                if (LanstallerSettings.CheckInstallDirectoryValid() == false)
-                {
-                    System.IO.Directory.CreateDirectory(LanstallerSettings.InstallDirectory); //Generate
-                }
-
-                bool install_files = chkFiles.Checked;
-                bool install_reg = chkRegistry.Checked;
-                bool install_shortcut = chkShortcuts.Checked;
-                bool apply_windowssettings = chkWindowsSettings.Checked;
-                bool apply_preferences = chkPreferences.Checked;
-                bool install_redist = chkRedist.Checked;
-
-
-                //Get Serials for All Software
-                if (install_reg)
-                {
-                    foreach (ClientSoftwareClass CSW in InstallList)
-                    {
-                        CSW.GetSerials();
-                        CSW.GenerateSerials();
-                    }
-
-                }
-
-                //Enable progress bar.
-                pbInstall.Invoke((MethodInvoker)delegate
-                {
-                    pbInstall.Visible = true;
-                });
-
-                //Run Through install list and install software.
-                foreach (ClientSoftwareClass CSW in InstallList)
-                {
-                    CSW.Install(install_files, install_reg, install_shortcut, apply_windowssettings, apply_preferences, install_redist);
-                }
-
-                //Reset install list.
-                lbxInstallList.Invoke((MethodInvoker)delegate
-                {
-                    lbxInstallList.Items.Clear();
-                });
-
-                InstallList.Clear();
-
-
-                frmComplete CF = new frmComplete();
-                CF.TopMost = true;
-                CF.FormBorderStyle = FormBorderStyle.None;
-                CF.ShowDialog();
-
-                btnInstall.Invoke((MethodInvoker)delegate
-                {
-                    EnableInstallControls(true);
-                });
-
-                pbInstall.Invoke((MethodInvoker)delegate
-                {
-                    pbInstall.Visible = false;
-                });
-
-            }
-
-            private void btnAdd_Click(object sender, EventArgs e)
-            {
-
+                //Single install - Use CMBX Selection.
                 if (cmbxSoftware.SelectedIndex == -1)
                 {
                     MessageBox.Show("Nothing Selected");
                     return;
                 }
 
-                int index = cmbxSoftware.SelectedIndex;
+                //Nothing queued in gui, add currently selected software to queue for install (single entry).
+                ClientSoftwareClass currentsw = new ClientSoftwareClass();
+                currentsw.Identity = SList[cmbxSoftware.SelectedIndex];
+                InstallList.Add(currentsw);
+            }
+            EnableInstallControls(false);
+
+            //Run Installation.
+            InsTrd = new Thread(InstallThread);
+            InsTrd.Start();
+
+
+        }
+
+
+
+        void InstallThread()
+        {
+
+            //Check Install Directory Valid.
+            if (LanstallerSettings.CheckInstallDirectoryValid() == false)
+            {
+                System.IO.Directory.CreateDirectory(LanstallerSettings.InstallDirectory); //Generate
+            }
+
+            bool install_files = chkFiles.Checked;
+            bool install_reg = chkRegistry.Checked;
+            bool install_shortcut = chkShortcuts.Checked;
+            bool apply_windowssettings = chkWindowsSettings.Checked;
+            bool apply_preferences = chkPreferences.Checked;
+            bool install_redist = chkRedist.Checked;
+
+
+            //Get Serials for All Software
+
+            if (install_reg)
+            {
+                //Get serial keys for all queued installs.
                 foreach (ClientSoftwareClass CSW in InstallList)
                 {
-                    if (SList[index].id == CSW.Identity.id)
+                    foreach(SoftwareClass.SerialNumber SN in SoftwareClass.GetSerials(CSW.Identity.id))
                     {
-                        //Duplicate entry.
-                        MessageBox.Show("Entry already in install list.");
-                        return;
+                        CSW.SerialList.Add(SN);
                     }
-
+                    ClientSoftwareClass.GenerateSerials(CSW.SerialList);
                 }
-
-                //add item to installation list.
-                lbxInstallList.Items.Add(SList[index].Name);
-
-                ClientSoftwareClass currentsw = new ClientSoftwareClass();
-                currentsw.Identity = SList[index];
-                InstallList.Add(currentsw);
-
+               
             }
 
-            private void btnClear_Click(object sender, EventArgs e)
+            //Enable progress bar.
+            pbInstall.Invoke((MethodInvoker)delegate
             {
-                //Reset install list.
+                pbInstall.Visible = true;
+            });
+
+            //Run Through install list and install software.
+            foreach (ClientSoftwareClass CSW in InstallList)
+            {
+                CSW.Install(install_files, install_reg, install_shortcut, apply_windowssettings, apply_preferences, install_redist);
+            }
+
+            //Reset install list.
+            lbxInstallList.Invoke((MethodInvoker)delegate
+            {
                 lbxInstallList.Items.Clear();
-                InstallList.Clear();
+            });
 
+            InstallList.Clear();
+
+
+            frmComplete CF = new frmComplete();
+            CF.TopMost = true;
+            CF.FormBorderStyle = FormBorderStyle.None;
+            CF.ShowDialog();
+
+            btnInstall.Invoke((MethodInvoker)delegate
+            {
+                EnableInstallControls(true);
+            });
+
+            pbInstall.Invoke((MethodInvoker)delegate
+            {
+                pbInstall.Visible = false;
+            });
+
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+
+            if (cmbxSoftware.SelectedIndex == -1)
+            {
+                MessageBox.Show("Nothing Selected");
+                return;
             }
 
-
-
-            private void txtInstallDirectory_TextChanged(object sender, EventArgs e)
+            int index = cmbxSoftware.SelectedIndex;
+            foreach (ClientSoftwareClass CSW in InstallList)
             {
-                LanstallerSettings.SetInstallDirectory(txtInstallDirectory.Text);
-            }
-
-            private void txtWidth_TextChanged(object sender, EventArgs e)
-            {
-                LanstallerSettings.SetWidth(int.Parse(txtWidth.Text));
-            }
-
-            private void txtHeight_TextChanged(object sender, EventArgs e)
-            {
-                LanstallerSettings.SetHeight(int.Parse(txtHeight.Text));
-            }
-
-            private void txtUsername_TextChanged(object sender, EventArgs e)
-            {
-                LanstallerSettings.SetUsername(txtUsername.Text);
-            }
-
-            private void frmLanstaller_Closing(object sender, FormClosingEventArgs e)
-            {
-                shutdown = true;
-                //Shutdown Threads.
-                MThread.Abort();
-                CThread.Abort();
-
-                if (InsTrd != null)
+                if (SList[index].id == CSW.Identity.id)
                 {
-                    InsTrd.Abort();
-                }
-
-
-
-            }
-
-            private void btnOpenTool_Click(object sender, EventArgs e)
-            {
-                if (cmbxTool.SelectedIndex == -1)
-                {
-                    return;
-                }
-                try
-                {
-                    Process.Start(ToolList[cmbxTool.SelectedIndex].path);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Failed to open tool, error:" + ex.ToString());
-                }
-
-
-            }
-
-            private void txtChatSendMessage_KeyUp(object sender, KeyEventArgs e)
-            {
-                if (e.KeyCode != Keys.Return)
-                    return;
-
-                ChatClient.SendMessageAPI(txtChatSendMessage.Text, Environment.UserName);
-            }
-
-
-            private void cmbxSoftware_SelectedIndexChanged(object sender, EventArgs e)
-            {
-                if (cmbxSoftware.SelectedIndex == -1)
-                {
+                    //Duplicate entry.
+                    MessageBox.Show("Entry already in install list.");
                     return;
                 }
 
-
-                long filesize = ClientSoftwareClass.GetInstallSize(SList[cmbxSoftware.SelectedIndex].id);
-
-                double mbfilesize = (double)filesize / (double)1048576;
-                if (mbfilesize < 1000)
-                {
-                    lblSpaceRequired.Text = "Space Required: " + Math.Round(mbfilesize, 2).ToString() + "MB";
-                }
-                else
-                {
-                    double gbfilesize = filesize / (double)1073741824;
-                    lblSpaceRequired.Text = "Space Required: " + Math.Round(gbfilesize, 2).ToString() + "GB";
-                }
-
-
             }
+
+            //add item to installation list.
+            lbxInstallList.Items.Add(SList[index].Name);
+
+            ClientSoftwareClass currentsw = new ClientSoftwareClass();
+            currentsw.Identity = SList[index];
+            InstallList.Add(currentsw);
+
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            //Reset install list.
+            lbxInstallList.Items.Clear();
+            InstallList.Clear();
+
+        }
+
+
+
+        private void txtInstallDirectory_TextChanged(object sender, EventArgs e)
+        {
+            LanstallerSettings.SetInstallDirectory(txtInstallDirectory.Text);
+        }
+
+        private void txtWidth_TextChanged(object sender, EventArgs e)
+        {
+            LanstallerSettings.SetWidth(int.Parse(txtWidth.Text));
+        }
+
+        private void txtHeight_TextChanged(object sender, EventArgs e)
+        {
+            LanstallerSettings.SetHeight(int.Parse(txtHeight.Text));
+        }
+
+        private void txtUsername_TextChanged(object sender, EventArgs e)
+        {
+            LanstallerSettings.SetUsername(txtUsername.Text);
+        }
+
+        private void frmLanstaller_Closing(object sender, FormClosingEventArgs e)
+        {
+            shutdown = true;
+            //Shutdown Threads.
+            MThread.Abort();
+            CThread.Abort();
+
+
+            if (InsTrd != null)
+            {
+                InsTrd.Abort();
+            }
+
+
+
+        }
+
+        private void btnOpenTool_Click(object sender, EventArgs e)
+        {
+            if (cmbxTool.SelectedIndex == -1)
+            {
+                return;
+            }
+            try
+            {
+                //SMB
+                //Process.Start(ToolList[cmbxTool.SelectedIndex].path);
+
+                //WEB
+                string toolpath = ToolList[cmbxTool.SelectedIndex].path;
+                int pathfinishpoint = toolpath.LastIndexOf("\\");
+                string destpath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp\\" + toolpath.Substring(pathfinishpoint);
+
+                ClientSoftwareClass.DownloadFile(ToolList[cmbxTool.SelectedIndex].path, destpath);
+                Process.Start(destpath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to open tool, error:" + ex.ToString());
+            }
+
+
+        }
+
+        private void txtChatSendMessage_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Return)
+                return;
+
+            ChatClient.SendMessageAPI(txtChatSendMessage.Text, Environment.UserName);
+            txtChatSendMessage.Text = "";
+        }
+
+
+        private void cmbxSoftware_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbxSoftware.SelectedIndex == -1)
+            {
+                return;
+            }
+
+
+            long filesize = ClientSoftwareClass.GetInstallSize(SList[cmbxSoftware.SelectedIndex].id);
+
+            double mbfilesize = (double)filesize / (double)1048576;
+            if (mbfilesize < 1000)
+            {
+                lblSpaceRequired.Text = "Space Required: " + Math.Round(mbfilesize, 2).ToString() + "MB";
+            }
+            else
+            {
+                double gbfilesize = filesize / (double)1073741824;
+                lblSpaceRequired.Text = "Space Required: " + Math.Round(gbfilesize, 2).ToString() + "GB";
+            }
+
+
+        }
 
 
         public const int WM_NCLBUTTONDOWN = 0xA1;
@@ -508,9 +517,6 @@ namespace Lanstaller
             }
         }
 
-        private void txtChatSendMessage_TextChanged(object sender, EventArgs e)
-        {
 
-        }
     }
 }

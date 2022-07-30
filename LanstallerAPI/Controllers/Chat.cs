@@ -2,6 +2,8 @@
 using Lanstaller_Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using static Lanstaller_Shared.SharedChat;
+
 
 namespace LanstallerAPI.Controllers
 {
@@ -11,18 +13,41 @@ namespace LanstallerAPI.Controllers
     {
 
         //untested and incomplete.
-
-        public string GetFullChat()
+        [Route("send")]
+        public string Post([FromBody] JObject MessageData)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
 
-            return JsonConvert.SerializeObject(SharedChat.GetFullChat);
+            testclass CM = MessageData.ToObject<testclass>();
+
+            SharedChat.SendMessage(CM.message, CM.sender);
+
+            return "ok";
         }
 
-        public string GetChat(string lastcheck)
+
+        class testclass
+        {
+            public string message;
+            public string sender;
+
+        }
+
+        public string Get()
+        {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+
+            return JsonConvert.SerializeObject(SharedChat.GetFullChat());
+        }
+
+        [Route("update")]
+        public string Update(string lastcheck)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
@@ -31,22 +56,8 @@ namespace LanstallerAPI.Controllers
 
             return JsonConvert.SerializeObject(SharedChat.GetChat(DateTime.Parse(lastcheck)));
         }
+        
 
-        public string Post(string jsondata)
-        {
-            if (Authentication.CheckLogon(HttpContext.Request) == false)
-            {
-                return "auth fail";
-            }
-            
-            JsonConvert.DeserializeObject(jsondata);
-
-            SharedChat.ChatMessage tmpmsg;
-            tmpmsg = (SharedChat.ChatMessage)JsonConvert.DeserializeObject(jsondata);
-
-            SharedChat.SendMessage(tmpmsg.message, tmpmsg.sender);
-
-            return "ok";
-        }
+       
     }
 }

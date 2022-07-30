@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
@@ -13,12 +12,10 @@ using System.Text.RegularExpressions; //Regex
 using System.Diagnostics;
 
 using System.IO;
-using System.Net;
 
 using Lanstaller_Shared;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using static Lanstaller.Classes.APIClient;
 
 namespace Lanstaller
 {
@@ -30,57 +27,13 @@ namespace Lanstaller
 
         //List<Servers> ServerList = new List<Servers>();
 
-
         //Locks.
         static readonly object _statuslock = new object();
         static readonly object _progresslock = new object();
 
-        public static string Server = "";
-        static string _authkey = "";
-        public static Server FileServer;
+        public List<SerialNumber> SerialList = new List<SerialNumber>();
 
-        static WebClient WC = new System.Net.WebClient();
         
-        public static void SetAuthKey(string authkey)
-        {
-            _authkey = authkey;
-            WC.Headers.Add("authorization", _authkey);
-        }
-
-        public static Server GetFileServerFromAPI()
-        {
-            return (Server)JsonConvert.DeserializeObject(WC.DownloadString(Server + "InstallationList/Server"));
-        }
-
-        public static List<SoftwareClass.SoftwareInfo> GetSoftwareListFromAPI()
-        {
-            List<SoftwareClass.SoftwareInfo> SWL = new List<SoftwareClass.SoftwareInfo>();
-            JArray SoftwareArray = JArray.Parse(WC.DownloadString(Server + "InstallationList/Software"));
-            foreach (var SW in SoftwareArray)
-            {
-                SWL.Add(SW.ToObject<SoftwareClass.SoftwareInfo>());
-            }
-            return SWL;
-                     
-        }
-
-        public static List<SoftwareClass.Tool> GetToolsListFromAPI()
-        {
-            //List<Tool> GetTools
-            List<Tool> TLL = new List<Tool>();
-            JArray ToolArray = JArray.Parse(WC.DownloadString(Server + "Tools"));
-            foreach (var TL in ToolArray)
-            {
-                TLL.Add(TL.ToObject<Tool>());
-            }
-            return TLL;
-        }
-
-
-
-
-
-
 
 
         public void Install(bool installfiles, bool installregistry, bool installshortcuts, bool apply_windowssettings, bool apply_preferences, bool install_redist)
@@ -90,51 +43,91 @@ namespace Lanstaller
             if (installregistry)
             {
                 SetStatus("Applying Registry - " + Identity.Name);
-                GetRegistry();
-                GenerateRegistry();
+                List<RegistryOperation> RegistryList;
+
+                //DB
+                //RegistryList = GetRegistry(Identity.id);
+                
+                //Web
+                RegistryList = GetRegistryListFromAPI(Identity.id);
+                GenerateRegistry(RegistryList, SerialList);
             }
 
 
             if (installfiles)
             {
                 SetStatus("Indexing - " + Identity.Name);
-                GetFiles();
+                List<FileCopyOperation> FCL;
+
+                //DB
+                //FCL = GetFiles(Identity.id);
+
+                //Web
+                FCL = GetFilesListFromAPI(Identity.id);
 
                 InstalledSize = 0; //reset install size.
                 InstallSize = GetInstallSize(Identity.id);
 
                 SetStatus("Copying Files - " + Identity.Name);
-                CopyFiles();
+                CopyFiles(FCL);
             }
 
             if (installshortcuts)
             {
                 SetStatus("Generating Shortcuts - " + Identity.Name);
-                GetShortcuts();
-                GenerateShortcuts();
+                List<ShortcutOperation> SCO;
+
+                //DB
+                //SCO = GetShortcuts(Identity.id);
+
+                //WEB
+                SCO = GetShortcutListFromAPI(Identity.id);
+
+                GenerateShortcuts(SCO);
             }
 
             SetStatus("Adding firewall rules - " + Identity.Name);
             //firewall rules.
             if (apply_windowssettings)
             {
-                GetFirewallRules();
-                GenerateFirewallRules();
+                List<FirewallRule> FWL;
+
+                //DB
+                //FWL = GetFirewallRules(Identity.id);
+
+                //WEB
+                FWL = GetFirewallRulesListFromAPI(Identity.id);
+
+                GenerateFirewallRules(FWL);
                 GenerateCompatibility();
             }
 
             SetStatus("Applying Preferences - " + Identity.Name);
             if (apply_preferences)
             {
-                GetPreferenceFiles();
-                GeneratePreferenceFiles();
+                List<PreferenceOperation> POList;
+                
+                //DB
+                //POList = GetPreferenceFiles(Identity.id);
+                
+                //WEB
+                POList = GetPreferencesListFromAPI(Identity.id);
+
+                GeneratePreferenceFiles(POList);
             }
 
             SetStatus("Installing Redistributables - " + Identity.Name);
             if (install_redist)
             {
-                GetRedistributables();
-                GenerateRedistributables();
+                List<Redistributable> RL;
+
+                //DB
+                //RL = GetRedistributables(Identity.id);
+
+                //WEB
+                RL = GetRedistributablesListFromAPI(Identity.id);
+
+                GenerateRedistributables(RL);
             }
 
             SetStatus("Install Complete:" + Environment.NewLine + Identity.Name);
@@ -184,7 +177,7 @@ namespace Lanstaller
 
 
 
-        void GeneratePreferenceFiles()
+        void GeneratePreferenceFiles(List<PreferenceOperation> PreferenceOperationList)
         {
             foreach (PreferenceOperation PO in PreferenceOperationList)
             {
@@ -194,7 +187,7 @@ namespace Lanstaller
 
 
 
-        void GenerateFirewallRules()
+        void GenerateFirewallRules(List<FirewallRule> FirewallRuleList)
         {
             //FirewallRule
             foreach (FirewallRule fwr in FirewallRuleList)
@@ -231,7 +224,7 @@ namespace Lanstaller
 
         }
 
-        public void GenerateRedistributables() //Incomplete.
+        public void GenerateRedistributables(List<Redistributable> RedistributableList) //Incomplete.
         {
             foreach (Redistributable Redist in RedistributableList)
             {
@@ -241,8 +234,10 @@ namespace Lanstaller
             //Check filecheck, if blank, check name against windows installations.
         }
 
-        public void GenerateSerials()
+        public static void GenerateSerials(List<SerialNumber> SerialList)
         {
+            //Updates SerialList with user input.
+
             foreach (SerialNumber SN in SerialList)
             {
                 //Prompt user to enter serial numbers.
@@ -275,7 +270,7 @@ namespace Lanstaller
 
 
 
-        void CopyFiles()
+        void CopyFiles(List<FileCopyOperation> FileCopyList)
         {
 
             //Calculate total copy size.
@@ -339,7 +334,7 @@ namespace Lanstaller
             }
 
             Server FileServer = GetFileServer();
-            
+
 
             int copycount = 0;
             long bytecounter = 0;
@@ -404,6 +399,11 @@ namespace Lanstaller
 
         }
 
+        public static void DownloadFile(string Source, string Destination)
+        {
+            //File download function for Tools.
+            WC.DownloadFile(Source, Destination);
+        }
 
 
 
@@ -419,7 +419,7 @@ namespace Lanstaller
         }
 
 
-        void GenerateRegistry()
+        void GenerateRegistry(List<RegistryOperation> RegistryList, List<SerialNumber> SerialList)
         {
             foreach (RegistryOperation REGOP in RegistryList)
             {
@@ -444,13 +444,15 @@ namespace Lanstaller
                 {
                     //Update data with variable for string.
                     REGOP.data = ReplaceVariable(REGOP.data);
-                }
 
+                    //Update data with serials.
+                    REGOP.data = ReplaceSerial(REGOP.data);
+                }
                 HKEY.SetValue(REGOP.value, REGOP.data, (RegistryValueKind)REGOP.regtype);
             }
         }
 
-        void GenerateShortcuts()
+        void GenerateShortcuts(List<ShortcutOperation>ShortcutList)
         {
             foreach (ShortcutOperation SCO in ShortcutList)
             {
@@ -470,7 +472,7 @@ namespace Lanstaller
 
         public long GetInstallSize()
         {
-           return GetInstallSize(Identity.id);
+            return GetInstallSize(Identity.id);
         }
 
         public static long GetInstallSize(int SoftwareID)
@@ -509,7 +511,30 @@ namespace Lanstaller
         }
 
 
+        string ReplaceSerial(string data)
+        {
+            //Serial Numbers.
+            //Check SerialList for matching serial number.
+            string newdata = data;
+            //check if %SERIALx%
+            Regex rx = new Regex("[%SERIAL]\\d[%]");
 
+            if (rx.Matches(data).Count > 0)
+            {
+                int SInstance = int.Parse(rx.Match(data).Value.ToString().Substring(1, 1)); //Get Serial Instance Number.
+                string replacestring = "%SERIAL" + SInstance.ToString() + "%";
+
+                foreach (SerialNumber SN in SerialList)
+                {
+                    if (SN.instancenumber == SInstance)
+                    {
+                        newdata = newdata.Replace(replacestring, SN.serialnumber); //update serial number.
+                    }
+                }
+
+            }
+            return newdata;
+        }
 
 
         public static void ReplacePreferenceFile(string filename, string target, string replace)

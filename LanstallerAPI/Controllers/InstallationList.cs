@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LanstallerAPI.Controllers
 {
@@ -40,28 +41,7 @@ namespace LanstallerAPI.Controllers
             {
                 return "auth fail";
             }
-
-            SoftwareClass SWC = new SoftwareClass();
-            SWC.Identity.id = swid;
-            SWC.GetFiles();
-            //SoftwareClass.GetFiles(12);
-
-            return JsonConvert.SerializeObject(SWC.FileCopyList);
-        }
-
-        [Route("Registry")]
-        public string Registry(int swid)
-        {
-            if (Authentication.CheckLogon(HttpContext.Request) == false)
-            {
-                return "auth fail";
-            }
-
-            SoftwareClass SWC = new SoftwareClass();
-            SWC.Identity.id = swid;
-            SWC.GetRegistry();
-            return JsonConvert.SerializeObject(SWC.RegistryList);
-
+            return JsonConvert.SerializeObject(SoftwareClass.GetFiles(swid));
         }
 
         [Route("Shortcuts")]
@@ -71,12 +51,20 @@ namespace LanstallerAPI.Controllers
             {
                 return "auth fail";
             }
-
-            SoftwareClass SWC = new SoftwareClass();
-            SWC.Identity.id = swid;
-            SWC.GetShortcuts();
-            return JsonConvert.SerializeObject(SWC.ShortcutList);
+            return JsonConvert.SerializeObject(SoftwareClass.GetShortcuts(swid));
         }
+
+        [Route("Registry")]
+        public string Registry(int swid)
+        {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+            return JsonConvert.SerializeObject(SoftwareClass.GetRegistry(swid));
+
+        }
+        
 
         [Route("Firewall")]
         public string Firewall(int swid)
@@ -85,11 +73,7 @@ namespace LanstallerAPI.Controllers
             {
                 return "auth fail";
             }
-
-            SoftwareClass SWC = new SoftwareClass();
-            SWC.Identity.id = swid;
-            SWC.GetFirewallRules();
-            return JsonConvert.SerializeObject(SWC.FirewallRuleList);
+            return JsonConvert.SerializeObject(SoftwareClass.GetFirewallRules(swid));
         }
 
         [Route("Preferences")]
@@ -99,11 +83,7 @@ namespace LanstallerAPI.Controllers
             {
                 return "auth fail";
             }
-
-            SoftwareClass SWC = new SoftwareClass();
-            SWC.Identity.id = swid;
-            SWC.GetPreferenceFiles();
-            return JsonConvert.SerializeObject(SWC.PreferenceOperationList);
+            return JsonConvert.SerializeObject(SoftwareClass.GetPreferenceFiles(swid));
         }
 
         [Route("Redistributables")]
@@ -114,10 +94,7 @@ namespace LanstallerAPI.Controllers
                 return "auth fail";
             }
 
-            SoftwareClass SWC = new SoftwareClass();
-            SWC.Identity.id = swid;
-            SWC.GetRedistributables();
-            return JsonConvert.SerializeObject(SWC.RedistributableList);
+            return JsonConvert.SerializeObject(SoftwareClass.GetRedistributables(swid));
         }
 
 
@@ -128,11 +105,7 @@ namespace LanstallerAPI.Controllers
             {
                 return "auth fail";
             }
-
-            SoftwareClass SWC = new SoftwareClass();
-            SWC.Identity.id = swid;
-            SWC.GetSerials();
-            return JsonConvert.SerializeObject(SWC.SerialList);
+            return JsonConvert.SerializeObject(SoftwareClass.GetSerials(swid));
         }
 
     }

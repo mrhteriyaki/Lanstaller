@@ -1,11 +1,12 @@
-﻿using Lanstaller_Shared;
+﻿
+using Lanstaller_Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-
+using static Lanstaller.Classes.APIClient;
 
 namespace Lanstaller
 {
@@ -16,6 +17,7 @@ namespace Lanstaller
         public static void SendMessageAPI(string Message, string Sender)
         {
             //Send request to API.
+            WC.UploadData(APIServer + "chat/send", "POST", Encoding.UTF8.GetBytes(Message));
 
         }
 
