@@ -33,6 +33,12 @@ namespace Lanstaller.Classes
             WC.DownloadFile(Source, Destination);
         }
 
+        public static double GetVersion()
+        {
+            //WC
+            return double.Parse(WC.DownloadString(APIServer + "System/version"));
+        }
+
         public static Server GetFileServerFromAPI()
         {
             return (Server)JsonConvert.DeserializeObject(WC.DownloadString(APIServer + "InstallationList/Server"));

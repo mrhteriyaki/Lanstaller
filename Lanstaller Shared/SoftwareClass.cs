@@ -124,6 +124,19 @@ namespace Lanstaller_Shared
 
         }
 
+        public static double GetSystemVersion()
+        {
+            string QueryString = "SELECT [version] from tblSystem";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            double _Version = 0;
+            _Version = (double)SQLCmd.ExecuteScalar();
+            SQLConn.Close();
+
+            return _Version;
+        }
 
         public static List<SoftwareInfo> LoadSoftware()
         {

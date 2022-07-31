@@ -18,6 +18,8 @@ namespace Lanstaller
 
     public partial class frmLanstaller : Form
     {
+        Double Version = 0.1;
+
         List<SoftwareClass.SoftwareInfo> SList; //List of Software.
         List<ClientSoftwareClass> InstallList = new List<ClientSoftwareClass>();
         List<SoftwareClass.Tool> ToolList = new List<SoftwareClass.Tool>();
@@ -69,6 +71,29 @@ namespace Lanstaller
                 }
             }
 
+            //Init threads.
+            MThread = new Thread(StatusMonitorThread);
+            CThread = new Thread(ChatThread);
+
+            //Check Server Version
+            try
+            {
+                double server_version = APIClient.GetVersion();
+                if (server_version != Version)
+                {
+                    MessageBox.Show("Server version does not match client.\nVersion Check Failure\nApplication will now close.");
+                    Application.Exit();
+                    return;
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Server version does not match client.\nVersion Check Failure" + ex.ToString() + "\nApplication will now close.");
+                Application.Exit();
+                return;
+            }
+            
+
 
 
             btnInstall.Text = "Start" + Environment.NewLine + "Install";
@@ -106,11 +131,9 @@ namespace Lanstaller
             }
 
             //Start installation progress bar thread.
-            MThread = new Thread(StatusMonitorThread);
             MThread.Start();
 
             //Start Chat thread.
-            CThread = new Thread(ChatThread);
             CThread.Start(); //Disabled until code update.
 
 
