@@ -316,13 +316,13 @@ namespace Lanstaller
 
 
             //Get Serials for All Software
-
+            
             if (install_reg)
             {
                 //Get serial keys for all queued installs.
                 foreach (ClientSoftwareClass CSW in InstallList)
                 {
-                    foreach(SoftwareClass.SerialNumber SN in SoftwareClass.GetSerials(CSW.Identity.id))
+                    foreach(SoftwareClass.SerialNumber SN in APIClient.GetSerialsListFromAPI(CSW.Identity.id))
                     {
                         CSW.SerialList.Add(SN);
                     }
@@ -511,8 +511,8 @@ namespace Lanstaller
                 return;
             }
 
-
-            long filesize = ClientSoftwareClass.GetInstallSize(SList[cmbxSoftware.SelectedIndex].id);
+            
+            long filesize = APIClient.GetInstallSizeFromAPI(SList[cmbxSoftware.SelectedIndex].id);
 
             double mbfilesize = (double)filesize / (double)1048576;
             if (mbfilesize < 1000)

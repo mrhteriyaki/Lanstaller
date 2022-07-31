@@ -121,6 +121,12 @@ namespace Lanstaller_Shared
 
         }
 
+        public class Compatibility
+        {
+            public string filename;
+            public int compat_type;
+        }
+
         public static double GetSystemVersion()
         {
             string QueryString = "SELECT [version] from tblSystem";
@@ -300,6 +306,31 @@ namespace Lanstaller_Shared
             return RegistryList;
         }
 
+
+        public static List<Compatibility> GetCompatibility(int swid)
+        {
+            //Set compatibility flags in registry.
+            List<Compatibility> CompatList = new List<Compatibility>();
+
+            string QueryString = "select filename,compat_type from tblCompatibility where software_id = @softwareid";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", swid);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                Compatibility tCompat = new Compatibility();
+                tCompat.filename = SQLOutput[0].ToString();
+                tCompat.compat_type = (int)SQLOutput[1];
+                CompatList.Add(tCompat);
+            }
+            SQLConn.Close();
+
+            return CompatList;
+        }
+
         //Gets Serial Requirements for Queued Installs.
         public static List<SerialNumber> GetSerials(int SoftwareID)
         {
@@ -437,7 +468,18 @@ namespace Lanstaller_Shared
 
         }
 
+        public static long GetInstallSize(int SoftwareID)
+        {
+            string QueryString = "SELECT SUM(filesize) FROM tblFiles where software_id = @softwareid";
 
+            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            long filesize = (long)SQLCmd.ExecuteScalar();
+            SQLConn.Close();
+            return filesize;
+        }
 
         public static void AddSerial(string name, int instancenumber, int softwareid, string regKey, string regVal)
         {
@@ -646,5 +688,7 @@ namespace Lanstaller_Shared
             }
             return false;
         }
+
+
     }
 }

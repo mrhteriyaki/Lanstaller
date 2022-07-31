@@ -33,6 +33,17 @@ namespace LanstallerAPI.Controllers
             return JsonConvert.SerializeObject(SoftwareClass.GetFileServer());
         }
 
+        //Get Installation Size
+        [Route("InstallSize")]
+        public string InstallSize(int swid)
+        {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+            return SoftwareClass.GetInstallSize(swid).ToString();
+        }
+
         //GetFiles
         [Route("Files")]
         public string Files(int swid)
@@ -43,6 +54,17 @@ namespace LanstallerAPI.Controllers
             }
             return JsonConvert.SerializeObject(SoftwareClass.GetFiles(swid));
         }
+
+        [Route("Compatibility")]
+        public string Compatibility(int swid)
+        {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+            return JsonConvert.SerializeObject(SoftwareClass.GetCompatibility(swid));
+        }
+
 
         [Route("Shortcuts")]
         public string Shortcuts(int swid)
@@ -64,7 +86,7 @@ namespace LanstallerAPI.Controllers
             return JsonConvert.SerializeObject(SoftwareClass.GetRegistry(swid));
 
         }
-        
+
 
         [Route("Firewall")]
         public string Firewall(int swid)

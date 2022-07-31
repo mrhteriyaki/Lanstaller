@@ -33,6 +33,11 @@ namespace Lanstaller.Classes
             WC.DownloadFile(Source, Destination);
         }
 
+        static string DownloadString(string ListName, int SoftwareID)
+        {
+            return  WC.DownloadString(APIServer + "InstallationList/" + ListName + "?swid=" + SoftwareID.ToString());
+        }
+
         public static double GetVersion()
         {
             //WC
@@ -41,7 +46,10 @@ namespace Lanstaller.Classes
 
         public static Server GetFileServerFromAPI()
         {
-            return (Server)JsonConvert.DeserializeObject(WC.DownloadString(APIServer + "InstallationList/Server"));
+            //return (Server)JsonConvert.DeserializeObject(WC.DownloadString(APIServer + "InstallationList/Server"));
+            Server FS = JObject.Parse(WC.DownloadString(APIServer + "InstallationList/Server")).ToObject<Server>();
+            return FS;
+
         }
         
         static JArray GetInstallationList(string ListName, int SoftwareID)
@@ -61,7 +69,16 @@ namespace Lanstaller.Classes
             }
             return SWL;
         }
-        
+
+        //Get Installation Size.
+        public static long GetInstallSizeFromAPI(int SoftwareID)
+        {
+            List<FileCopyOperation> FCL = new List<FileCopyOperation>();
+            string returnstr = DownloadString("InstallSize", SoftwareID);
+            return long.Parse(returnstr);
+        }
+
+
         //Get Tools
         public static List<Tool> GetToolsListFromAPI()
         {
@@ -112,6 +129,18 @@ namespace Lanstaller.Classes
             }
             return RGL;
         }
+
+        public static List<Compatibility> GetCompatibilitiesFromAPI(int SoftwareID)
+        {
+            List<Compatibility> CPL = new List<Compatibility>();
+            JArray CPArray = GetInstallationList("Compatibility", SoftwareID);
+            foreach (var CP in CPArray)
+            {
+                CPL.Add(CP.ToObject<Compatibility>());
+            }
+            return CPL;
+        }
+
 
         //Firewall
         public static List<FirewallRule> GetFirewallRulesListFromAPI(int SoftwareID)

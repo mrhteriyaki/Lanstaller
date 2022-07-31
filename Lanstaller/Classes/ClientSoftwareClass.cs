@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
@@ -66,7 +65,7 @@ namespace Lanstaller
                 FCL = GetFilesListFromAPI(Identity.id);
 
                 InstalledSize = 0; //reset install size.
-                InstallSize = GetInstallSize(Identity.id);
+                InstallSize = GetInstallSizeFromAPI(Identity.id);
 
                 SetStatus("Copying Files - " + Identity.Name);
                 CopyFiles(FCL);
@@ -86,20 +85,27 @@ namespace Lanstaller
                 GenerateShortcuts(SCO);
             }
 
-            SetStatus("Adding firewall rules - " + Identity.Name);
-            //firewall rules.
+            SetStatus("Updating Windows Settings (Firewall, Compatibility) - " + Identity.Name);
+            //Windows Settings (Firewall rules, Compatibility)
             if (apply_windowssettings)
             {
+                //Firewall
                 List<FirewallRule> FWL;
-
+                
                 //DB
                 //FWL = GetFirewallRules(Identity.id);
 
                 //WEB
                 FWL = GetFirewallRulesListFromAPI(Identity.id);
-
                 GenerateFirewallRules(FWL);
-                GenerateCompatibility();
+
+                //Compatibility.
+                List<Compatibility> CPL = GetCompatibilitiesFromAPI(Identity.id);
+                foreach(Compatibility CP in CPL)
+                {
+                    GenerateCompatibility(CP.filename,CP.compat_type);
+                }
+                
             }
 
             SetStatus("Applying Preferences - " + Identity.Name);
@@ -203,26 +209,7 @@ namespace Lanstaller
             }
         }
 
-        void GenerateCompatibility()
-        {
-            //Set compatibility flags in registry.
-
-            string QueryString = "select filename,compat_type from tblCompatibility where software_id = @softwareid";
-
-            SqlConnection SQLConn = new SqlConnection(ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", Identity.id);
-            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
-
-            while (SQLOutput.Read())
-            {
-                GenerateCompatiblity(SQLOutput[0].ToString(), (int)SQLOutput[1]);
-            }
-
-            SQLConn.Close();
-
-        }
+       
 
         public void GenerateRedistributables(List<Redistributable> RedistributableList) //Incomplete.
         {
@@ -274,7 +261,7 @@ namespace Lanstaller
         {
 
             //Calculate total copy size.
-            long totalbytes = GetInstallSize();
+            long totalbytes = GetInstallSizeFromAPI(Identity.id);
             double totalgbytes = (double)totalbytes / 1073741824;
 
 
@@ -333,7 +320,7 @@ namespace Lanstaller
 
             }
 
-            Server FileServer = GetFileServer();
+            Server FileServer = GetFileServerFromAPI();
 
 
             int copycount = 0;
@@ -402,7 +389,7 @@ namespace Lanstaller
 
 
 
-        public static void GenerateCompatiblity(string filename, int compat_type)
+        public static void GenerateCompatibility(string filename, int compat_type)
         {
             //compat_types:
             if (compat_type == 1)
@@ -465,25 +452,7 @@ namespace Lanstaller
 
         }
 
-        public long GetInstallSize()
-        {
-            return GetInstallSize(Identity.id);
-        }
-
-        public static long GetInstallSize(int SoftwareID)
-        {
-            string QueryString = "SELECT SUM(filesize) FROM tblFiles where software_id = @softwareid";
-
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
-            long filesize = (long)SQLCmd.ExecuteScalar();
-            SQLConn.Close();
-            return filesize;
-        }
-
-
+      
         public static string ReplaceVariable(string dataline)
         {
             //VARIABLES for FilePath, Shortcut Path, Registry Data.
