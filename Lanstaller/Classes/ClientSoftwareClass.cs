@@ -368,7 +368,7 @@ namespace Lanstaller
                     {
                         //Web mode.
                         //MessageBox.Show("http://lanstallerfiles.mrhsystems.com/Games%20Source/" + FCO.fileinfo.source);
-                        WC.DownloadFile(FileServer.path + FCO.fileinfo.source, FCO.destination);
+                        DownloadFile(FileServer.path + FCO.fileinfo.source, FCO.destination);
                     }
                     else if (FileServer.protocol == "smb")
                     {
@@ -398,12 +398,7 @@ namespace Lanstaller
             }
 
         }
-
-        public static void DownloadFile(string Source, string Destination)
-        {
-            //File download function for Tools.
-            WC.DownloadFile(Source, Destination);
-        }
+    
 
 
 

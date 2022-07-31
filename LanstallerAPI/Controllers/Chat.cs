@@ -11,31 +11,6 @@ namespace LanstallerAPI.Controllers
     [Route("chat")]
     public class Chat : ControllerBase
     {
-
-        //untested and incomplete.
-        [Route("send")]
-        public string Post([FromBody] JObject MessageData)
-        {
-            if (Authentication.CheckLogon(HttpContext.Request) == false)
-            {
-                return "auth fail";
-            }
-
-            testclass CM = MessageData.ToObject<testclass>();
-
-            SharedChat.SendMessage(CM.message, CM.sender);
-
-            return "ok";
-        }
-
-
-        class testclass
-        {
-            public string message;
-            public string sender;
-
-        }
-
         public string Get()
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
@@ -46,17 +21,29 @@ namespace LanstallerAPI.Controllers
             return JsonConvert.SerializeObject(SharedChat.GetFullChat());
         }
 
-        [Route("update")]
-        public string Update(string lastcheck)
+        [Route("send")]
+        public string Post([FromBody] ChatMessage cm)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-
-            return JsonConvert.SerializeObject(SharedChat.GetChat(DateTime.Parse(lastcheck)));
+            SendMessage(cm.message,cm.sender);
+            return "";
         }
-        
+
+       
+
+        [Route("check")]
+        public string GetNewCount(int lastid)
+        {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+            return SharedChat.GetMessageCount(lastid).ToString();
+        }
+
 
        
     }

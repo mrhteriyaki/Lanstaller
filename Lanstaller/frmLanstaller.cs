@@ -51,7 +51,10 @@ namespace Lanstaller
                 }
                 else if (line.StartsWith("authkey="))
                 {
-                    APIClient.SetAuthKey(line.Split('=')[1]);
+                    string auth = line.Split('=')[1];
+                    APIClient.SetAuthKey(auth);
+                    ChatClient.InitChatWC(auth);
+
                 }
                 else if (line.StartsWith("apiserver="))
                 {
@@ -59,9 +62,14 @@ namespace Lanstaller
                     if (!APIClient.APIServer.EndsWith("/"))
                     {
                         APIClient.APIServer = APIClient.APIServer + "/";
+                        
                     }
+                    //Set chat server to match api.
+                    ChatClient.ChatServer = APIClient.APIServer;
                 }
             }
+
+
 
             btnInstall.Text = "Start" + Environment.NewLine + "Install";
             lblSpaceRequired.Text = "";
@@ -103,7 +111,7 @@ namespace Lanstaller
 
             //Start Chat thread.
             CThread = new Thread(ChatThread);
-            //CThread.Start(); //Disabled until code update.
+            CThread.Start(); //Disabled until code update.
 
 
 
@@ -147,35 +155,50 @@ namespace Lanstaller
 
         }
 
+        long lastid = 0;
+        
         void ChatThread()
         {
-            DateTime lastcheck = DateTime.Now;
-            StringBuilder MessageBox = new StringBuilder();
-            foreach (SharedChat.ChatMessage CM in ChatClient.GetFullMessagesAPI())
-            {
-                //Get last hour of chat messages.
-                MessageBox.AppendLine(CM.timestamp.ToString("HH:mm:ss") + " " + CM.sender + ":" + CM.message);
-                lastcheck = CM.timestamp;
-            }
-
+            UpdateChatMessages();
+            //lastcheck = CM.timestamp;
             while (shutdown == false)
-            {
-                foreach (SharedChat.ChatMessage CM in ChatClient.GetMessagesAPI(lastcheck))
+            { 
+                if (ChatClient.GetMessageCount(lastid) != 0)
                 {
-                    MessageBox.AppendLine(CM.timestamp.ToString("HH:mm:ss") + " " + CM.sender + ":" + CM.message);
-                    lastcheck = CM.timestamp;
+                    UpdateChatMessages();
                 }
-
-                //Update GUI.
-                txtChatMessages.Invoke((MethodInvoker)delegate
-                {
-                    txtChatMessages.Text = MessageBox.ToString();
-                    txtChatMessages.SelectionStart = txtChatMessages.Text.Length;
-                    txtChatMessages.ScrollToCaret();
-                });
-
                 Thread.Sleep(300);
             }
+            
+        }
+
+        void UpdateChatMessages()
+        {
+            StringBuilder MessageData = new StringBuilder();
+            foreach (SharedChat.ChatMessage CM in ChatClient.GetMessagesAPI())
+            {
+                //Get last hour of chat messages.
+                if (CM.timestamp > DateTime.Today)
+                {
+                    MessageData.AppendLine(CM.timestamp.ToString("HH:mm") + " " + CM.sender + ": " + CM.message);
+                }
+                else
+                {
+                    MessageData.AppendLine("(" + CM.timestamp.ToString("m") + " " + CM.timestamp.ToString("yyyy") + ") " + CM.timestamp.ToString("HH:mm") + " " + CM.sender + ": " + CM.message);
+                }
+                lastid = CM.id;
+            }
+            
+            //Trim empty lastline.
+            string MessageDataStr = MessageData.ToString().Substring(0, (MessageData.Length - 1)); 
+            
+            //Update GUI
+            txtChatMessages.Invoke((MethodInvoker)delegate
+            {
+                txtChatMessages.Text = MessageDataStr.ToString();
+                txtChatMessages.SelectionStart = txtChatMessages.Text.Length;
+                txtChatMessages.ScrollToCaret();
+            });
         }
 
 
@@ -414,7 +437,7 @@ namespace Lanstaller
                 int pathfinishpoint = toolpath.LastIndexOf("\\");
                 string destpath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp\\" + toolpath.Substring(pathfinishpoint);
 
-                ClientSoftwareClass.DownloadFile(ToolList[cmbxTool.SelectedIndex].path, destpath);
+                APIClient.DownloadFile(ToolList[cmbxTool.SelectedIndex].path, destpath);
                 Process.Start(destpath);
             }
             catch (Exception ex)
@@ -430,7 +453,28 @@ namespace Lanstaller
             if (e.KeyCode != Keys.Return)
                 return;
 
-            ChatClient.SendMessageAPI(txtChatSendMessage.Text, Environment.UserName);
+            try
+            {
+                SharedChat.ChatMessage tMsg = new SharedChat.ChatMessage();
+                tMsg.message = txtChatSendMessage.Text;
+                tMsg.sender = txtUsername.Text;
+                tMsg.timestamp = DateTime.Now;
+
+                ChatClient.SendMessageAPI(tMsg);
+
+                string MessageData = txtChatMessages.Text.ToString() + Environment.NewLine + tMsg.timestamp.ToString("HH:mm") + " " + tMsg.sender + ": " + tMsg.message;
+                txtChatMessages.Text = MessageData;
+                txtChatMessages.SelectionStart = MessageData.Length;
+                txtChatMessages.ScrollToCaret();
+
+            }
+            catch(Exception ex)
+            {
+                //Failed to send.
+                MessageBox.Show(ex.ToString());
+            }
+            
+            
             txtChatSendMessage.Text = "";
         }
 

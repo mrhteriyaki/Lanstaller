@@ -17,15 +17,22 @@ namespace Lanstaller.Classes
     {
         //Client side functions to access Lanstaller API.
         
-        public static WebClient WC = new System.Net.WebClient();
+        static WebClient WC = new System.Net.WebClient();
         public static string APIServer = "";
         static string _authkey = "";
         public static void SetAuthKey(string authkey)
         {
             _authkey = authkey;
+            WC.Headers.Clear();
             WC.Headers.Add("authorization", _authkey);
         }
-       
+
+        public static void DownloadFile(string Source, string Destination)
+        {
+            //File download function for Tools.
+            WC.DownloadFile(Source, Destination);
+        }
+
         public static Server GetFileServerFromAPI()
         {
             return (Server)JsonConvert.DeserializeObject(WC.DownloadString(APIServer + "InstallationList/Server"));

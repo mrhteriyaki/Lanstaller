@@ -14,39 +14,34 @@ namespace Lanstaller_Shared
 
         public class ChatMessage
         {
-            public string message;
-            public string sender;
-            public DateTime timestamp;
+            public long id { get; set; }
+            public string message { get; set; } //get;set; required for Json.
+            public string sender { get; set; }
+            public DateTime timestamp { get; set; }
         }
-
-        public static List<ChatMessage> GetChat(DateTime FromTimestamp)
+        
+        public static int GetMessageCount(int lastId)
         {
-            string QueryString = "SELECT [timestamp],[message],[sender] from tblMessages WHERE [timestamp] > @frmtm ORDER BY [timestamp] ASC";
+            string QueryString = "SELECT COUNT([id]) from tblMessages WHERE [id] > @lid";
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);         
 
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("frmtm", FromTimestamp);
-            SqlDataReader SR = SQLCmd.ExecuteReader();
-            List<ChatMessage> ChatMessages = new List<ChatMessage>();
-            while (SR.Read())
-            {
-                ChatMessage tmpMsg = new ChatMessage();
-                tmpMsg.timestamp = (DateTime)SR["timestamp"];
-                tmpMsg.message = SR["message"].ToString();
-                tmpMsg.sender = SR["sender"].ToString();
-                ChatMessages.Add(tmpMsg);
-            }
+            SQLCmd.Parameters.AddWithValue("lid", lastId);
+            int count = 0;
+            count = (int)SQLCmd.ExecuteScalar();           
             SQLConn.Close();
 
-            return ChatMessages;
+            return count;
 
         }
+        
 
         public static List<ChatMessage> GetFullChat()
         {
             //Returns last hour of chat messages.
-            string QueryString = "SELECT [timestamp],[message],[sender] from tblMessages WHERE [timestamp] > DATEADD(HOUR, -1, GETDATE()) ORDER BY [timestamp] ASC";
+            //string QueryString = "SELECT TOP(50) [timestamp],[message],[sender] from tblMessages WHERE [timestamp] > DATEADD(HOUR, -1, GETDATE()) ORDER BY [timestamp] ASC";
+            string QueryString = "SELECT TOP(35) [id],[timestamp],[message],[sender] from tblMessages ORDER BY [id] DESC";
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
 
             SQLConn.Open();
@@ -57,6 +52,7 @@ namespace Lanstaller_Shared
             while (SR.Read())
             {
                 ChatMessage tmpMsg = new ChatMessage();
+                tmpMsg.id = (long)SR["id"];
                 tmpMsg.timestamp = (DateTime)SR["timestamp"];
                 tmpMsg.message = SR["message"].ToString();
                 tmpMsg.sender = SR["sender"].ToString();
@@ -76,6 +72,8 @@ namespace Lanstaller_Shared
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
         }
+
+        
 
 
 
