@@ -23,9 +23,6 @@ namespace Lanstaller_Shared
 
         public SoftwareInfo Identity = new SoftwareInfo();
 
-        
-
-
 
         public class SoftwareInfo
         {

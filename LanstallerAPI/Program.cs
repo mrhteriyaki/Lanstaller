@@ -25,6 +25,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
 SoftwareClass.ConnectionString = app.Configuration.GetValue<string>("ConnectionString");
 
 app.Run();

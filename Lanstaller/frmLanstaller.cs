@@ -41,7 +41,9 @@ namespace Lanstaller
             //Load Config File.
             if (!File.Exists("config.ini"))
             {
-                MessageBox.Show("Missing config file - no database information");
+                //Generate Config File if missing.
+                frmConfigInput CI = new frmConfigInput();
+                CI.ShowDialog();
             }
 
 

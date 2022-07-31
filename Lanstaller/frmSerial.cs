@@ -76,9 +76,6 @@ namespace Lanstaller
             }
         }
 
-        private void frmSerial_Load(object sender, EventArgs e)
-        {
-
-        }
+        
     }
 }

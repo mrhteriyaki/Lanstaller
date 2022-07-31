@@ -107,6 +107,12 @@
       <DependentUpon>frmComplete.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\LanstallerSettings.cs" />
+    <Compile Include="frmConfigInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmConfigInput.Designer.cs">
+      <DependentUpon>frmConfigInput.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="frmSerial.cs">
@@ -122,6 +128,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmComplete.resx">
       <DependentUpon>frmComplete.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmConfigInput.resx">
+      <DependentUpon>frmConfigInput.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

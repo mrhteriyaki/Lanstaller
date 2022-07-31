@@ -95,7 +95,6 @@ namespace Lanstaller
             this.Name = "frmSerial";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SerialForm";
-            this.Load += new System.EventHandler(this.frmSerial_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
