@@ -19,10 +19,9 @@ namespace Lanstaller
     public partial class frmLanstaller : Form
     {
         Double Version = 0.1;
-
-        List<SoftwareClass.SoftwareInfo> SList; //List of Software.
         List<ClientSoftwareClass> InstallList = new List<ClientSoftwareClass>();
-        List<SoftwareClass.Tool> ToolList = new List<SoftwareClass.Tool>();
+        List<ClientSoftwareClass.SoftwareInfo> SList; //List of Software.
+        List<ClientSoftwareClass.Tool> ToolList = new List<ClientSoftwareClass.Tool>();
 
         Thread MThread; //Status Monitor Thread
         Thread CThread; //Chat Thread
@@ -49,11 +48,13 @@ namespace Lanstaller
 
             foreach (string line in System.IO.File.ReadAllLines("config.ini"))
             {
+                /*
                 if (line.StartsWith("Data Source="))
                 {
                     ClientSoftwareClass.ConnectionString = line;
                 }
-                else if (line.StartsWith("authkey="))
+                else */
+                if (line.StartsWith("authkey="))
                 {
                     string auth = line.Split('=')[1];
                     APIClient.SetAuthKey(auth);
@@ -127,7 +128,7 @@ namespace Lanstaller
 
             //Web API
             SList = APIClient.GetSoftwareListFromAPI();
-            foreach (SoftwareClass.SoftwareInfo Sw in SList)
+            foreach (ClientSoftwareClass.SoftwareInfo Sw in SList)
             {
                 cmbxSoftware.Items.Add(Sw.Name);
             }
@@ -149,7 +150,7 @@ namespace Lanstaller
             }
             */
 
-            foreach (SoftwareClass.Tool TL in APIClient.GetToolsListFromAPI())
+            foreach (ClientSoftwareClass.Tool TL in APIClient.GetToolsListFromAPI())
             {
                 ToolList.Add(TL);
                 cmbxTool.Items.Add(TL.Name);
@@ -322,7 +323,7 @@ namespace Lanstaller
                 //Get serial keys for all queued installs.
                 foreach (ClientSoftwareClass CSW in InstallList)
                 {
-                    foreach(SoftwareClass.SerialNumber SN in APIClient.GetSerialsListFromAPI(CSW.Identity.id))
+                    foreach(ClientSoftwareClass.SerialNumber SN in APIClient.GetSerialsListFromAPI(CSW.Identity.id))
                     {
                         CSW.SerialList.Add(SN);
                     }
