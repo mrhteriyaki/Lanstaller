@@ -28,7 +28,7 @@ namespace LanstallerAPI
             {
                 //Check Token in DB.
                 string token = HR.Headers["Authorization"];
-                if (SoftwareClass.CheckSecurityToken(token) == true)
+                if (Security.CheckSecurityToken(token) == true)
                 {
                     return true;
                 }

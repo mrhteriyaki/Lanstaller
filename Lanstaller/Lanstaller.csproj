@@ -94,6 +94,7 @@
     <Compile Include="Classes\APIClient.cs" />
     <Compile Include="Classes\ChatClient.cs" />
     <Compile Include="Classes\Cryptographic.cs" />
+    <Compile Include="Classes\VPN.cs" />
     <Compile Include="frmLanstaller.cs">
       <SubType>Form</SubType>
     </Compile>

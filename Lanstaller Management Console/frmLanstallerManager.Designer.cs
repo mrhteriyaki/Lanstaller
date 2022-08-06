@@ -1,7 +1,7 @@
 ﻿
 namespace Lanstaller_Management_Console
 {
-    partial class frmLanstallerMmanager
+    partial class frmLanstallerManager
     {
         /// <summary>
         /// Required designer variable.
@@ -35,22 +35,24 @@ namespace Lanstaller_Management_Console
             this.lblVariable = new System.Windows.Forms.Label();
             this.lblInstallInfo = new System.Windows.Forms.Label();
             this.gbxInfo = new System.Windows.Forms.GroupBox();
+            this.btnRemove = new System.Windows.Forms.Button();
+            this.btnSecurity = new System.Windows.Forms.Button();
             this.gbxInfo.SuspendLayout();
             this.SuspendLayout();
             // 
             // lbxSoftware
             // 
             this.lbxSoftware.FormattingEnabled = true;
-            this.lbxSoftware.Location = new System.Drawing.Point(12, 33);
+            this.lbxSoftware.Location = new System.Drawing.Point(12, 63);
             this.lbxSoftware.Name = "lbxSoftware";
-            this.lbxSoftware.Size = new System.Drawing.Size(278, 550);
+            this.lbxSoftware.Size = new System.Drawing.Size(278, 537);
             this.lbxSoftware.TabIndex = 0;
             this.lbxSoftware.SelectedIndexChanged += new System.EventHandler(this.lbxSoftware_SelectedIndexChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Location = new System.Drawing.Point(12, 47);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(71, 13);
             this.label1.TabIndex = 1;
@@ -58,7 +60,7 @@ namespace Lanstaller_Management_Console
             // 
             // btnNew
             // 
-            this.btnNew.Location = new System.Drawing.Point(215, 4);
+            this.btnNew.Location = new System.Drawing.Point(215, 39);
             this.btnNew.Name = "btnNew";
             this.btnNew.Size = new System.Drawing.Size(75, 23);
             this.btnNew.TabIndex = 2;
@@ -95,16 +97,38 @@ namespace Lanstaller_Management_Console
             this.gbxInfo.TabStop = false;
             this.gbxInfo.Text = "Info";
             // 
-            // frmLanstallerMmanager
+            // btnRemove
+            // 
+            this.btnRemove.Location = new System.Drawing.Point(134, 39);
+            this.btnRemove.Name = "btnRemove";
+            this.btnRemove.Size = new System.Drawing.Size(75, 23);
+            this.btnRemove.TabIndex = 25;
+            this.btnRemove.Text = "Remove";
+            this.btnRemove.UseVisualStyleBackColor = true;
+            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+            // 
+            // btnSecurity
+            // 
+            this.btnSecurity.Location = new System.Drawing.Point(8, 12);
+            this.btnSecurity.Name = "btnSecurity";
+            this.btnSecurity.Size = new System.Drawing.Size(109, 23);
+            this.btnSecurity.TabIndex = 26;
+            this.btnSecurity.Text = "Security";
+            this.btnSecurity.UseVisualStyleBackColor = true;
+            this.btnSecurity.Click += new System.EventHandler(this.btnSecurity_Click);
+            // 
+            // frmLanstallerManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1182, 595);
+            this.ClientSize = new System.Drawing.Size(1182, 631);
+            this.Controls.Add(this.btnSecurity);
+            this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.gbxInfo);
             this.Controls.Add(this.btnNew);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lbxSoftware);
-            this.Name = "frmLanstallerMmanager";
+            this.Name = "frmLanstallerManager";
             this.Text = "Lanstaller Management";
             this.Load += new System.EventHandler(this.frmLanstallerMmanager_Load);
             this.gbxInfo.ResumeLayout(false);
@@ -122,6 +146,8 @@ namespace Lanstaller_Management_Console
         private System.Windows.Forms.Label lblVariable;
         private System.Windows.Forms.Label lblInstallInfo;
         private System.Windows.Forms.GroupBox gbxInfo;
+        private System.Windows.Forms.Button btnRemove;
+        private System.Windows.Forms.Button btnSecurity;
     }
 }
 

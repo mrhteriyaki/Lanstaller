@@ -18,7 +18,7 @@ using System.IO;
 
 namespace Lanstaller_Management_Console
 {
-    public partial class frmLanstallerMmanager : Form
+    public partial class frmLanstallerManager : Form
     {
         int selectedsoftwareid = -1;
         List<SoftwareClass.SoftwareInfo> SoftwareList = new List<SoftwareClass.SoftwareInfo>();
@@ -31,11 +31,12 @@ namespace Lanstaller_Management_Console
         Panels.Serial SerialPanel = new Panels.Serial();
         Panels.Shortcuts ShortcutsPanel = new Panels.Shortcuts();
         Panels.Windows_Settings WindowsSettingsPanel = new Panels.Windows_Settings();
-
+        
         int panel_button_x = 300;
 
+        
 
-        public frmLanstallerMmanager()
+        public frmLanstallerManager()
         {
             InitializeComponent();
         }
@@ -76,6 +77,7 @@ namespace Lanstaller_Management_Console
 
         private void frmLanstallerMmanager_Load(object sender, EventArgs e)
         {
+            
 
             if (!File.Exists("config.ini"))
             {
@@ -100,9 +102,15 @@ namespace Lanstaller_Management_Console
             AddPanel(SerialPanel);
             AddPanel(ShortcutsPanel);
             AddPanel(WindowsSettingsPanel);
+            
+
+            lblVariable.Text = "%INSTALLPATH% = Base Install Directory (Default C:\\Games)" + Environment.NewLine + 
+                               "%USERPROFILE% = User Profile Path (Default C:\\Users\\<Username>)" + Environment.NewLine + 
+                               "%WIDTH% = Resolution Preference X" + Environment.NewLine + 
+                               "%HEIGHT% = Resolution Preference Y" + Environment.NewLine +
+                               "%USERNAME% = Username Preference";
 
 
-            lblVariable.Text = "%INSTALLPATH% = Base Install Directory (Default C:\\Games)" + Environment.NewLine + "%USERPROFILE% = User Profile Path (Default C:\\Users\\<Username>)" + Environment.NewLine + "%WIDTH% = Resolution Preference X" + Environment.NewLine + "%HEIGHT% = Resolution Preference Y" + Environment.NewLine + "%USERNAME% = Username Preference";
             FilesPanel.lblCopyActionInfo.Text = "";
 
             RefreshSoftware();
@@ -120,7 +128,7 @@ namespace Lanstaller_Management_Console
             RegistryPanel.cmbxHiveKey.SelectedIndex = 0;
             RegistryPanel.cmbxType.SelectedIndex = 0;
 
-
+            
          
         }
 
@@ -133,6 +141,8 @@ namespace Lanstaller_Management_Console
                 lbxSoftware.Items.Add(SW.Name);
             }
         }
+
+
         private void btnNew_Click(object sender, EventArgs e)
         {
             string softwarename = Interaction.InputBox("Name:");
@@ -154,6 +164,7 @@ namespace Lanstaller_Management_Console
                 index++;
             }
         }
+
 
         string[] filelist;
         private void btnScan_Click(object sender, EventArgs e)
@@ -537,6 +548,30 @@ namespace Lanstaller_Management_Console
         {
 
             SoftwareClass.RescanFileHashes(false);
+        }
+
+        private void btnAuthNew_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRemove_Click(object sender, EventArgs e)
+        {
+            if(lbxSoftware.SelectedIndex == -1)
+            {
+                return;
+            }
+            //Delete Software.
+            SoftwareClass.DeleteSoftware(SoftwareList[lbxSoftware.SelectedIndex].id);
+
+            RefreshSoftware();
+
+        }
+
+        private void btnSecurity_Click(object sender, EventArgs e)
+        {
+            frmSecurity fS = new frmSecurity();
+            fS.Show();
         }
     }
 }

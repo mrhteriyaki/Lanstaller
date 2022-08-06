@@ -84,7 +84,7 @@ namespace Lanstaller
             this.txtAuth.BackColor = System.Drawing.Color.White;
             this.txtAuth.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtAuth.ForeColor = System.Drawing.Color.Black;
-            this.txtAuth.Location = new System.Drawing.Point(15, 113);
+            this.txtAuth.Location = new System.Drawing.Point(12, 113);
             this.txtAuth.Name = "txtAuth";
             this.txtAuth.Size = new System.Drawing.Size(601, 26);
             this.txtAuth.TabIndex = 3;

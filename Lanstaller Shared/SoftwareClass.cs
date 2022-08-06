@@ -199,6 +199,56 @@ namespace Lanstaller_Shared
             return idval;
         }
 
+        public static void DeleteSoftware(int software_id)
+        {
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
+            SQLCmd.Parameters.AddWithValue("softid", software_id);
+
+            SQLConn.Open();
+
+            //Delete Files.
+            SQLCmd.CommandText = "DELETE FROM tblFiles WHERE software_id = @softid";
+            SQLCmd.ExecuteNonQuery();
+
+            //Delete Registry
+            SQLCmd.CommandText = "DELETE FROM tblRegistry WHERE software_id = @softid";
+            SQLCmd.ExecuteNonQuery();
+
+            //Delete Compatibility
+            SQLCmd.CommandText = "DELETE FROM tblCompatibility WHERE software_id = @softid";
+            SQLCmd.ExecuteNonQuery();
+
+            //Delete Firewall rules.
+            SQLCmd.CommandText = "DELETE FROM tblFirewallExceptions WHERE software_id = @softid";
+            SQLCmd.ExecuteNonQuery();
+
+            //Delete Preference files
+            SQLCmd.CommandText = "DELETE FROM tblPreferenceFiles WHERE software_id = @softid";
+            SQLCmd.ExecuteNonQuery();
+
+            //Delete serials
+            SQLCmd.CommandText = "DELETE FROM tblSerials WHERE software_id = @softid";
+            SQLCmd.ExecuteNonQuery();
+
+            //Delete shortcuts
+            SQLCmd.CommandText = "DELETE FROM tblShortcut WHERE software_id = @softid";
+            SQLCmd.ExecuteNonQuery();
+
+            //delete Redist Usage
+            SQLCmd.CommandText = "DELETE FROM tblRedistUsage WHERE software_id = @softid";
+            SQLCmd.ExecuteNonQuery();
+
+            //Delete software index.
+            SQLCmd.CommandText = "DELETE FROM tblSoftware WHERE id = @softid";
+            SQLCmd.ExecuteNonQuery();
+
+            SQLConn.Close();
+
+            
+        }
+
         public static Server GetFileServer()
         {
             return GetFileServer("");
@@ -669,26 +719,6 @@ namespace Lanstaller_Shared
                 }
             }
         }
-
-        public static bool CheckSecurityToken(string token)
-        {
-            //tblSecurityTokens
-            SqlConnection SQLConn = new SqlConnection(ConnectionString);
-            SqlCommand SQLCmd = new SqlCommand("SELECT COUNT(token) FROM tblSecurityTokens WHERE token = @tkval", SQLConn);
-            SQLCmd.Parameters.AddWithValue("tkval", token);
-
-            int tokencount = 0;
-            SQLConn.Open();
-            tokencount = (int)SQLCmd.ExecuteScalar();
-            SQLConn.Close();
-
-            if (tokencount > 0)
-            {
-                return true;
-            }
-            return false;
-        }
-
 
     }
 }

@@ -22,5 +22,24 @@ namespace LanstallerAPI.Controllers
                 return "";
             }
         }
+
+        [Route("newtoken")]
+        public string Post([FromBody] Security.Registration tokenrequest)
+        {
+            if (tokenrequest.name == null || tokenrequest.regcode == null)
+            {
+                return "fail1";
+            }
+            
+            int reg_response = 0;
+            reg_response = Security.NewToken(tokenrequest.name, tokenrequest.regcode);
+
+            if (reg_response == 0)
+            {
+                return "fail2";
+            }
+             
+            return Security.GetToken(reg_response).token;
+        }
     }
 }

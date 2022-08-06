@@ -48,12 +48,6 @@ namespace Lanstaller
 
             foreach (string line in System.IO.File.ReadAllLines("config.ini"))
             {
-                /*
-                if (line.StartsWith("Data Source="))
-                {
-                    ClientSoftwareClass.ConnectionString = line;
-                }
-                else */
                 if (line.StartsWith("authkey="))
                 {
                     string auth = line.Split('=')[1];

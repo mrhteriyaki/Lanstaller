@@ -22,18 +22,47 @@ namespace Lanstaller
         }
 
            
-
+        class RegistrationRequest
+        {
+            public string regcode { get; set; }
+            public string name { get; set; }
+        }
      
         private void btnOK_Click(object sender, EventArgs e)
         {
             //Validate Server & Authorisation.
             string _Server = txtServer.Text;
-            string _authkey = txtAuth.Text;
-
-            string URI = _Server + "/System/version";
-
+            string _regcode = txtAuth.Text;
+            
             WebClient WC = new WebClient();
+            WC.Headers.Add("Content-Type", "application/json");
+
+            RegistrationRequest Rqst = new RegistrationRequest();
+            Rqst.name = Environment.MachineName + ":" + Environment.UserName;
+            Rqst.regcode = _regcode;
+            
+            string _authkey;
+
+            string URI = _Server + "/auth/newtoken";
+            try
+            {
+                string MsgData = Newtonsoft.Json.JsonConvert.SerializeObject(Rqst);
+                byte[] responsedata = WC.UploadData(URI, "POST", Encoding.UTF8.GetBytes(MsgData));
+                _authkey = Encoding.UTF8.GetString(responsedata);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error:" + ex.ToString());
+                return;
+            }
+
+
+            URI = _Server + "/System/version";
+
+            
             WC.Headers.Add("authorization", _authkey);
+            
             try
             {
                 string response = WC.DownloadString(URI);
@@ -47,7 +76,7 @@ namespace Lanstaller
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot connect to server - " + ex.ToString());
+                MessageBox.Show("Cannot connect to server. Error:" + ex.ToString());
             }
 
 
