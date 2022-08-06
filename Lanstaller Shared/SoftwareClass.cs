@@ -127,19 +127,18 @@ namespace Lanstaller_Shared
             public int compat_type;
         }
 
-        public static double GetSystemVersion()
+
+        public static string GetSystemData(string setting)
         {
-            string QueryString = "SELECT [version] from tblSystem";
-
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand("SELECT [data] from tblSystem WHERE setting = @setval", SQLConn);
+            SQLCmd.Parameters.AddWithValue("setval", setting);
             SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            double _Version = 0;
-            _Version = (double)SQLCmd.ExecuteScalar();
+            string data = SQLCmd.ExecuteScalar().ToString();
             SQLConn.Close();
-
-            return _Version;
+            return data;
         }
+
 
         public static List<SoftwareInfo> LoadSoftware()
         {
@@ -246,7 +245,7 @@ namespace Lanstaller_Shared
 
             SQLConn.Close();
 
-            
+
         }
 
         public static Server GetFileServer()

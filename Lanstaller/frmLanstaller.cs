@@ -13,8 +13,7 @@ using Lanstaller.Classes;
 
 namespace Lanstaller
 {
-    //Lanstaller Project - mrhsystems.com
-
+    //Lanstaller Project
 
     public partial class frmLanstaller : Form
     {
@@ -75,7 +74,7 @@ namespace Lanstaller
             //Check Server Version
             try
             {
-                double server_version = APIClient.GetVersion();
+                double server_version = double.Parse(APIClient.GetSystemInfo("version"));
                 if (server_version != Version)
                 {
                     MessageBox.Show("Server version does not match client.\nVersion Check Failure\nApplication will now close.");
@@ -85,7 +84,7 @@ namespace Lanstaller
             }
             catch(Exception ex)
             {
-                MessageBox.Show("Server version does not match client.\nVersion Check Failure" + ex.ToString() + "\nApplication will now close.");
+                MessageBox.Show("Version Check Failure" + ex.ToString() + "\nApplication will now close.");
                 Application.Exit();
                 return;
             }
@@ -209,6 +208,11 @@ namespace Lanstaller
                 lastid = CM.id;
             }
             
+            if (MessageData.Length == 0)
+            {
+                return;
+            }
+
             //Trim empty lastline.
             string MessageDataStr = MessageData.ToString().Substring(0, (MessageData.Length - 1)); 
             

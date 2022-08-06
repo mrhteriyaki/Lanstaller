@@ -14,8 +14,18 @@ namespace LanstallerAPI.Controllers
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
+            }         
+            return SoftwareClass.GetSystemData("version");
+        }
+
+        [Route("wireguard_msi_url")]
+        public string WireguardMSI()
+        {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
             }
-            return SoftwareClass.GetSystemVersion().ToString();
+            return SoftwareClass.GetSystemData("wireguard_msi_url");
         }
     }
 }

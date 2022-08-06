@@ -33,15 +33,15 @@ namespace Lanstaller.Classes
             WC.DownloadFile(Source, Destination);
         }
 
+        
         static string DownloadString(string ListName, int SoftwareID)
         {
             return  WC.DownloadString(APIServer + "InstallationList/" + ListName + "?swid=" + SoftwareID.ToString());
         }
 
-        public static double GetVersion()
+        public static string GetSystemInfo(string setting)
         {
-            //WC
-            return double.Parse(WC.DownloadString(APIServer + "System/version"));
+            return WC.DownloadString(APIServer + "System/" + setting);
         }
 
         public static Server GetFileServerFromAPI()
@@ -191,5 +191,8 @@ namespace Lanstaller.Classes
             }
             return LST;
         }
+
+
+
     }
 }
