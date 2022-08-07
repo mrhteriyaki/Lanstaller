@@ -404,6 +404,10 @@ namespace Lanstaller
             lbxInstallList.Items.Clear();
             InstallList.Clear();
 
+
+
+            //returns public client cert as string.
+            //Console.WriteLine(VPN.InstallConfig("192.168.90.2/32","192.168.90.0/24", "pADjnbdB1mTsopMmmvOdkzKo56voLeWYBHEz6tyoHgQ=", "192.168.88.1:13231"));
         }
 
 

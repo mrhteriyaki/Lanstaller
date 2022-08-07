@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanstaller Management Conso
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LanstallerAPI", "LanstallerAPI\LanstallerAPI.csproj", "{564255A4-BA91-4EF1-986E-6B51CF4C118B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanstaller Shared", "Lanstaller Shared\Lanstaller Shared.csproj", "{6E28D0C4-FC93-415C-B8BF-F4AED62F74BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lanstaller Shared", "Lanstaller Shared\Lanstaller Shared.csproj", "{6E28D0C4-FC93-415C-B8BF-F4AED62F74BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
