@@ -171,7 +171,6 @@ namespace Lanstaller
             this.chkRedist.AutoSize = true;
             this.chkRedist.Checked = true;
             this.chkRedist.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkRedist.Enabled = false;
             this.chkRedist.ForeColor = System.Drawing.Color.White;
             this.chkRedist.Location = new System.Drawing.Point(5, 120);
             this.chkRedist.Name = "chkRedist";

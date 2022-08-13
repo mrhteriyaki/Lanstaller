@@ -16,6 +16,7 @@ using Lanstaller_Shared;
 
 using static Lanstaller.Classes.APIClient;
 
+
 namespace Lanstaller
 {
     public class ClientSoftwareClass : SoftwareClass //Extension of shared Software class with client / windows exclusive functions.
@@ -215,6 +216,58 @@ namespace Lanstaller
         {
             foreach (Redistributable Redist in RedistributableList)
             {
+                if (Redist.filecheck != "")
+                {
+                    if (System.IO.File.Exists(Redist.filecheck))
+                    {
+                        //File check true - skip installation.
+                        continue;
+                    }
+                }
+
+
+                string temppath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp" ;
+                
+                string filename = Redist.path.Substring(Redist.path.Replace("\\", "/").LastIndexOf("/"));
+                string destpath = temppath + filename;
+
+
+
+                DownloadFile(Redist.path, destpath);
+
+                Process RDProc = new Process();
+
+                if (Redist.compressed == "0" || Redist.compressed == "") //Direct file, run.
+                {
+                    RDProc.StartInfo.FileName = destpath;
+                    RDProc.StartInfo.Arguments = Redist.args;
+                   
+                }
+                else if (Redist.compressed == "1")
+                {
+                    string extractpath = temppath + "\\" + Guid.NewGuid().ToString() + "\\";
+                    Directory.CreateDirectory(extractpath);
+
+                    //Extract.
+                    Process SevenZipProc = new Process();                   
+                    SevenZipProc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "7z.exe";
+                    SevenZipProc.StartInfo.Arguments = "x \"" + destpath + "\" -o\"" + extractpath + "\"";
+                    SevenZipProc.StartInfo.UseShellExecute = false;
+                    SevenZipProc.Start();
+                    SevenZipProc.WaitForExit();
+
+                    //Run
+                    RDProc.StartInfo.FileName = extractpath + Redist.compressed_path;
+                    RDProc.StartInfo.Arguments = Redist.args;
+                }
+                else
+                {
+                    MessageBox.Show("Redist Installation Error - check configuration.");
+                    return;
+                }
+
+                RDProc.Start();
+                RDProc.WaitForExit();
 
             }
 
@@ -354,7 +407,6 @@ namespace Lanstaller
                     if (FileServer.protocol == "web")
                     {
                         //Web mode.
-                        //MessageBox.Show("http://lanstallerfiles.mrhsystems.com/Games%20Source/" + FCO.fileinfo.source);
                         DownloadFile(FileServer.path + FCO.fileinfo.source, FCO.destination);
                     }
                     else if (FileServer.protocol == "smb")

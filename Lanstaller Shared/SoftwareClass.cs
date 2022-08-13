@@ -91,7 +91,10 @@ namespace Lanstaller_Shared
             public string name;
             public string path;
             public string filecheck;
+            public string args;
             public string version;
+            public string compressed;
+            public string compressed_path;
         }
 
         public class Server
@@ -165,6 +168,8 @@ namespace Lanstaller_Shared
 
         public static List<Tool> GetTools()
         {
+            string server_path = GetFileServer("web").path;
+
             List<Tool> tmpList = new List<Tool>();
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -175,7 +180,7 @@ namespace Lanstaller_Shared
                 Tool tmpTool = new Tool();
                 tmpTool.id = (int)SQLOutput[0];
                 tmpTool.Name = SQLOutput[1].ToString();
-                tmpTool.path = SQLOutput[2].ToString();
+                tmpTool.path = server_path + SQLOutput[2].ToString();
                 tmpList.Add(tmpTool);
             }
             SQLConn.Close();
@@ -261,6 +266,7 @@ namespace Lanstaller_Shared
             SQLCmd.Connection = SQLConn;
 
             SQLCmd.CommandText = "SELECT TOP (1) [address],[type] FROM [tblServers] ORDER BY [Priority] ASC";
+            //server type specified (web / smb)
             if (servertype != "")
             {
                 SQLCmd.CommandText = "SELECT TOP (1) [address],[type] FROM [tblServers] WHERE [type] = @servertype ORDER BY [Priority] ASC";
@@ -492,8 +498,10 @@ namespace Lanstaller_Shared
         {
             List<Redistributable> RedistributableList = new List<Redistributable>();
 
+            string server_path = GetFileServer("web").path;
+
             //Get Required Redist ID for install.
-            string QueryString = "SELECT tblRedistUsage.[redist_id],tblRedist.id,tblRedist.[name],tblRedist.[path],tblRedist.filecheck,tblRedist.[version] FROM tblRedistUsage INNER JOIN tblRedist ON tblRedistUsage.redist_id=tblRedist.id WHERE tblRedistUsage.software_id = @softwareid ORDER BY tblRedistUsage.[install_order] ASC";
+            string QueryString = "SELECT tblRedistUsage.[redist_id],tblRedist.id,tblRedist.[name],tblRedist.[path],tblRedist.args,tblRedist.filecheck,tblRedist.[version],tblRedist.compressed,tblRedist.compressed_path FROM tblRedistUsage INNER JOIN tblRedist ON tblRedistUsage.redist_id=tblRedist.id WHERE tblRedistUsage.software_id = @softwareid ORDER BY tblRedistUsage.[install_order] ASC";
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
@@ -502,10 +510,13 @@ namespace Lanstaller_Shared
             while (SQLOutput.Read())
             {
                 Redistributable tmpRedist = new Redistributable();
-                tmpRedist.name = SQLOutput[2].ToString();
-                tmpRedist.path = SQLOutput[3].ToString();
-                tmpRedist.filecheck = SQLOutput[4].ToString();
-                tmpRedist.version = SQLOutput[5].ToString();
+                tmpRedist.name = SQLOutput["name"].ToString();
+                tmpRedist.path = server_path + SQLOutput["path"].ToString();
+                tmpRedist.args = SQLOutput["args"].ToString();
+                tmpRedist.filecheck = SQLOutput["filecheck"].ToString();
+                tmpRedist.version = SQLOutput["version"].ToString();
+                tmpRedist.compressed = SQLOutput["compressed"].ToString();
+                tmpRedist.compressed_path = SQLOutput["compressed_path"].ToString();
 
                 RedistributableList.Add(tmpRedist);
             }
@@ -525,7 +536,13 @@ namespace Lanstaller_Shared
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
-            long filesize = (long)SQLCmd.ExecuteScalar();
+            long filesize = 0;
+            string filesizestr = SQLCmd.ExecuteScalar().ToString();
+            if (filesizestr != "")
+            {
+                filesize = long.Parse(filesizestr);
+            }
+           
             SQLConn.Close();
             return filesize;
         }

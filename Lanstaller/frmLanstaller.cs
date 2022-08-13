@@ -36,6 +36,7 @@ namespace Lanstaller
 
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
+            
             //Load Config File.
             if (!File.Exists("config.ini"))
             {

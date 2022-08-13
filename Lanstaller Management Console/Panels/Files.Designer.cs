@@ -61,7 +61,7 @@
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(377, 228);
+            this.groupBox1.Size = new System.Drawing.Size(752, 291);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Files:";
@@ -78,7 +78,7 @@
             // btnAddFolder
             // 
             this.btnAddFolder.Enabled = false;
-            this.btnAddFolder.Location = new System.Drawing.Point(273, 194);
+            this.btnAddFolder.Location = new System.Drawing.Point(646, 257);
             this.btnAddFolder.Name = "btnAddFolder";
             this.btnAddFolder.Size = new System.Drawing.Size(100, 28);
             this.btnAddFolder.TabIndex = 9;
@@ -88,7 +88,7 @@
             // btnScan
             // 
             this.btnScan.Enabled = false;
-            this.btnScan.Location = new System.Drawing.Point(196, 194);
+            this.btnScan.Location = new System.Drawing.Point(569, 257);
             this.btnScan.Name = "btnScan";
             this.btnScan.Size = new System.Drawing.Size(71, 28);
             this.btnScan.TabIndex = 6;
@@ -99,7 +99,7 @@
             // 
             this.txtSubFolder.Location = new System.Drawing.Point(9, 119);
             this.txtSubFolder.Name = "txtSubFolder";
-            this.txtSubFolder.Size = new System.Drawing.Size(364, 20);
+            this.txtSubFolder.Size = new System.Drawing.Size(737, 20);
             this.txtSubFolder.TabIndex = 12;
             // 
             // label16
@@ -133,21 +133,21 @@
             // 
             this.txtServerShare.Location = new System.Drawing.Point(9, 78);
             this.txtServerShare.Name = "txtServerShare";
-            this.txtServerShare.Size = new System.Drawing.Size(364, 20);
+            this.txtServerShare.Size = new System.Drawing.Size(737, 20);
             this.txtServerShare.TabIndex = 10;
             // 
             // txtDestination
             // 
             this.txtDestination.Location = new System.Drawing.Point(9, 158);
             this.txtDestination.Name = "txtDestination";
-            this.txtDestination.Size = new System.Drawing.Size(364, 20);
+            this.txtDestination.Size = new System.Drawing.Size(737, 20);
             this.txtDestination.TabIndex = 7;
             // 
             // txtScanfolder
             // 
             this.txtScanfolder.Location = new System.Drawing.Point(9, 37);
             this.txtScanfolder.Name = "txtScanfolder";
-            this.txtScanfolder.Size = new System.Drawing.Size(364, 20);
+            this.txtScanfolder.Size = new System.Drawing.Size(737, 20);
             this.txtScanfolder.TabIndex = 3;
             // 
             // label2
@@ -161,7 +161,7 @@
             // 
             // btnGenerateNewFilehashes
             // 
-            this.btnGenerateNewFilehashes.Location = new System.Drawing.Point(386, 88);
+            this.btnGenerateNewFilehashes.Location = new System.Drawing.Point(3, 380);
             this.btnGenerateNewFilehashes.Name = "btnGenerateNewFilehashes";
             this.btnGenerateNewFilehashes.Size = new System.Drawing.Size(159, 34);
             this.btnGenerateNewFilehashes.TabIndex = 26;
@@ -170,7 +170,7 @@
             // 
             // btnRescanFileHash
             // 
-            this.btnRescanFileHash.Location = new System.Drawing.Point(386, 48);
+            this.btnRescanFileHash.Location = new System.Drawing.Point(3, 340);
             this.btnRescanFileHash.Name = "btnRescanFileHash";
             this.btnRescanFileHash.Size = new System.Drawing.Size(159, 34);
             this.btnRescanFileHash.TabIndex = 25;
@@ -179,7 +179,7 @@
             // 
             // btnRescanFileSize
             // 
-            this.btnRescanFileSize.Location = new System.Drawing.Point(386, 8);
+            this.btnRescanFileSize.Location = new System.Drawing.Point(3, 300);
             this.btnRescanFileSize.Name = "btnRescanFileSize";
             this.btnRescanFileSize.Size = new System.Drawing.Size(159, 34);
             this.btnRescanFileSize.TabIndex = 24;
@@ -195,7 +195,7 @@
             this.Controls.Add(this.btnRescanFileSize);
             this.Controls.Add(this.groupBox1);
             this.Name = "Files";
-            this.Size = new System.Drawing.Size(553, 246);
+            this.Size = new System.Drawing.Size(758, 419);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

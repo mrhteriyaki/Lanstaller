@@ -128,8 +128,16 @@ namespace Lanstaller_Management_Console
             RegistryPanel.cmbxHiveKey.SelectedIndex = 0;
             RegistryPanel.cmbxType.SelectedIndex = 0;
 
-            
-         
+            //add handlers.
+            FilesPanel.txtScanfolder.TextChanged += new System.EventHandler(this.txtScanfolder_TextChanged);
+            FilesPanel.txtDestination.TextChanged += new System.EventHandler(this.txtDestination_TextChanged);
+            FilesPanel.txtServerShare.TextChanged += new System.EventHandler(this.txtServerShare_TextChanged);
+
+            FilesPanel.btnAddFolder.Click += new System.EventHandler(this.btnAddFolder_Click);
+            //FilesPanel.btnGenerateNewFilehashes.Click += new System.EventHandler();
+            FilesPanel.btnRescanFileHash.Click += new System.EventHandler(this.btnRescanFileHash_Click);
+            FilesPanel.btnRescanFileSize.Click += new System.EventHandler(this.btnRescanFileSize_Click);
+            FilesPanel.btnScan.Click += new System.EventHandler(this.btnScan_Click);
         }
 
         void RefreshSoftware()
@@ -317,7 +325,9 @@ namespace Lanstaller_Management_Console
                 string src = filename.Substring(servershare.Length);
                 string dst = destination + filename.Substring(subfolder.Length);
 
-                MessageBox.Show(src + Environment.NewLine + dst);
+                
+                //Messagebox for each file:
+                //MessageBox.Show(src + Environment.NewLine + dst);
 
                 Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(filename);
                 SoftwareClass.AddFile(src, dst, FI.Length, selectedsoftwareid);
@@ -331,7 +341,7 @@ namespace Lanstaller_Management_Console
             Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE\\Lanstaller", true).SetValue("management_basefolder", FilesPanel.txtServerShare.Text);
         }
 
-        private void txtScanfolder_TextChanged(object sender, EventArgs e)
+        public void txtScanfolder_TextChanged(object sender, EventArgs e)
         {
 
             if (FilesPanel.txtScanfolder.Text.Contains("\\") && FilesPanel.txtServerShare.Text != "")
