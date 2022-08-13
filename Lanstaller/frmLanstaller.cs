@@ -332,10 +332,8 @@ namespace Lanstaller
             }
 
             //Enable progress bar.
-            pbInstall.Invoke((MethodInvoker)delegate
-            {
-                pbInstall.Visible = true;
-            });
+            this.BeginInvoke((MethodInvoker)(() => pbInstall.Visible = true));
+
 
             //Run Through install list and install software.
             foreach (ClientSoftwareClass CSW in InstallList)
@@ -343,11 +341,8 @@ namespace Lanstaller
                 CSW.Install(install_files, install_reg, install_shortcut, apply_windowssettings, apply_preferences, install_redist);
             }
 
-            //Reset install list.
-            lbxInstallList.Invoke((MethodInvoker)delegate
-            {
-                lbxInstallList.Items.Clear();
-            });
+            //Reset install list. (begin invoke is async).
+            this.BeginInvoke((MethodInvoker)(() => lbxInstallList.Items.Clear()));
 
             InstallList.Clear();
 
