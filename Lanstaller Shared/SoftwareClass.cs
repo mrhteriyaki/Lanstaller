@@ -10,6 +10,7 @@ using System.Diagnostics;
 
 using System.IO;
 using System.Security.Cryptography;
+using System.Web;
 
 
 //Shared library of functions for client and API (Server).
@@ -322,7 +323,29 @@ namespace Lanstaller_Shared
                 //Prepare full source and destination locations for transfer process.
                 FileCopyOperation tFCO = new FileCopyOperation();
                 tFCO.fileinfo.id = (int)SQLOutput[0];
-                tFCO.fileinfo.source = SQLOutput[1].ToString();
+
+                string strsource = SQLOutput[1].ToString();
+                strsource = strsource.Replace("\\", "/");
+
+                if (strsource.Contains("/"))
+                {
+                    string[] pathnames = strsource.Split('/');
+                    StringBuilder encodedsource = new StringBuilder();
+                    foreach (string pth in pathnames)
+                    {
+                        encodedsource.Append("/" + Uri.EscapeDataString(pth));
+                        //encodedsource.Append("/" + HttpUtility.UrlEncode(pth));
+                        
+                    }
+                    tFCO.fileinfo.source = encodedsource.ToString();
+                }
+                else
+                {
+                    //For files in root directory, unlikely but just incase.
+                    tFCO.fileinfo.source = "/" + Uri.EscapeDataString(strsource);
+                    //tFCO.fileinfo.source = "/" + HttpUtility.UrlEncode(strsource);
+                }
+
                 tFCO.destination = SQLOutput[2].ToString();
                 tFCO.fileinfo.size = (long)SQLOutput[3];
                 tFCO.fileinfo.hash = SQLOutput[4].ToString();

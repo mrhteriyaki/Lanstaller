@@ -128,16 +128,46 @@ namespace Lanstaller_Management_Console
             RegistryPanel.cmbxHiveKey.SelectedIndex = 0;
             RegistryPanel.cmbxType.SelectedIndex = 0;
 
-            //add handlers.
+            
+
+            //Textbox handlers.
+
+            //Files.
             FilesPanel.txtScanfolder.TextChanged += new System.EventHandler(this.txtScanfolder_TextChanged);
             FilesPanel.txtDestination.TextChanged += new System.EventHandler(this.txtDestination_TextChanged);
+            FilesPanel.txtSubFolder.TextChanged += new System.EventHandler(this.txtSubFolder_TextChanged);
             FilesPanel.txtServerShare.TextChanged += new System.EventHandler(this.txtServerShare_TextChanged);
 
+            
+            
+            //Button Handlers.
             FilesPanel.btnAddFolder.Click += new System.EventHandler(this.btnAddFolder_Click);
             //FilesPanel.btnGenerateNewFilehashes.Click += new System.EventHandler();
             FilesPanel.btnRescanFileHash.Click += new System.EventHandler(this.btnRescanFileHash_Click);
             FilesPanel.btnRescanFileSize.Click += new System.EventHandler(this.btnRescanFileSize_Click);
             FilesPanel.btnScan.Click += new System.EventHandler(this.btnScan_Click);
+            FilesPanel.btnCheckAllFiles.Click += new System.EventHandler(this.btnCheckAllFiles_Click);
+
+            //Preferences
+            PreferencesPanel.btnAddPrefFile.Click += new System.EventHandler(this.btnAddPrefFile_Click);
+
+
+            //Registry
+            RegistryPanel.btnAddReg.Click += new System.EventHandler(this.btnAddReg_Click);
+
+            //Serials
+            SerialPanel.btnAddSerial.Click += new System.EventHandler(this.btnAddSerial_Click);
+
+            //Shortcuts
+            ShortcutsPanel.btnAddShortcut.Click += new System.EventHandler(this.btnAddShortcut_Click);
+
+
+
+            //Firewall
+            WindowsSettingsPanel.btnFirewallRuleAdd.Click += new System.EventHandler(this.btnFirewallRuleAdd_Click);
+            WindowsSettingsPanel.txtFirewallPath.TextChanged += new System.EventHandler(this.txtFirewallPath_TextChanged);
+
+
         }
 
         void RefreshSoftware()
@@ -224,6 +254,53 @@ namespace Lanstaller_Management_Console
             FilesPanel.btnAddFolder.Enabled = true;
         }
 
+        private void btnCheckAllFiles_Click(object sender, EventArgs e)
+        {
+            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
+            
+            SQLConn.Open();
+            SQLCmd.CommandText = "SELECT address from tblServers where [type] = 'smb'";
+            string serveradd = SQLCmd.ExecuteScalar().ToString();
+            if (!serveradd.EndsWith("\\"))
+            {
+                serveradd = serveradd + "\\";
+            }
+
+            SQLCmd.CommandText = "SELECT id,source from tblFiles";
+            SqlDataReader SR = SQLCmd.ExecuteReader();
+            List<string> OutputList = new List<string>();
+            int filecount = 0;
+            while (SR.Read())
+            {
+                filecount++;
+                if (File.Exists(serveradd + SR["source"].ToString()) == false)
+                {
+                    OutputList.Add(SR["id"].ToString() + "," + SR["source"].ToString());
+                }
+            }
+            SQLConn.Close();
+
+
+            if(OutputList.Count > 0)
+            {
+                StreamWriter SW = new StreamWriter("missingfiles.txt");
+                foreach (string Output in OutputList)
+                {
+                    SW.WriteLine(Output);
+                }
+                SW.Close();
+                MessageBox.Show("Missing files found - logged list to missingfiles.txt");
+            }
+            else
+            {
+                MessageBox.Show("No missing files - checked: " + filecount.ToString());
+            }
+            
+
+        }
+
         private void lbxSoftware_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (lbxSoftware.SelectedIndex == -1)
@@ -236,6 +313,12 @@ namespace Lanstaller_Management_Console
             SerialPanel.txtSerialName.Text = SoftwareList[lbxSoftware.SelectedIndex].Name;
             SerialPanel.txtSerialInstance.Text = "1";
 
+            UpdateInfo();
+
+        }
+
+        void UpdateInfo()
+        {
             //Get info for install./
 
 
@@ -254,7 +337,6 @@ namespace Lanstaller_Management_Console
             info += "Shortcuts: " + shortcutcount.ToString() + Environment.NewLine;
 
             lblInstallInfo.Text = "Installation Info:" + Environment.NewLine + info;
-
         }
 
         static int GetScalarInfo(string Query, int softwareid)
@@ -343,6 +425,15 @@ namespace Lanstaller_Management_Console
 
         public void txtScanfolder_TextChanged(object sender, EventArgs e)
         {
+            if (Directory.Exists(FilesPanel.txtScanfolder.Text) == true)
+            {
+                FilesPanel.txtScanfolder.BackColor = Color.White;
+            }
+            else
+            {
+                FilesPanel.txtScanfolder.BackColor = Color.Yellow;
+                return;
+            }
 
             if (FilesPanel.txtScanfolder.Text.Contains("\\") && FilesPanel.txtServerShare.Text != "")
             {
@@ -354,7 +445,11 @@ namespace Lanstaller_Management_Console
                 }
 
                 string scanroot = FilesPanel.txtScanfolder.Text.Substring(0, scanpath.LastIndexOf("\\") + 1); //offset +1 to include \
-                FilesPanel.txtSubFolder.Text = (scanroot).Substring(FilesPanel.txtServerShare.Text.Length);
+                
+                if (FilesPanel.txtServerShare.Text.Length < scanroot.Length)
+                {
+                    FilesPanel.txtSubFolder.Text = scanroot.Substring(FilesPanel.txtServerShare.Text.Length);
+                }
 
             }
 
@@ -481,6 +576,10 @@ namespace Lanstaller_Management_Console
             UpdateLabels();
         }
 
+        private void txtSubFolder_TextChanged(object sender, EventArgs e)
+        {
+            UpdateLabels();
+        }
 
 
         void UpdateLabels()
@@ -492,22 +591,40 @@ namespace Lanstaller_Management_Console
                 destdir = "%INSTALLPATH%\\";
             }
 
-            string dstpath = FilesPanel.txtScanfolder.Text.Substring(FilesPanel.txtServerShare.TextLength + FilesPanel.txtSubFolder.TextLength);
+            int length = FilesPanel.txtServerShare.TextLength + FilesPanel.txtSubFolder.TextLength;
 
-            string srcpath = FilesPanel.txtScanfolder.Text + "example.exe";
-            string dstfile = destdir + dstpath + "example.exe";
+            if (length < FilesPanel.txtScanfolder.Text.Length)
+            {
+                string dstpath = FilesPanel.txtScanfolder.Text.Substring(length);
+                string srcpath = FilesPanel.txtScanfolder.Text + "example.exe";
+                string dstfile = destdir + dstpath + "example.exe";
+                FilesPanel.lblCopyActionInfo.Text = "Copy files from: " + srcpath + Environment.NewLine +
+                    "to: " + dstfile;
+            }
+            else
+            {
+                FilesPanel.lblCopyActionInfo.Text = "Error";
+            }
+            
 
-
-            FilesPanel.lblCopyActionInfo.Text = "Copy files from: " + srcpath + Environment.NewLine +
-                "to: " + dstfile;
+            
 
         }
 
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)
         {
+            WindowsSettingsPanel.btnFirewallRuleAdd.Enabled = false;
             SoftwareClass.AddFirewallRule(WindowsSettingsPanel.txtFirewallPath.Text, selectedsoftwareid);
+            UpdateInfo();
 
         }
+
+        private void txtFirewallPath_TextChanged(object sender, EventArgs e)
+        {
+            WindowsSettingsPanel.btnFirewallRuleAdd.Enabled = true;
+        }
+
+        
 
         private void groupBox5_Enter(object sender, EventArgs e)
         {
@@ -536,6 +653,8 @@ namespace Lanstaller_Management_Console
             LanstallerManagement.RescanFileSize();
             FilesPanel.btnRescanFileSize.Enabled = true;
         }
+
+     
 
         private void btnAddPrefFile_Click(object sender, EventArgs e)
         {

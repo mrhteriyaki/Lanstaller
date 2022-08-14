@@ -374,11 +374,16 @@ namespace Lanstaller
             }
 
             Server FileServer = GetFileServerFromAPI();
+            
+            //Trim / from url (getfiles will prepend / to source on copy operation).
+            if (FileServer.path.EndsWith("/"))
+            {
+                FileServer.path = FileServer.path.Substring(0, FileServer.path.Length - 1);
+            }
 
-
+            //Copy Files.
             int copycount = 0;
             long bytecounter = 0;
-            //Copy Files.
             while (copycount < FileCopyList.Count)
             {
                 FileCopyOperation FCO = FileCopyList[copycount];

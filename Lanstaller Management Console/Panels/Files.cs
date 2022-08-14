@@ -17,6 +17,6 @@ namespace Lanstaller_Management_Console.Panels
             InitializeComponent();
         }
 
-        
+      
     }
 }

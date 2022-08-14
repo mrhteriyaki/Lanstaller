@@ -43,7 +43,10 @@
             this.btnGenerateNewFilehashes = new System.Windows.Forms.Button();
             this.btnRescanFileHash = new System.Windows.Forms.Button();
             this.btnRescanFileSize = new System.Windows.Forms.Button();
+            this.btnCheckAllFiles = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -186,10 +189,30 @@
             this.btnRescanFileSize.Text = "Rescan size for all files.";
             this.btnRescanFileSize.UseVisualStyleBackColor = true;
             // 
+            // btnCheckAllFiles
+            // 
+            this.btnCheckAllFiles.Location = new System.Drawing.Point(24, 19);
+            this.btnCheckAllFiles.Name = "btnCheckAllFiles";
+            this.btnCheckAllFiles.Size = new System.Drawing.Size(159, 34);
+            this.btnCheckAllFiles.TabIndex = 27;
+            this.btnCheckAllFiles.Text = "Check Files Exist";
+            this.btnCheckAllFiles.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.btnCheckAllFiles);
+            this.groupBox2.Location = new System.Drawing.Point(168, 300);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(200, 66);
+            this.groupBox2.TabIndex = 28;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "All Software";
+            // 
             // Files
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.btnGenerateNewFilehashes);
             this.Controls.Add(this.btnRescanFileHash);
             this.Controls.Add(this.btnRescanFileSize);
@@ -198,6 +221,7 @@
             this.Size = new System.Drawing.Size(758, 419);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -219,5 +243,7 @@
         public System.Windows.Forms.Button btnGenerateNewFilehashes;
         public System.Windows.Forms.Button btnRescanFileHash;
         public System.Windows.Forms.Button btnRescanFileSize;
+        public System.Windows.Forms.Button btnCheckAllFiles;
+        private System.Windows.Forms.GroupBox groupBox2;
     }
 }

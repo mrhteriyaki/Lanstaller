@@ -11,6 +11,7 @@ using System.Net;
 using static Lanstaller_Shared.SoftwareClass;
 using System.IO;
 using System.Web;
+using System.Windows.Forms;
 
 namespace Lanstaller.Classes
 {
@@ -31,7 +32,26 @@ namespace Lanstaller.Classes
         public static void DownloadFile(string Source, string Destination)
         {
             //File download function for Tools.
-            WC.DownloadFile(Source, Destination);
+            try
+            {
+                WC.DownloadFile(Source, Destination);
+            }
+            catch(WebException ex)
+            {
+                DialogResult DR = MessageBox.Show("File Download Error\n" + Source + "\nRetry or Cancel (Skip this file)?\n" + ex.ToString(),"Download Error",MessageBoxButtons.RetryCancel);
+                if (DR == DialogResult.Retry)
+                {
+                    DownloadFile(Source, Destination);
+                    return;
+                }
+                else if (DR == DialogResult.Cancel)
+                {
+                    //Skip - Return ok.
+                    return;
+                }
+            }
+            
+            
         }
 
         
