@@ -112,7 +112,7 @@ namespace Lanstaller
             this.btnAdd.ForeColor = System.Drawing.Color.White;
             this.btnAdd.Location = new System.Drawing.Point(11, 183);
             this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(111, 26);
+            this.btnAdd.Size = new System.Drawing.Size(84, 26);
             this.btnAdd.TabIndex = 3;
             this.btnAdd.Text = "Queue Install";
             this.btnAdd.UseVisualStyleBackColor = true;
@@ -122,9 +122,9 @@ namespace Lanstaller
             // 
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClear.ForeColor = System.Drawing.Color.White;
-            this.btnClear.Location = new System.Drawing.Point(128, 183);
+            this.btnClear.Location = new System.Drawing.Point(101, 183);
             this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(111, 26);
+            this.btnClear.Size = new System.Drawing.Size(79, 26);
             this.btnClear.TabIndex = 4;
             this.btnClear.Text = "Clear Queue";
             this.btnClear.UseVisualStyleBackColor = true;

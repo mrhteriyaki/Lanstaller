@@ -10,6 +10,10 @@ namespace LanstallerAPI.Controllers
     {
         public string GET()
         {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }     
             return JsonConvert.SerializeObject(SoftwareClass.GetTools());
         }
 

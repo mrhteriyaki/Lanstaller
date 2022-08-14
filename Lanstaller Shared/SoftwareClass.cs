@@ -103,6 +103,8 @@ namespace Lanstaller_Shared
             public string protocol;
         }
 
+       
+
         public class RegistryOperation
         {
             public int hkey;
@@ -672,8 +674,7 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
-
-
+       
 
         public static void RescanFileHashes(bool fullrescan)
         {

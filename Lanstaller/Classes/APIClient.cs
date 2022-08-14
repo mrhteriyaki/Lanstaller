@@ -10,6 +10,7 @@ using System.Net;
 //using static Lanstaller.ClientSoftwareClass;
 using static Lanstaller_Shared.SoftwareClass;
 using System.IO;
+using System.Web;
 
 namespace Lanstaller.Classes
 {
@@ -192,6 +193,14 @@ namespace Lanstaller.Classes
             return LST;
         }
 
+
+        //Post VPN Configuration.
+        public static void SendVPNPeer(string PeerCert)
+        {
+            string pcert = HttpUtility.UrlEncode(PeerCert);
+            string Reply = WC.DownloadString(APIServer + "VPN?peercert=" + pcert);
+            Console.WriteLine(Reply);
+        }
 
 
     }

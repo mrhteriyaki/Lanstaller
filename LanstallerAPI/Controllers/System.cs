@@ -18,6 +18,8 @@ namespace LanstallerAPI.Controllers
             return SoftwareClass.GetSystemData("version");
         }
 
+
+        //Wireguard software install.
         [Route("wireguard_msi_url")]
         public string WireguardMSI()
         {
@@ -27,5 +29,6 @@ namespace LanstallerAPI.Controllers
             }
             return SoftwareClass.GetSystemData("wireguard_msi_url");
         }
+
     }
 }

@@ -79,6 +79,17 @@ namespace Lanstaller_Shared
             return tST;
         }
 
+        public static int GetTokenID(string token)
+        {
+            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand("SELECT id FROM tblSecurityTokens where token = @tkval", SQLConn);
+            SQLCmd.Parameters.AddWithValue("tkval", token);
+            SQLConn.Open();
+            int tokenid = (int)SQLCmd.ExecuteScalar();
+            SQLConn.Close();
+            return tokenid;
+        }
+
 
         public static int NewToken(string Name, string registration_code)
         {

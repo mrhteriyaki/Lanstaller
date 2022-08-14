@@ -33,9 +33,16 @@ namespace LanstallerAPI
                     return true;
                 }
             }
-
-
             return false;
         }
+
+
+        //Returns Token ID from auth header.
+        public static int GetTokenID(HttpRequest HR)
+        {
+            string token = HR.Headers["Authorization"];
+            return Security.GetTokenID(token);
+        }
+
     }
 }
