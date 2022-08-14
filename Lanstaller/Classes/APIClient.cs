@@ -194,13 +194,7 @@ namespace Lanstaller.Classes
         }
 
 
-        //Post VPN Configuration.
-        public static void SendVPNPeer(string PeerCert)
-        {
-            string pcert = HttpUtility.UrlEncode(PeerCert);
-            string Reply = WC.DownloadString(APIServer + "VPN?peercert=" + pcert);
-            Console.WriteLine(Reply);
-        }
+       
 
 
     }

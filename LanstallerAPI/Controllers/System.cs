@@ -19,16 +19,6 @@ namespace LanstallerAPI.Controllers
         }
 
 
-        //Wireguard software install.
-        [Route("wireguard_msi_url")]
-        public string WireguardMSI()
-        {
-            if (Authentication.CheckLogon(HttpContext.Request) == false)
-            {
-                return "auth fail";
-            }
-            return SoftwareClass.GetSystemData("wireguard_msi_url");
-        }
-
+        
     }
 }
