@@ -31,10 +31,10 @@ namespace Lanstaller_Management_Console
         Panels.Serial SerialPanel = new Panels.Serial();
         Panels.Shortcuts ShortcutsPanel = new Panels.Shortcuts();
         Panels.Windows_Settings WindowsSettingsPanel = new Panels.Windows_Settings();
-        
+
         int panel_button_x = 300;
 
-        
+
 
         public frmLanstallerManager()
         {
@@ -77,7 +77,7 @@ namespace Lanstaller_Management_Console
 
         private void frmLanstallerMmanager_Load(object sender, EventArgs e)
         {
-            
+
 
             if (!File.Exists("config.ini"))
             {
@@ -102,11 +102,11 @@ namespace Lanstaller_Management_Console
             AddPanel(SerialPanel);
             AddPanel(ShortcutsPanel);
             AddPanel(WindowsSettingsPanel);
-            
 
-            lblVariable.Text = "%INSTALLPATH% = Base Install Directory (Default C:\\Games)" + Environment.NewLine + 
-                               "%USERPROFILE% = User Profile Path (Default C:\\Users\\<Username>)" + Environment.NewLine + 
-                               "%WIDTH% = Resolution Preference X" + Environment.NewLine + 
+
+            lblVariable.Text = "%INSTALLPATH% = Base Install Directory (Default C:\\Games)" + Environment.NewLine +
+                               "%USERPROFILE% = User Profile Path (Default C:\\Users\\<Username>)" + Environment.NewLine +
+                               "%WIDTH% = Resolution Preference X" + Environment.NewLine +
                                "%HEIGHT% = Resolution Preference Y" + Environment.NewLine +
                                "%USERNAME% = Username Preference";
 
@@ -128,9 +128,7 @@ namespace Lanstaller_Management_Console
             RegistryPanel.cmbxHiveKey.SelectedIndex = 0;
             RegistryPanel.cmbxType.SelectedIndex = 0;
 
-            
 
-            //Textbox handlers.
 
             //Files.
             FilesPanel.txtScanfolder.TextChanged += new System.EventHandler(this.txtScanfolder_TextChanged);
@@ -138,15 +136,16 @@ namespace Lanstaller_Management_Console
             FilesPanel.txtSubFolder.TextChanged += new System.EventHandler(this.txtSubFolder_TextChanged);
             FilesPanel.txtServerShare.TextChanged += new System.EventHandler(this.txtServerShare_TextChanged);
 
-            
-            
-            //Button Handlers.
+            FilesPanel.btnScan.Click += new System.EventHandler(this.btnScan_Click);
             FilesPanel.btnAddFolder.Click += new System.EventHandler(this.btnAddFolder_Click);
+
+
             //FilesPanel.btnGenerateNewFilehashes.Click += new System.EventHandler();
             FilesPanel.btnRescanFileHash.Click += new System.EventHandler(this.btnRescanFileHash_Click);
             FilesPanel.btnRescanFileSize.Click += new System.EventHandler(this.btnRescanFileSize_Click);
-            FilesPanel.btnScan.Click += new System.EventHandler(this.btnScan_Click);
             FilesPanel.btnCheckAllFiles.Click += new System.EventHandler(this.btnCheckAllFiles_Click);
+
+            
 
             //Preferences
             PreferencesPanel.btnAddPrefFile.Click += new System.EventHandler(this.btnAddPrefFile_Click);
@@ -154,13 +153,19 @@ namespace Lanstaller_Management_Console
 
             //Registry
             RegistryPanel.btnAddReg.Click += new System.EventHandler(this.btnAddReg_Click);
+            RegistryPanel.txtData.TextChanged += new System.EventHandler(this.txtData_TextChanged);
+            RegistryPanel.txtKey.TextChanged += new System.EventHandler(this.txtKey_TextChanged);
+            RegistryPanel.txtValue.TextChanged += new System.EventHandler(this.txtValue_TextChanged);
 
             //Serials
             SerialPanel.btnAddSerial.Click += new System.EventHandler(this.btnAddSerial_Click);
+            //SerialPanel.txtRegKey.TextChanged += new System.EventHandler(this.
+            SerialPanel.txtSerialName.TextChanged += new System.EventHandler(this.txtSerialName_TextChanged);
+
 
             //Shortcuts
             ShortcutsPanel.btnAddShortcut.Click += new System.EventHandler(this.btnAddShortcut_Click);
-
+            ShortcutsPanel.txtName.TextChanged += new System.EventHandler(this.txtName_TextChanged);
 
 
             //Firewall
@@ -216,10 +221,14 @@ namespace Lanstaller_Management_Console
                 return;
             }
 
-            if (!(FilesPanel.txtSubFolder.Text.EndsWith("\\")))
+
+            if (!(FilesPanel.txtSubFolder.Text.Equals("")))
             {
-                MessageBox.Show("Sub folder path must end with backslash.");
-                return;
+                if (!(FilesPanel.txtSubFolder.Text.EndsWith("\\")))
+                {
+                    MessageBox.Show("Sub folder path must end with backslash.");
+                    return;
+                }
             }
             if (FilesPanel.txtSubFolder.Text.StartsWith("\\"))
             {
@@ -259,7 +268,7 @@ namespace Lanstaller_Management_Console
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
-            
+
             SQLConn.Open();
             SQLCmd.CommandText = "SELECT address from tblServers where [type] = 'smb'";
             string serveradd = SQLCmd.ExecuteScalar().ToString();
@@ -283,7 +292,7 @@ namespace Lanstaller_Management_Console
             SQLConn.Close();
 
 
-            if(OutputList.Count > 0)
+            if (OutputList.Count > 0)
             {
                 StreamWriter SW = new StreamWriter("missingfiles.txt");
                 foreach (string Output in OutputList)
@@ -297,7 +306,7 @@ namespace Lanstaller_Management_Console
             {
                 MessageBox.Show("No missing files - checked: " + filecount.ToString());
             }
-            
+
 
         }
 
@@ -407,7 +416,7 @@ namespace Lanstaller_Management_Console
                 string src = filename.Substring(servershare.Length);
                 string dst = destination + filename.Substring(subfolder.Length);
 
-                
+
                 //Messagebox for each file:
                 //MessageBox.Show(src + Environment.NewLine + dst);
 
@@ -415,6 +424,8 @@ namespace Lanstaller_Management_Console
                 SoftwareClass.AddFile(src, dst, FI.Length, selectedsoftwareid);
 
             }
+            UpdateInfo(); //label info update
+            FilesPanel.btnScan.Enabled = true;
 
         }
 
@@ -445,7 +456,7 @@ namespace Lanstaller_Management_Console
                 }
 
                 string scanroot = FilesPanel.txtScanfolder.Text.Substring(0, scanpath.LastIndexOf("\\") + 1); //offset +1 to include \
-                
+
                 if (FilesPanel.txtServerShare.Text.Length < scanroot.Length)
                 {
                     FilesPanel.txtSubFolder.Text = scanroot.Substring(FilesPanel.txtServerShare.Text.Length);
@@ -453,14 +464,6 @@ namespace Lanstaller_Management_Console
 
             }
 
-            if (FilesPanel.txtSubFolder.Text == "")
-            {
-                FilesPanel.btnScan.Enabled = false;
-            }
-            else
-            {
-                FilesPanel.btnScan.Enabled = true;
-            }
             UpdateLabels();
 
         }
@@ -593,7 +596,7 @@ namespace Lanstaller_Management_Console
 
             int length = FilesPanel.txtServerShare.TextLength + FilesPanel.txtSubFolder.TextLength;
 
-            if (length < FilesPanel.txtScanfolder.Text.Length)
+            if (length <= FilesPanel.txtScanfolder.Text.Length)
             {
                 string dstpath = FilesPanel.txtScanfolder.Text.Substring(length);
                 string srcpath = FilesPanel.txtScanfolder.Text + "example.exe";
@@ -605,9 +608,9 @@ namespace Lanstaller_Management_Console
             {
                 FilesPanel.lblCopyActionInfo.Text = "Error";
             }
-            
 
-            
+
+
 
         }
 
@@ -624,7 +627,7 @@ namespace Lanstaller_Management_Console
             WindowsSettingsPanel.btnFirewallRuleAdd.Enabled = true;
         }
 
-        
+
 
         private void groupBox5_Enter(object sender, EventArgs e)
         {
@@ -654,7 +657,7 @@ namespace Lanstaller_Management_Console
             FilesPanel.btnRescanFileSize.Enabled = true;
         }
 
-     
+
 
         private void btnAddPrefFile_Click(object sender, EventArgs e)
         {
@@ -686,7 +689,7 @@ namespace Lanstaller_Management_Console
 
         private void btnRemove_Click(object sender, EventArgs e)
         {
-            if(lbxSoftware.SelectedIndex == -1)
+            if (lbxSoftware.SelectedIndex == -1)
             {
                 return;
             }

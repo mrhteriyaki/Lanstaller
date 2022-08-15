@@ -17,6 +17,14 @@ namespace Lanstaller_Management_Console.Panels
             InitializeComponent();
         }
 
-      
+        private void Files_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnScan_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

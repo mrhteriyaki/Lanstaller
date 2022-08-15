@@ -294,7 +294,17 @@ namespace Lanstaller
                 {
                     try
                     {
-                        SF.txtSerial.Text = Microsoft.Win32.Registry.GetValue(SN.regKey, SN.regVal, "").ToString();
+
+                        if (SN.regKey.StartsWith("HKEY_LOCAL_MACHINE"))
+                        { 
+                            RegistryKey RK = Registry.LocalMachine.OpenSubKey(SN.regKey.Substring(19));
+                            if (RK != null)
+                            {
+                                SF.txtSerial.Text = RK.GetValue(SN.regVal, "").ToString();
+                            }
+                        }
+
+                       
                     }
                     catch (Exception ex)
                     {

@@ -90,13 +90,13 @@
             // 
             // btnScan
             // 
-            this.btnScan.Enabled = false;
             this.btnScan.Location = new System.Drawing.Point(569, 257);
             this.btnScan.Name = "btnScan";
             this.btnScan.Size = new System.Drawing.Size(71, 28);
             this.btnScan.TabIndex = 6;
             this.btnScan.Text = "Scan";
             this.btnScan.UseVisualStyleBackColor = true;
+            this.btnScan.Click += new System.EventHandler(this.btnScan_Click);
             // 
             // txtSubFolder
             // 
@@ -219,6 +219,7 @@
             this.Controls.Add(this.groupBox1);
             this.Name = "Files";
             this.Size = new System.Drawing.Size(758, 419);
+            this.Load += new System.EventHandler(this.Files_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
