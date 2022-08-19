@@ -22,7 +22,7 @@ namespace Lanstaller.Classes
         static WebClient WC = new System.Net.WebClient();
         public static string APIServer = "";
         static string _authkey = "";
-        public static void SetAuthKey(string authkey)
+        public static void Setup(string authkey)
         {
             _authkey = authkey;
             WC.Headers.Clear();

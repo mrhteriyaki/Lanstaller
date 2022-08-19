@@ -328,6 +328,8 @@ namespace Lanstaller
             double totalgbytes = (double)totalbytes / 1073741824;
 
 
+            
+            
             //Generate Directories.
             List<string> DirectoryList = new List<string>();
             foreach (FileCopyOperation FCO in FileCopyList)
@@ -344,14 +346,14 @@ namespace Lanstaller
                 {
                     //Check each directory including parents against list and add if missing.
                     checkdir = checkdir + FileDirSection + "\\";
-
+                    
                     count++;
                     if (count == 1)
                     {
-                        //Skip Root of drive.
+                        //Root of drive.
                         continue;
                     }
-
+                    
                     bool missing = true;
                     foreach (string existingdir in DirectoryList)
                     {
@@ -363,7 +365,6 @@ namespace Lanstaller
                     }
                     if (missing == true)
                     {
-
                         DirectoryList.Add(checkdir);
                     }
 
@@ -374,13 +375,33 @@ namespace Lanstaller
 
             SetStatus("Installing: " + Identity.Name + Environment.NewLine + "Status: Generating Directories");
 
+            
             foreach (string dir in DirectoryList)
             {
+                if (Pri.LongPath.Directory.Exists(dir) == true)
+                {
+                    //Prompt to remove any existing game folder.
+                    if (dir.StartsWith(LanstallerSettings.InstallDirectory + "\\") && dir != LanstallerSettings.InstallDirectory + "\\")
+                    {
+                        if (MessageBox.Show("Delete existing folder?\n" + dir, "Delete?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        {
+                            while(Pri.LongPath.Directory.Exists(dir) == true)
+                            {
+                                Pri.LongPath.Directory.Delete(dir, true);
+                                if (Pri.LongPath.Directory.Exists(dir))
+                                {
+                                    MessageBox.Show("Removal failed, try again?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+
                 if (Pri.LongPath.Directory.Exists(dir) == false)
                 {
                     Pri.LongPath.Directory.CreateDirectory(dir);
                 }
-
             }
 
             Server FileServer = GetFileServerFromAPI();

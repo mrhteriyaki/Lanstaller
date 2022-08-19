@@ -50,7 +50,7 @@ namespace Lanstaller
                 if (line.StartsWith("authkey="))
                 {
                     string auth = line.Split('=')[1];
-                    APIClient.SetAuthKey(auth);
+                    APIClient.Setup(auth);
                     ChatClient.InitChatWC(auth);
 
                 }
@@ -69,8 +69,10 @@ namespace Lanstaller
 
             //Init threads.
             MThread = new Thread(StatusMonitorThread);
+            MThread.Name = "Status Monitor";
             CThread = new Thread(ChatThread);
-
+            CThread.Name = "Chat Thread";
+            
             //Check Server Version
             try
             {
@@ -239,6 +241,9 @@ namespace Lanstaller
 
             lbxInstallList.Enabled = state;
 
+
+            txtInstallDirectory.Enabled = state;
+
             /*
             chkFiles.Enabled = state;
             chkRegistry.Enabled = state;
@@ -390,6 +395,11 @@ namespace Lanstaller
             ClientSoftwareClass currentsw = new ClientSoftwareClass();
             currentsw.Identity = SList[index];
             InstallList.Add(currentsw);
+
+            if (cmbxSoftware.SelectedIndex < (cmbxSoftware.Items.Count - 1))
+            {
+                cmbxSoftware.SelectedIndex += 1;
+            }
 
         }
 
