@@ -1,4 +1,6 @@
 using Lanstaller_Shared;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,20 @@ if (app.Environment.IsDevelopment())
 
 //HTTPS redirect disabled.
 //app.UseHttpsRedirection();
+
+//Add MIME for DLL.
+var extensionProvider = new FileExtensionContentTypeProvider();
+extensionProvider.Mappings.Add(".dll", "application/octet-stream");
+
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+           Path.Combine(builder.Environment.ContentRootPath, "StaticFiles")),
+    RequestPath = "/StaticFiles",
+    ContentTypeProvider = extensionProvider
+
+});
 
 app.UseAuthorization();
 

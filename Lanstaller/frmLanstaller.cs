@@ -17,7 +17,7 @@ namespace Lanstaller
 
     public partial class frmLanstaller : Form
     {
-        Double Version = 0.1;
+        Double Version = 0.2;
         List<ClientSoftwareClass> InstallList = new List<ClientSoftwareClass>();
         List<ClientSoftwareClass.SoftwareInfo> SList; //List of Software.
         List<ClientSoftwareClass.Tool> ToolList = new List<ClientSoftwareClass.Tool>();
@@ -60,37 +60,68 @@ namespace Lanstaller
                     if (!APIClient.APIServer.EndsWith("/"))
                     {
                         APIClient.APIServer = APIClient.APIServer + "/";
-                        
                     }
                     //Set chat server to match api.
                     ChatClient.ChatServer = APIClient.APIServer;
                 }
             }
 
-            //Init threads.
-            MThread = new Thread(StatusMonitorThread);
-            MThread.Name = "Status Monitor";
-            CThread = new Thread(ChatThread);
-            CThread.Name = "Chat Thread";
-            
+
             //Check Server Version
             try
             {
                 double server_version = double.Parse(APIClient.GetSystemInfo("version"));
                 if (server_version != Version)
                 {
-                    MessageBox.Show("Server version does not match client.\nVersion Check Failure\nApplication will now close.");
-                    Application.Exit();
-                    return;
+                    if (MessageBox.Show("Lanstaller Update Required.","Update Required",MessageBoxButtons.OKCancel,MessageBoxIcon.Warning) == DialogResult.OK)
+                    {
+                        string upath = AppDomain.CurrentDomain.BaseDirectory;
+                        string updaterpath = upath + "\\Lanstaller.Updater.exe";
+
+                        //Update.
+                        if (File.Exists(updaterpath))
+                        {
+                            File.Delete(updaterpath);
+                        }
+                        //Download file.
+                        APIClient.DownloadFile(APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe", updaterpath);
+
+                        //Run with wscript.
+                        Process UProc = new Process();
+                        UProc.StartInfo.FileName = updaterpath;
+                        UProc.StartInfo.WorkingDirectory = upath;
+                        UProc.StartInfo.Arguments = APIClient.APIServer;
+                        UProc.Start();
+                        UProc.WaitForExit();
+
+                        Thread.Sleep(10000);
+                        MessageBox.Show("Update timeout");
+                        this.BeginInvoke(new MethodInvoker(this.Close));
+                    }
+                    else
+                    {
+                        this.BeginInvoke(new MethodInvoker(this.Close));
+                        //return;
+                    }                   
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show("Version Check Failure" + ex.ToString() + "\nApplication will now close.");
-                Application.Exit();
-                return;
+                MessageBox.Show("Version Check / Update Failure" + ex.ToString() + "\nApplication will now close.","Update Failure",MessageBoxButtons.OK,MessageBoxIcon.Error);
+                this.BeginInvoke(new MethodInvoker(this.Close));
+                //return;
             }
-            
+
+
+
+
+            //Init threads.
+            MThread = new Thread(StatusMonitorThread);
+            MThread.Name = "Status Monitor";
+            CThread = new Thread(ChatThread);
+            CThread.Name = "Chat Thread";
+
+
 
 
 
@@ -177,20 +208,20 @@ namespace Lanstaller
         }
 
         long lastid = 0;
-        
+
         void ChatThread()
         {
             UpdateChatMessages();
             //lastcheck = CM.timestamp;
             while (shutdown == false)
-            { 
+            {
                 if (ChatClient.GetMessageCount(lastid) != 0)
                 {
                     UpdateChatMessages();
                 }
                 Thread.Sleep(300);
             }
-            
+
         }
 
         void UpdateChatMessages()
@@ -209,15 +240,15 @@ namespace Lanstaller
                 }
                 lastid = CM.id;
             }
-            
+
             if (MessageData.Length == 0)
             {
                 return;
             }
 
             //Trim empty lastline.
-            string MessageDataStr = MessageData.ToString().Substring(0, (MessageData.Length - 1)); 
-            
+            string MessageDataStr = MessageData.ToString().Substring(0, (MessageData.Length - 1));
+
             //Update GUI
             txtChatMessages.Invoke((MethodInvoker)delegate
             {
@@ -320,19 +351,19 @@ namespace Lanstaller
 
 
             //Get Serials for All Software
-            
+
             if (install_reg)
             {
                 //Get serial keys for all queued installs.
                 foreach (ClientSoftwareClass CSW in InstallList)
                 {
-                    foreach(ClientSoftwareClass.SerialNumber SN in APIClient.GetSerialsListFromAPI(CSW.Identity.id))
+                    foreach (ClientSoftwareClass.SerialNumber SN in APIClient.GetSerialsListFromAPI(CSW.Identity.id))
                     {
                         CSW.SerialList.Add(SN);
                     }
                     ClientSoftwareClass.GenerateSerials(CSW.SerialList);
                 }
-               
+
             }
 
             //Enable progress bar.
@@ -497,13 +528,13 @@ namespace Lanstaller
                 txtChatMessages.ScrollToCaret();
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 //Failed to send.
                 MessageBox.Show(ex.ToString());
             }
-            
-            
+
+
             txtChatSendMessage.Text = "";
         }
 
@@ -515,7 +546,7 @@ namespace Lanstaller
                 return;
             }
 
-            
+
             long filesize = APIClient.GetInstallSizeFromAPI(SList[cmbxSoftware.SelectedIndex].id);
 
             double mbfilesize = (double)filesize / (double)1048576;
@@ -590,6 +621,6 @@ namespace Lanstaller
             }
         }
 
-      
+
     }
 }
