@@ -55,8 +55,16 @@ namespace Lanstaller
             {
                 //Send request to API.
                 //ChatWC.UploadData(ChatServer + "chat/send", "POST", Encoding.UTF8.GetBytes(lastid));
-                string countstr = ChatWC.DownloadString(ChatServer + "chat/check?lastid=" + lastid);
-                return int.Parse(countstr);
+                try
+                {
+                    string countstr = ChatWC.DownloadString(ChatServer + "chat/check?lastid=" + lastid);
+                    return int.Parse(countstr);
+                }
+                catch(Exception ex)
+                {
+                    
+                }
+                return 0;
             }
         }
 
