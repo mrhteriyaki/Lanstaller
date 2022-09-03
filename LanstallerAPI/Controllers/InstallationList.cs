@@ -55,6 +55,18 @@ namespace LanstallerAPI.Controllers
             return JsonConvert.SerializeObject(SoftwareClass.GetFiles(swid));
         }
 
+        //Get Directories.
+        [Route("Directories")]
+        public string Directories(int swid)
+        {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+
+            return JsonConvert.SerializeObject(SoftwareClass.GetDirectories(swid));
+        }
+
         [Route("Compatibility")]
         public string Compatibility(int swid)
         {

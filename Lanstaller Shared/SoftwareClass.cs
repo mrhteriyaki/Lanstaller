@@ -54,6 +54,7 @@ namespace Lanstaller_Shared
             public string destination;
         }
 
+
         public class ShortcutOperation
         {
             public string name;
@@ -356,6 +357,23 @@ namespace Lanstaller_Shared
             SQLConn.Close();
 
             return FileCopyList;
+        }
+
+        public static List<string> GetDirectories(int SoftwareID)
+        {
+            List<string> DirList = new List<string>();
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand("SELECT [path] FROM tblDirectories WHERE software_id = @softwareid", SQLConn);
+            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID); //Identity.id
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                DirList.Add(SQLOutput[0].ToString());
+            }
+            SQLConn.Close();
+
+            return DirList;
         }
 
         public static List<RegistryOperation> GetRegistry(int SoftwareID)
@@ -697,7 +715,20 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
-       
+        public static void AddDirectory(string directorypath, int softwareid)
+        {
+            string QueryString = "INSERT into tblDirectories ([path],[software_id]) VALUES (@dirpath,@softwareid)";
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("dirpath", directorypath);
+            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.ExecuteNonQuery();
+            SQLConn.Close();
+        }
+
+
 
         public static void RescanFileHashes(bool fullrescan)
         {

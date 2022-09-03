@@ -210,17 +210,16 @@ namespace Lanstaller_Management_Console
 
 
         string[] filelist;
+        string[] directories;
+
         private void btnScan_Click(object sender, EventArgs e)
         {
-
-
             //Cleanup path ends.
             if (!(FilesPanel.txtScanfolder.Text.EndsWith("\\")))
             {
                 MessageBox.Show("Scan path must end with backslash.");
                 return;
             }
-
 
             if (!(FilesPanel.txtSubFolder.Text.Equals("")))
             {
@@ -230,6 +229,7 @@ namespace Lanstaller_Management_Console
                     return;
                 }
             }
+
             if (FilesPanel.txtSubFolder.Text.StartsWith("\\"))
             {
                 MessageBox.Show("Sub Folder path cannot start with backslash");
@@ -240,6 +240,7 @@ namespace Lanstaller_Management_Console
             {
                 FilesPanel.txtServerShare.Text = FilesPanel.txtServerShare.Text + "\\"; //append backslash to server share location..
             }
+
             //check server share location matches start of scan path.
             if (!(FilesPanel.txtScanfolder.Text.ToLower().StartsWith(FilesPanel.txtServerShare.Text.ToLower())))
             {
@@ -259,7 +260,9 @@ namespace Lanstaller_Management_Console
 
             FilesPanel.lblCopyActionInfo.Text = "Status: Scanning";
             filelist = Pri.LongPath.Directory.GetFiles(scanfolder, "*", System.IO.SearchOption.AllDirectories);
-            FilesPanel.lblCopyActionInfo.Text = "Status: Scanned Files: " + filelist.Count();
+            directories = Pri.LongPath.Directory.GetDirectories(scanfolder, "*", SearchOption.AllDirectories);
+
+            FilesPanel.lblCopyActionInfo.Text = "Status: Scanned Files: " + filelist.Count() + "\nDirectories: " + directories.Count();
             FilesPanel.btnAddFolder.Enabled = true;
         }
 
@@ -393,10 +396,17 @@ namespace Lanstaller_Management_Console
             }
 
 
-
-
             string servershare = FilesPanel.txtServerShare.Text;
             string subfolder = servershare + FilesPanel.txtSubFolder.Text;
+
+
+            foreach (string dirname in directories)
+            {
+                string dst = destination + dirname.Substring(subfolder.Length);
+                SoftwareClass.AddDirectory(dst, selectedsoftwareid);
+
+            }
+
 
             //Loop through each file from .getfiles.
             foreach (string filename in filelist)
@@ -431,7 +441,7 @@ namespace Lanstaller_Management_Console
 
         private void txtServerShare_TextChanged(object sender, EventArgs e)
         {
-            Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE\\Lanstaller", true).SetValue("management_basefolder", FilesPanel.txtServerShare.Text);
+           Registry.LocalMachine.OpenSubKey("SOFTWARE\\Lanstaller", true).SetValue("management_basefolder", FilesPanel.txtServerShare.Text);
         }
 
         public void txtScanfolder_TextChanged(object sender, EventArgs e)

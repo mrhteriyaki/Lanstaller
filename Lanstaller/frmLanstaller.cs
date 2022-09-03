@@ -67,6 +67,14 @@ namespace Lanstaller
             }
 
 
+            //Init threads.
+            MThread = new Thread(StatusMonitorThread);
+            MThread.Name = "Status Monitor";
+            CThread = new Thread(ChatThread);
+            CThread.Name = "Chat Thread";
+
+
+
             //Check Server Version
             try
             {
@@ -107,22 +115,11 @@ namespace Lanstaller
             }
             catch (Exception ex)
             {
+                //Exit on failure.
                 MessageBox.Show("Version Check / Update Failure" + ex.ToString() + "\nApplication will now close.","Update Failure",MessageBoxButtons.OK,MessageBoxIcon.Error);
                 this.BeginInvoke(new MethodInvoker(this.Close));
-                //return;
+                return;
             }
-
-
-
-
-            //Init threads.
-            MThread = new Thread(StatusMonitorThread);
-            MThread.Name = "Status Monitor";
-            CThread = new Thread(ChatThread);
-            CThread.Name = "Chat Thread";
-
-
-
 
 
             btnInstall.Text = "Start" + Environment.NewLine + "Install";

@@ -58,18 +58,34 @@ namespace Lanstaller
             {
                 SetStatus("Indexing - " + Identity.Name);
                 List<FileCopyOperation> FCL;
+                List<string> DirectoryList = new List<string>();
 
                 //DB
                 //FCL = GetFiles(Identity.id);
 
                 //Web
                 FCL = GetFilesListFromAPI(Identity.id);
+                
+                //Get Directories, split up all sub directory paths and add to generation list.
+                foreach (string Dir in GetDirectoriesFromAPI(Identity.id))
+                {
+                    Console.WriteLine(Dir);
+                    GetSubFolders(ReplaceVariable(Dir), DirectoryList);
+                }
+
+                foreach (FileCopyOperation FCO in FCL)
+                {
+                    FCO.destination = ReplaceVariable(FCO.destination);
+                    //Remove filename from path.
+                    string filedirectory = FCO.destination.Substring(0, FCO.destination.LastIndexOf("\\"));
+                    GetSubFolders(filedirectory, DirectoryList);
+                }
 
                 InstalledSize = 0; //reset install size.
                 InstallSize = GetInstallSizeFromAPI(Identity.id);
 
                 SetStatus("Copying Files - " + Identity.Name);
-                CopyFiles(FCL);
+                CopyFiles(FCL, DirectoryList);
             }
 
             if (installshortcuts)
@@ -181,7 +197,50 @@ namespace Lanstaller
             }
         }
 
+        //Gets all sub folders for given directory, adds to list.
+        void GetSubFolders(string directory, List<string> DirectoryList)
+        {
+            //Check if already in list, if so skip.
+            foreach (string dir in DirectoryList)
+            {
+                if (dir == directory)
+                {
+                    return;
+                }
+            }
 
+            //Split up file directory for parent folders.
+            int count = 0;
+            string directorypath = "";
+            foreach (string FileDirSection in directory.Split(Char.Parse("\\")))
+            {
+                //Check each directory including parents against list and add if missing.
+                directorypath = directorypath + FileDirSection + "\\";
+
+                count++;
+                if (count == 1)
+                {
+                    //Skip Drive Root (Eg: C:).
+                    continue;
+                }
+
+                //Check if path already added to list.
+                bool missing = true;
+                foreach (string existingdir in DirectoryList)
+                {
+                    if (existingdir.Equals(directorypath))
+                    {
+                        missing = false;
+                        break;
+                    }
+                }
+                if (missing == true)
+                {
+                    DirectoryList.Add(directorypath);
+                }
+            }
+
+        }
 
 
         void GeneratePreferenceFiles(List<PreferenceOperation> PreferenceOperationList)
@@ -318,9 +377,9 @@ namespace Lanstaller
             }
         }
 
+        
 
-
-        void CopyFiles(List<FileCopyOperation> FileCopyList)
+        void CopyFiles(List<FileCopyOperation> FileCopyList, List<string> DirectoryList)
         {
 
             //Calculate total copy size.
@@ -328,54 +387,8 @@ namespace Lanstaller
             double totalgbytes = (double)totalbytes / 1073741824;
 
 
-            
-            
-            //Generate Directories.
-            List<string> DirectoryList = new List<string>();
-            foreach (FileCopyOperation FCO in FileCopyList)
-            {
-                //Update destination variables.
-                FCO.destination = ReplaceVariable(FCO.destination);
-
-                //Get File Directory, trim end filename.
-                string filedirectory = FCO.destination.Substring(0, FCO.destination.LastIndexOf("\\"));
-                string checkdir = "";
-                //Split up file directory for parent folders.
-                int count = 0;
-                foreach (string FileDirSection in filedirectory.Split(Char.Parse("\\")))
-                {
-                    //Check each directory including parents against list and add if missing.
-                    checkdir = checkdir + FileDirSection + "\\";
-                    
-                    count++;
-                    if (count == 1)
-                    {
-                        //Root of drive.
-                        continue;
-                    }
-                    
-                    bool missing = true;
-                    foreach (string existingdir in DirectoryList)
-                    {
-                        if (existingdir.Equals(checkdir))
-                        {
-                            missing = false;
-                            break;
-                        }
-                    }
-                    if (missing == true)
-                    {
-                        DirectoryList.Add(checkdir);
-                    }
-
-                }
-
-            }
-
-
-            SetStatus("Installing: " + Identity.Name + Environment.NewLine + "Status: Generating Directories");
-
-            
+            SetStatus("Status: Installing " + Identity.Name + Environment.NewLine + " - Generating Directories");
+            //Generate any required Directories for Files.
             foreach (string dir in DirectoryList)
             {
                 if (Pri.LongPath.Directory.Exists(dir) == true)

@@ -126,6 +126,18 @@ namespace Lanstaller.Classes
             return FCL;
         }
 
+        //Get Directories.
+        public static List<string> GetDirectoriesFromAPI(int SoftwareID)
+        {
+            List<string> DirList = new List<string>();
+            JArray DirArray = GetInstallationList("Directories", SoftwareID);
+            foreach (var DO in DirArray)
+            {
+                DirList.Add(DO.ToObject<string>());
+            }
+            return DirList;
+        }
+
 
         //Shortcuts
         public static List<ShortcutOperation> GetShortcutListFromAPI(int SoftwareID)
