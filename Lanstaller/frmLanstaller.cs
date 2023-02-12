@@ -14,6 +14,8 @@ using Lanstaller.Classes;
 namespace Lanstaller
 {
     //Lanstaller Project
+    
+
 
     public partial class frmLanstaller : Form
     {
@@ -27,6 +29,8 @@ namespace Lanstaller
         Thread InsTrd; //installer thread.
 
         bool shutdown = false;
+
+        Size StartSize;
 
         public frmLanstaller()
         {
@@ -43,6 +47,8 @@ namespace Lanstaller
                 frmConfigInput CI = new frmConfigInput();
                 CI.ShowDialog();
             }
+
+            StartSize = this.Size;
 
 
             foreach (string line in System.IO.File.ReadAllLines("config.ini"))
@@ -592,7 +598,7 @@ namespace Lanstaller
             ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.White, ButtonBorderStyle.Solid);
         }
 
-
+        
 
         private void cmbxTool_KeyDown(object sender, KeyEventArgs e)
         {
@@ -618,6 +624,39 @@ namespace Lanstaller
             }
         }
 
+        private void frmLanstaller_Resize(object sender, EventArgs e)
+        {
 
+        }
+
+
+
+        private void tmrRefresh_Tick(object sender, EventArgs e)
+        {
+            //If game force shrinks window, reset to normal size.
+            
+            if(this.Size.Width < StartSize.Width)
+            {
+                int monwidth = System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Width;
+                if (monwidth > StartSize.Width)
+                {
+                    this.Width = StartSize.Width;
+                    
+                }
+
+
+            }
+            if(this.Size.Height < StartSize.Height)
+            {
+                int monheight = System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Height;
+                if (monheight > StartSize.Height)
+                {
+                    this.Height = StartSize.Height;
+                }
+            }
+
+            this.Invalidate();
+
+        }
     }
 }

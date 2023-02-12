@@ -29,6 +29,7 @@ namespace Lanstaller
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.cmbxSoftware = new System.Windows.Forms.ComboBox();
             this.lbxInstallList = new System.Windows.Forms.ListBox();
             this.btnInstall = new System.Windows.Forms.Button();
@@ -65,6 +66,7 @@ namespace Lanstaller
             this.label4 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
+            this.tmrRefresh = new System.Windows.Forms.Timer(this.components);
             this.gbxActions.SuspendLayout();
             this.gbxPref.SuspendLayout();
             this.gbxStatus.SuspendLayout();
@@ -417,15 +419,16 @@ namespace Lanstaller
             this.pbTitleExpanded.BackColor = System.Drawing.Color.Transparent;
             this.pbTitleExpanded.ErrorImage = null;
             this.pbTitleExpanded.InitialImage = null;
-            this.pbTitleExpanded.Location = new System.Drawing.Point(-12, -9);
+            this.pbTitleExpanded.Location = new System.Drawing.Point(0, 0);
             this.pbTitleExpanded.Name = "pbTitleExpanded";
-            this.pbTitleExpanded.Size = new System.Drawing.Size(941, 99);
+            this.pbTitleExpanded.Size = new System.Drawing.Size(920, 90);
             this.pbTitleExpanded.TabIndex = 17;
             this.pbTitleExpanded.TabStop = false;
             this.pbTitleExpanded.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Caption_MouseDown);
             // 
             // btnExit
             // 
+            this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnExit.ForeColor = System.Drawing.Color.White;
@@ -479,6 +482,12 @@ namespace Lanstaller
             this.label8.TabIndex = 20;
             this.label8.Text = "User Preferences:";
             // 
+            // tmrRefresh
+            // 
+            this.tmrRefresh.Enabled = true;
+            this.tmrRefresh.Interval = 4000;
+            this.tmrRefresh.Tick += new System.EventHandler(this.tmrRefresh_Tick);
+            // 
             // frmLanstaller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -514,6 +523,7 @@ namespace Lanstaller
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmLanstaller_Closing);
             this.Load += new System.EventHandler(this.frmLanstaller_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.OnPaint);
+            this.Resize += new System.EventHandler(this.frmLanstaller_Resize);
             this.gbxActions.ResumeLayout(false);
             this.gbxActions.PerformLayout();
             this.gbxPref.ResumeLayout(false);
@@ -565,6 +575,7 @@ namespace Lanstaller
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Timer tmrRefresh;
     }
 }
 
