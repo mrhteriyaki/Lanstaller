@@ -545,8 +545,10 @@ namespace Lanstaller
                 shortcut.TargetPath = ReplaceVariable(SCO.filepath);
                 shortcut.WorkingDirectory = ReplaceVariable(SCO.runpath);
                 shortcut.Arguments = ReplaceVariable(SCO.arguments);
-                shortcut.IconLocation = ReplaceVariable(SCO.icon);
-
+                if (!String.IsNullOrEmpty(SCO.icon))
+                {
+                    shortcut.IconLocation = ReplaceVariable(SCO.icon);
+                }
                 shortcut.Save();
             }
 
