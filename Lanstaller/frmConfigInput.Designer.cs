@@ -35,6 +35,7 @@ namespace Lanstaller
             this.label1 = new System.Windows.Forms.Label();
             this.txtAuth = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtServer
@@ -99,12 +100,25 @@ namespace Lanstaller
             this.label2.TabIndex = 5;
             this.label2.Text = "Lanstaller Configuration - Specify Server URL and Authentication Key.";
             // 
+            // btnCancel
+            // 
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancel.ForeColor = System.Drawing.Color.White;
+            this.btnCancel.Location = new System.Drawing.Point(410, 145);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(100, 30);
+            this.btnCancel.TabIndex = 6;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
             // frmConfigInput
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(628, 183);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtAuth);
@@ -128,5 +142,6 @@ namespace Lanstaller
         public System.Windows.Forms.Label label1;
         public System.Windows.Forms.TextBox txtAuth;
         public System.Windows.Forms.Label label2;
+        public System.Windows.Forms.Button btnCancel;
     }
 }

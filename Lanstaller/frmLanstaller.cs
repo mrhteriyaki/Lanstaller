@@ -47,6 +47,11 @@ namespace Lanstaller
                 CI.ShowDialog();
             }
 
+            if (!File.Exists("config.ini"))
+            {
+                Application.Exit();
+            }
+
             StartSize = this.Size;
 
 
@@ -467,10 +472,15 @@ namespace Lanstaller
         {
             shutdown = true;
             //Shutdown Threads.
-            MThread.Abort();
-            CThread.Abort();
-
-
+            if (MThread != null)
+            {
+                MThread.Abort();
+            }
+            if (CThread != null)
+            {
+                CThread.Abort();
+            }
+            
             if (InsTrd != null)
             {
                 InsTrd.Abort();
