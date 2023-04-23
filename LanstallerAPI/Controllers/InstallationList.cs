@@ -35,111 +35,122 @@ namespace LanstallerAPI.Controllers
 
         //Get Installation Size
         [Route("InstallSize")]
-        public string InstallSize(int swid)
+        public string InstallSize(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-            return SoftwareClass.GetInstallSize(swid).ToString();
+            return SoftwareClass.GetInstallSize(id).ToString();
         }
 
         //GetFiles
         [Route("Files")]
-        public string Files(int swid)
+        public string Files(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetFiles(swid));
+            return JsonConvert.SerializeObject(SoftwareClass.GetFiles(id));
         }
 
         //Get Directories.
         [Route("Directories")]
-        public string Directories(int swid)
+        public string Directories(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
 
-            return JsonConvert.SerializeObject(SoftwareClass.GetDirectories(swid));
+            return JsonConvert.SerializeObject(SoftwareClass.GetDirectories(id));
         }
 
         [Route("Compatibility")]
-        public string Compatibility(int swid)
+        public string Compatibility(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetCompatibility(swid));
+            return JsonConvert.SerializeObject(SoftwareClass.GetCompatibility(id));
         }
 
 
         [Route("Shortcuts")]
-        public string Shortcuts(int swid)
+        public string Shortcuts(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetShortcuts(swid));
+            return JsonConvert.SerializeObject(SoftwareClass.GetShortcuts(id));
         }
 
         [Route("Registry")]
-        public string Registry(int swid)
+        public string Registry(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetRegistry(swid));
+            return JsonConvert.SerializeObject(SoftwareClass.GetRegistry(id));
 
         }
 
 
         [Route("Firewall")]
-        public string Firewall(int swid)
+        public string Firewall(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetFirewallRules(swid));
+            return JsonConvert.SerializeObject(SoftwareClass.GetFirewallRules(id));
         }
 
         [Route("Preferences")]
-        public string Preferences(int swid)
+        public string Preferences(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetPreferenceFiles(swid));
+            return JsonConvert.SerializeObject(SoftwareClass.GetPreferenceFiles(id));
         }
 
         [Route("Redistributables")]
-        public string Redistributables(int swid)
+        public string Redistributables(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
 
-            return JsonConvert.SerializeObject(SoftwareClass.GetRedistributables(swid));
+            return JsonConvert.SerializeObject(SoftwareClass.GetRedistributables(id));
         }
 
 
         [Route("Serials")]
-        public string Serials(int swid)
+        public string Serials(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetSerials(swid));
+            return JsonConvert.SerializeObject(SoftwareClass.GetSerials(id));
+        }
+
+
+        [Route("AvailableSerials")]
+        public string AvailableSerials(int id)
+        {
+            if (Authentication.CheckLogon(HttpContext.Request) == false)
+            {
+                return "auth fail";
+            }
+            return JsonConvert.SerializeObject(SoftwareClass.GetAvailableSerials(id));
         }
 
     }

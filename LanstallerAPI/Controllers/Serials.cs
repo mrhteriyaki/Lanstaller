@@ -1,21 +1,21 @@
 ﻿using Lanstaller_Shared;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace LanstallerAPI.Controllers
 {
     [ApiController]
-    [Route("tools")]
-    public class Tools : ControllerBase
+    [Route("Serials")]
+    public class Serials : ControllerBase
     {
-        public string GET()
+        public string Index(int id, string serial)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
-            }     
-            return JsonConvert.SerializeObject(SoftwareClass.GetTools());
-        }
+            }
+            SoftwareClass.SetAvailableSerial(id, serial);
 
+            return "ok";
+        }
     }
 }

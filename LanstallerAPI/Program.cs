@@ -27,7 +27,7 @@ if (app.Environment.IsDevelopment())
 var extensionProvider = new FileExtensionContentTypeProvider();
 extensionProvider.Mappings.Add(".dll", "application/octet-stream");
 
-
+/*
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
@@ -36,6 +36,7 @@ app.UseStaticFiles(new StaticFileOptions
     ContentTypeProvider = extensionProvider
 
 });
+*/
 
 app.UseAuthorization();
 

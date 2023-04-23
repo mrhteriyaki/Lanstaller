@@ -31,14 +31,6 @@ namespace Lanstaller_Shared
             public string Name;
         }
 
-        public class Tool
-        {
-            public int id;
-            public string Name;
-            public string path;
-        }
-
-
         public class FileInfoClass
         {
             public int id;
@@ -67,6 +59,7 @@ namespace Lanstaller_Shared
 
         public class SerialNumber
         {
+            public int serialid;
             public string name;
             public int instancenumber;
             public string serialnumber;
@@ -170,28 +163,7 @@ namespace Lanstaller_Shared
             return tmpList;
         }
 
-        public static List<Tool> GetTools()
-        {
-            string server_path = GetFileServer("web").path;
-
-            List<Tool> tmpList = new List<Tool>();
-            SqlConnection SQLConn = new SqlConnection(ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand("SELECT id,[name],[path] from tblTools", SQLConn);
-            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
-            while (SQLOutput.Read())
-            {
-                Tool tmpTool = new Tool();
-                tmpTool.id = (int)SQLOutput[0];
-                tmpTool.Name = SQLOutput[1].ToString();
-                tmpTool.path = server_path + SQLOutput[2].ToString();
-                tmpList.Add(tmpTool);
-            }
-            SQLConn.Close();
-
-            return tmpList;
-
-        }
+        
 
         public static int AddSoftware(string softwarename)
         {
@@ -236,9 +208,14 @@ namespace Lanstaller_Shared
             SQLCmd.CommandText = "DELETE FROM tblPreferenceFiles WHERE software_id = @softid";
             SQLCmd.ExecuteNonQuery();
 
+            //Delete available serials.
+            SQLCmd.CommandText = "DELETE FROM tblSerialsAvailable WHERE serial_id = (SELECT id FROM tblSerials WHERE software_id = @softid)";
+            SQLCmd.ExecuteNonQuery();
+
             //Delete serials
             SQLCmd.CommandText = "DELETE FROM tblSerials WHERE software_id = @softid";
             SQLCmd.ExecuteNonQuery();
+
 
             //Delete shortcuts
             SQLCmd.CommandText = "DELETE FROM tblShortcut WHERE software_id = @softid";
@@ -434,7 +411,7 @@ namespace Lanstaller_Shared
         {
             List<SerialNumber> SerialList = new List<SerialNumber>();
 
-            string QueryString = "select [name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid";
+            string QueryString = "select [id],[name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -445,10 +422,11 @@ namespace Lanstaller_Shared
             {
                 SerialNumber tSerial = new SerialNumber();
                 tSerial.softwareid = SoftwareID;
-                tSerial.name = SQLOutput[0].ToString();
-                tSerial.instancenumber = (int)SQLOutput[1];
-                tSerial.regKey = SQLOutput[2].ToString();
-                tSerial.regVal = SQLOutput[3].ToString();
+                tSerial.serialid = (int)SQLOutput[0];
+                tSerial.name = SQLOutput[1].ToString();
+                tSerial.instancenumber = (int)SQLOutput[2];
+                tSerial.regKey = SQLOutput[3].ToString();
+                tSerial.regVal = SQLOutput[4].ToString();
                 SerialList.Add(tSerial);
             }
             SQLConn.Close();
@@ -457,6 +435,34 @@ namespace Lanstaller_Shared
         }
 
 
+        public static List<string> GetAvailableSerials(int SerialID)
+        {
+            string QueryString = "select [serial_value] from [tblSerialsAvailable] WHERE serial_id = @serialid AND serial_used is NULL";
+
+            List<string> SerialList = new List<string>();
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("serialid", SerialID);
+            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+            while (SQLOutput.Read())
+            {
+                SerialList.Add(SQLOutput[0].ToString());
+            }
+            SQLConn.Close();
+            return SerialList;
+        }
+
+        public static void SetAvailableSerial(int SerialID, string Serial)
+        {
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand("UPDATE [tblSerialsAvailable] SET serial_used = GETDATE() WHERE serial_id = @sid AND serial_value = @sval", SQLConn);
+            SQLCmd.Parameters.AddWithValue("sid", SerialID);
+            SQLCmd.Parameters.AddWithValue("sval", Serial);
+            SQLCmd.ExecuteNonQuery();
+            SQLConn.Close();
+        }
 
         public static List<ShortcutOperation> GetShortcuts(int SoftwareID)
         {

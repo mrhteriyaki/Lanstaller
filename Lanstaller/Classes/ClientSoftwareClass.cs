@@ -33,7 +33,9 @@ namespace Lanstaller
 
         public List<SerialNumber> SerialList = new List<SerialNumber>();
 
-        
+
+
+
 
 
         public void Install(bool installfiles, bool installregistry, bool installshortcuts, bool apply_windowssettings, bool apply_preferences, bool install_redist)
@@ -47,7 +49,7 @@ namespace Lanstaller
 
                 //DB
                 //RegistryList = GetRegistry(Identity.id);
-                
+
                 //Web
                 RegistryList = GetRegistryListFromAPI(Identity.id);
                 GenerateRegistry(RegistryList, SerialList);
@@ -65,7 +67,7 @@ namespace Lanstaller
 
                 //Web
                 FCL = GetFilesListFromAPI(Identity.id);
-                
+
                 //Get Directories, split up all sub directory paths and add to generation list.
                 foreach (string Dir in GetDirectoriesFromAPI(Identity.id))
                 {
@@ -108,7 +110,7 @@ namespace Lanstaller
             {
                 //Firewall
                 List<FirewallRule> FWL;
-                
+
                 //DB
                 //FWL = GetFirewallRules(Identity.id);
 
@@ -118,21 +120,21 @@ namespace Lanstaller
 
                 //Compatibility.
                 List<Compatibility> CPL = GetCompatibilitiesFromAPI(Identity.id);
-                foreach(Compatibility CP in CPL)
+                foreach (Compatibility CP in CPL)
                 {
-                    GenerateCompatibility(CP.filename,CP.compat_type);
+                    GenerateCompatibility(CP.filename, CP.compat_type);
                 }
-                
+
             }
 
             SetStatus("Applying Preferences - " + Identity.Name);
             if (apply_preferences)
             {
                 List<PreferenceOperation> POList;
-                
+
                 //DB
                 //POList = GetPreferenceFiles(Identity.id);
-                
+
                 //WEB
                 POList = GetPreferencesListFromAPI(Identity.id);
 
@@ -269,7 +271,7 @@ namespace Lanstaller
             }
         }
 
-       
+
 
         public void GenerateRedistributables(List<Redistributable> RedistributableList) //Incomplete.
         {
@@ -285,8 +287,8 @@ namespace Lanstaller
                 }
 
 
-                string temppath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp" ;
-                
+                string temppath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp";
+
                 string filename = Redist.path.Substring(Redist.path.Replace("\\", "/").LastIndexOf("/"));
                 string destpath = temppath + filename;
 
@@ -300,7 +302,7 @@ namespace Lanstaller
                 {
                     RDProc.StartInfo.FileName = destpath;
                     RDProc.StartInfo.Arguments = Redist.args;
-                   
+
                 }
                 else if (Redist.compressed == "1")
                 {
@@ -308,7 +310,7 @@ namespace Lanstaller
                     Directory.CreateDirectory(extractpath);
 
                     //Extract.
-                    Process SevenZipProc = new Process();                   
+                    Process SevenZipProc = new Process();
                     SevenZipProc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "7z.exe";
                     SevenZipProc.StartInfo.Arguments = "x \"" + destpath + "\" -o\"" + extractpath + "\"";
                     SevenZipProc.StartInfo.UseShellExecute = false;
@@ -348,6 +350,8 @@ namespace Lanstaller
                 SF.Text = "Serial Number Prompt";
                 SF.lblTitle.Text = "Input Serial Number for " + SN.name;
                 SF.FormBorderStyle = FormBorderStyle.FixedSingle;
+                SF.serialid = SN.serialid;
+
 
                 if (!SN.regKey.Equals(""))
                 {
@@ -355,7 +359,7 @@ namespace Lanstaller
                     {
 
                         if (SN.regKey.StartsWith("HKEY_LOCAL_MACHINE"))
-                        { 
+                        {
                             RegistryKey RK = Registry.LocalMachine.OpenSubKey(SN.regKey.Substring(19));
                             if (RK != null)
                             {
@@ -363,7 +367,7 @@ namespace Lanstaller
                             }
                         }
 
-                       
+
                     }
                     catch (Exception ex)
                     {
@@ -377,7 +381,7 @@ namespace Lanstaller
             }
         }
 
-        
+
 
         void CopyFiles(List<FileCopyOperation> FileCopyList, List<string> DirectoryList)
         {
@@ -386,6 +390,7 @@ namespace Lanstaller
             long totalbytes = GetInstallSizeFromAPI(Identity.id);
             double totalgbytes = (double)totalbytes / 1073741824;
 
+            List<string> DeleteConfirmationIgnore = new List<string>(); //Ignore Subdirectories of paths already prompted.
 
             SetStatus("Status: Installing " + Identity.Name + Environment.NewLine + " - Generating Directories");
             //Generate any required Directories for Files.
@@ -396,17 +401,35 @@ namespace Lanstaller
                     //Prompt to remove any existing game folder.
                     if (dir.StartsWith(LanstallerSettings.InstallDirectory + "\\") && dir != LanstallerSettings.InstallDirectory + "\\")
                     {
-                        if (MessageBox.Show("Delete existing folder?\n" + dir, "Delete?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+
+                        //Prevent user delete folder prompt on every subfolder if request on parent folder declined.
+                        bool skip_check = false;
+                        foreach (string checkeddir in DeleteConfirmationIgnore)
                         {
-                            while(Pri.LongPath.Directory.Exists(dir) == true)
+                            if (dir.StartsWith(checkeddir))
                             {
-                                Pri.LongPath.Directory.Delete(dir, true);
-                                if (Pri.LongPath.Directory.Exists(dir))
-                                {
-                                    MessageBox.Show("Removal failed, try again?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                                }
+                                skip_check = true;
                             }
-                            
+                        }
+
+                        if (skip_check == false)
+                        {
+                            if (MessageBox.Show("Delete existing folder?\n" + dir, "Delete?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                            {
+                                while (Pri.LongPath.Directory.Exists(dir) == true)
+                                {
+                                    Pri.LongPath.Directory.Delete(dir, true);
+                                    if (Pri.LongPath.Directory.Exists(dir))
+                                    {
+                                        MessageBox.Show("Removal failed, try again?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                DeleteConfirmationIgnore.Add(dir); //add path to ignore list for any subdirectories.
+                            }
                         }
                     }
                 }
@@ -418,7 +441,7 @@ namespace Lanstaller
             }
 
             Server FileServer = GetFileServerFromAPI();
-            
+
             //Trim / from url (getfiles will prepend / to source on copy operation).
             if (FileServer.path.EndsWith("/"))
             {
@@ -486,7 +509,7 @@ namespace Lanstaller
             }
 
         }
-    
+
 
 
 
@@ -535,7 +558,7 @@ namespace Lanstaller
             }
         }
 
-        void GenerateShortcuts(List<ShortcutOperation>ShortcutList)
+        void GenerateShortcuts(List<ShortcutOperation> ShortcutList)
         {
             foreach (ShortcutOperation SCO in ShortcutList)
             {
@@ -553,7 +576,7 @@ namespace Lanstaller
 
         }
 
-      
+
         public static string ReplaceVariable(string dataline)
         {
             //VARIABLES for FilePath, Shortcut Path, Registry Data.

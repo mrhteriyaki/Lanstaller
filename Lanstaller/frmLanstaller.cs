@@ -22,7 +22,6 @@ namespace Lanstaller
         Double Version = 0.2;
         List<ClientSoftwareClass> InstallList = new List<ClientSoftwareClass>();
         List<ClientSoftwareClass.SoftwareInfo> SList; //List of Software.
-        List<ClientSoftwareClass.Tool> ToolList = new List<ClientSoftwareClass.Tool>();
 
         Thread MThread; //Status Monitor Thread
         Thread CThread; //Chat Thread
@@ -179,11 +178,6 @@ namespace Lanstaller
             }
             */
 
-            foreach (ClientSoftwareClass.Tool TL in APIClient.GetToolsListFromAPI())
-            {
-                ToolList.Add(TL);
-                cmbxTool.Items.Add(TL.Name);
-            }
         }
 
 
@@ -267,6 +261,8 @@ namespace Lanstaller
             btnInstall.Enabled = state;
             btnInstall.Visible = state;
 
+            cmbxSoftware.Enabled = state;
+
             btnAdd.Enabled = state;
             btnAdd.Visible = state;
 
@@ -308,7 +304,7 @@ namespace Lanstaller
 
         private void btnInstall_Click(object sender, EventArgs e)
         {
-
+            
 
             //Check for single install, add selected item to install list.
             if (lbxInstallList.Items.Count == 0)
@@ -480,33 +476,6 @@ namespace Lanstaller
                 InsTrd.Abort();
             }
 
-
-
-        }
-
-        private void btnOpenTool_Click(object sender, EventArgs e)
-        {
-            if (cmbxTool.SelectedIndex == -1)
-            {
-                return;
-            }
-            try
-            {
-                //SMB
-                //Process.Start(ToolList[cmbxTool.SelectedIndex].path);
-
-                //WEB
-                string toolpath = ToolList[cmbxTool.SelectedIndex].path;
-                int pathfinishpoint = toolpath.LastIndexOf("\\");
-                string destpath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp\\" + toolpath.Substring(pathfinishpoint);
-
-                APIClient.DownloadFile(ToolList[cmbxTool.SelectedIndex].path, destpath);
-                Process.Start(destpath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to open tool, error:" + ex.ToString());
-            }
 
 
         }
