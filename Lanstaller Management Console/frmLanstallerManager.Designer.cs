@@ -29,6 +29,7 @@ namespace Lanstaller_Management_Console
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lbxSoftware = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btnNew = new System.Windows.Forms.Button();
@@ -37,6 +38,7 @@ namespace Lanstaller_Management_Console
             this.gbxInfo = new System.Windows.Forms.GroupBox();
             this.btnRemove = new System.Windows.Forms.Button();
             this.btnSecurity = new System.Windows.Forms.Button();
+            this.tmrProgress = new System.Windows.Forms.Timer(this.components);
             this.gbxInfo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -117,6 +119,12 @@ namespace Lanstaller_Management_Console
             this.btnSecurity.UseVisualStyleBackColor = true;
             this.btnSecurity.Click += new System.EventHandler(this.btnSecurity_Click);
             // 
+            // tmrProgress
+            // 
+            this.tmrProgress.Enabled = true;
+            this.tmrProgress.Interval = 1000;
+            this.tmrProgress.Tick += new System.EventHandler(this.tmrProgress_Tick);
+            // 
             // frmLanstallerManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -148,6 +156,7 @@ namespace Lanstaller_Management_Console
         private System.Windows.Forms.GroupBox gbxInfo;
         private System.Windows.Forms.Button btnRemove;
         private System.Windows.Forms.Button btnSecurity;
+        private System.Windows.Forms.Timer tmrProgress;
     }
 }
 

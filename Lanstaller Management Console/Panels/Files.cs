@@ -26,5 +26,25 @@ namespace Lanstaller_Management_Console.Panels
         {
 
         }
+
+        private void btnRescanFileHash_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRescanFileSize_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnCheckAllFiles_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnGenerateNewFilehashes_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

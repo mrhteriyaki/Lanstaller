@@ -22,7 +22,6 @@ namespace Lanstaller
         Double Version = 0.2;
         List<ClientSoftwareClass> InstallList = new List<ClientSoftwareClass>();
         List<ClientSoftwareClass.SoftwareInfo> SList; //List of Software.
-        List<ClientSoftwareClass.Tool> ToolList = new List<ClientSoftwareClass.Tool>();
 
         Thread MThread; //Status Monitor Thread
         Thread CThread; //Chat Thread
@@ -175,20 +174,6 @@ namespace Lanstaller
 
 
 
-            //Update list of tools.
-            /*
-            foreach (SoftwareClass.Tool TL in SoftwareClass.GetTools())
-            {
-                ToolList.Add(TL);
-                cmbxTool.Items.Add(TL.Name);
-            }
-            */
-
-            foreach (ClientSoftwareClass.Tool TL in APIClient.GetToolsListFromAPI())
-            {
-                ToolList.Add(TL);
-                cmbxTool.Items.Add(TL.Name);
-            }
         }
 
 
@@ -494,32 +479,7 @@ namespace Lanstaller
 
         }
 
-        private void btnOpenTool_Click(object sender, EventArgs e)
-        {
-            if (cmbxTool.SelectedIndex == -1)
-            {
-                return;
-            }
-            try
-            {
-                //SMB
-                //Process.Start(ToolList[cmbxTool.SelectedIndex].path);
-
-                //WEB
-                string toolpath = ToolList[cmbxTool.SelectedIndex].path;
-                int pathfinishpoint = toolpath.LastIndexOf("\\");
-                string destpath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp\\" + toolpath.Substring(pathfinishpoint);
-
-                APIClient.DownloadFile(ToolList[cmbxTool.SelectedIndex].path, destpath);
-                Process.Start(destpath);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to open tool, error:" + ex.ToString());
-            }
-
-
-        }
+      
 
         private void txtChatSendMessage_KeyUp(object sender, KeyEventArgs e)
         {
@@ -610,29 +570,7 @@ namespace Lanstaller
 
         
 
-        private void cmbxTool_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.F12)
-            {
-                string debuginfo = "Debug Info: ";
-
-                if (InsTrd == null)
-                {
-                    debuginfo = "Installer Thread status: not initalised"; //null reference - no install started.
-                }
-                else if (InsTrd.IsAlive)
-                {
-                    debuginfo += "Installer Thread status: alive"; //install thread running.
-                }
-                else
-                {
-                    debuginfo += "Installer Thread status: not running"; //thread not running / crashed.
-                }
-
-                MessageBox.Show(debuginfo);
-
-            }
-        }
+      
 
         private void frmLanstaller_Resize(object sender, EventArgs e)
         {

@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 //using Lanstaller;
@@ -683,7 +683,36 @@ namespace Lanstaller_Management_Console
 
         private void btnRescanFileHash_Click(object sender, EventArgs e)
         {
-            SoftwareClass.RescanFileHashes(true);
+            FilesPanel.btnRescanFileHash.Enabled = false;
+            
+            //GetUnhashedFileCount
+            Thread ST = new Thread(GenerateFileHash);
+            ST.Start();
+
+        }
+
+        void GenerateFileHash()
+        {
+            if (MessageBox.Show("Also verify existing hashes?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                SoftwareClass.RescanFileHashes(true);
+            }
+            else
+            {
+                SoftwareClass.RescanFileHashes(false);
+            }
+
+            FilesPanel.lblCopyActionInfo.Invoke((MethodInvoker)delegate {
+                // Running on the UI thread
+                FilesPanel.lblCopyActionInfo.Visible = false;
+            });
+
+            FilesPanel.btnRescanFileHash.Invoke((MethodInvoker)delegate
+            {
+                FilesPanel.btnRescanFileHash.Enabled = true;
+            });
+
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -714,6 +743,11 @@ namespace Lanstaller_Management_Console
         {
             frmSecurity fS = new frmSecurity();
             fS.Show();
+        }
+
+        private void tmrProgress_Tick(object sender, EventArgs e)
+        {
+            FilesPanel.lblUnhashedFiles.Text = "Unhashed Files:" + SoftwareClass.GetUnhashedFileCount();
         }
     }
 }

@@ -12,16 +12,23 @@ using static Lanstaller_Shared.SoftwareClass;
 using System.IO;
 using System.Web;
 using System.Windows.Forms;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.ComponentModel;
+using System.Threading;
 
 namespace Lanstaller.Classes
 {
     public class APIClient
     {
         //Client side functions to access Lanstaller API.
-        
-        static WebClient WC = new System.Net.WebClient();
+
+        static WebClient WC = new System.Net.WebClient(); //Static webclient to reduce time_wait open ports.
         public static string APIServer = "";
         static string _authkey = "";
+
+
         public static void Setup(string authkey)
         {
             _authkey = authkey;
@@ -31,14 +38,14 @@ namespace Lanstaller.Classes
 
         public static void DownloadFile(string Source, string Destination)
         {
-            //File download function for Tools.
+            //File download function.
             try
             {
                 WC.DownloadFile(Source, Destination);
             }
-            catch(WebException ex)
+            catch (WebException ex)
             {
-                DialogResult DR = MessageBox.Show("File Download Error\n" + Source + "\nRetry or Cancel (Skip this file)?\n" + ex.ToString(),"Download Error",MessageBoxButtons.RetryCancel);
+                DialogResult DR = MessageBox.Show("File Download Error\n" + Source + "\nRetry or Cancel (Skip this file)?\n" + ex.ToString(), "Download Error", MessageBoxButtons.RetryCancel);
                 if (DR == DialogResult.Retry)
                 {
                     DownloadFile(Source, Destination);
@@ -50,14 +57,39 @@ namespace Lanstaller.Classes
                     return;
                 }
             }
-            
-            
         }
 
-        
+        public class DownloadWithProgress
+        {
+            public long downloadedbytes = 0;
+            string _source;
+            string _destination;
+            public bool completed = false;
+
+            public DownloadWithProgress(string Source, string Destination) { _source = Source; _destination = Destination; }
+            public void Download()
+            {
+                WC.DownloadProgressChanged += new DownloadProgressChangedEventHandler(client_DownloadProgressChanged);
+                WC.DownloadFileCompleted += new AsyncCompletedEventHandler(client_DownloadFileCompleted);
+                WC.DownloadFileAsync(new Uri(_source),_destination);
+            }
+            void client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+            {
+                downloadedbytes = e.BytesReceived;
+                //double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());   
+
+            }
+            void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+            {
+                completed = true;
+            }
+
+        }
+
+
         static string DownloadString(string ListName, int SoftwareID)
         {
-            return  WC.DownloadString(APIServer + "InstallationList/" + ListName + "?swid=" + SoftwareID.ToString());
+            return WC.DownloadString(APIServer + "InstallationList/" + ListName + "?swid=" + SoftwareID.ToString());
         }
 
         public static string GetSystemInfo(string setting)
@@ -72,7 +104,7 @@ namespace Lanstaller.Classes
             return FS;
 
         }
-        
+
         static JArray GetInstallationList(string ListName, int SoftwareID)
         {
             string Reply = WC.DownloadString(APIServer + "InstallationList/" + ListName + "?swid=" + SoftwareID.ToString());
@@ -99,19 +131,6 @@ namespace Lanstaller.Classes
             return long.Parse(returnstr);
         }
 
-
-        //Get Tools
-        public static List<Tool> GetToolsListFromAPI()
-        {
-            //List<Tool> GetTools
-            List<Tool> TLL = new List<Tool>();
-            JArray ToolArray = JArray.Parse(WC.DownloadString(APIServer + "Tools"));
-            foreach (var TL in ToolArray)
-            {
-                TLL.Add(TL.ToObject<Tool>());
-            }
-            return TLL;
-        }
 
 
         //Get Files.
@@ -155,8 +174,8 @@ namespace Lanstaller.Classes
         public static List<RegistryOperation> GetRegistryListFromAPI(int SoftwareID)
         {
             List<RegistryOperation> RGL = new List<RegistryOperation>();
-            JArray RGArray = GetInstallationList("Registry",SoftwareID);
-            foreach(var RG in RGArray)
+            JArray RGArray = GetInstallationList("Registry", SoftwareID);
+            foreach (var RG in RGArray)
             {
                 RGL.Add(RG.ToObject<RegistryOperation>());
             }
@@ -179,7 +198,7 @@ namespace Lanstaller.Classes
         public static List<FirewallRule> GetFirewallRulesListFromAPI(int SoftwareID)
         {
             List<FirewallRule> FWL = new List<FirewallRule>();
-            JArray FRArray = GetInstallationList("Firewall",SoftwareID);
+            JArray FRArray = GetInstallationList("Firewall", SoftwareID);
             foreach (var FR in FRArray)
             {
                 FWL.Add(FR.ToObject<FirewallRule>());
@@ -191,7 +210,7 @@ namespace Lanstaller.Classes
         public static List<PreferenceOperation> GetPreferencesListFromAPI(int SoftwareID)
         {
             List<PreferenceOperation> LST = new List<PreferenceOperation>();
-            JArray Array = GetInstallationList("Preferences",SoftwareID);
+            JArray Array = GetInstallationList("Preferences", SoftwareID);
             foreach (var itm in Array)
             {
                 LST.Add(itm.ToObject<PreferenceOperation>());
@@ -204,7 +223,7 @@ namespace Lanstaller.Classes
         public static List<Redistributable> GetRedistributablesListFromAPI(int SoftwareID)
         {
             List<Redistributable> LST = new List<Redistributable>();
-            JArray Array = GetInstallationList("Redistributables",SoftwareID);
+            JArray Array = GetInstallationList("Redistributables", SoftwareID);
             foreach (var itm in Array)
             {
                 LST.Add(itm.ToObject<Redistributable>());
@@ -217,7 +236,7 @@ namespace Lanstaller.Classes
         public static List<SerialNumber> GetSerialsListFromAPI(int SoftwareID)
         {
             List<SerialNumber> LST = new List<SerialNumber>();
-            JArray Array = GetInstallationList("Serials",SoftwareID);
+            JArray Array = GetInstallationList("Serials", SoftwareID);
             foreach (var itm in Array)
             {
                 LST.Add(itm.ToObject<SerialNumber>());
@@ -226,7 +245,7 @@ namespace Lanstaller.Classes
         }
 
 
-       
+
 
 
     }

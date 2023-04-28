@@ -93,6 +93,7 @@ namespace Lanstaller_Shared
 
         public static int NewToken(string Name, string registration_code)
         {
+            //Generate security token given client name and registration code, return the token ID.
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;

@@ -40,11 +40,11 @@
             this.txtDestination = new System.Windows.Forms.TextBox();
             this.txtScanfolder = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.btnGenerateNewFilehashes = new System.Windows.Forms.Button();
             this.btnRescanFileHash = new System.Windows.Forms.Button();
             this.btnRescanFileSize = new System.Windows.Forms.Button();
             this.btnCheckAllFiles = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lblUnhashedFiles = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -162,32 +162,25 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "Scan Folder (Get Files from this directory):";
             // 
-            // btnGenerateNewFilehashes
-            // 
-            this.btnGenerateNewFilehashes.Location = new System.Drawing.Point(3, 380);
-            this.btnGenerateNewFilehashes.Name = "btnGenerateNewFilehashes";
-            this.btnGenerateNewFilehashes.Size = new System.Drawing.Size(159, 34);
-            this.btnGenerateNewFilehashes.TabIndex = 26;
-            this.btnGenerateNewFilehashes.Text = "Generate File Hashes";
-            this.btnGenerateNewFilehashes.UseVisualStyleBackColor = true;
-            // 
             // btnRescanFileHash
             // 
-            this.btnRescanFileHash.Location = new System.Drawing.Point(3, 340);
+            this.btnRescanFileHash.Location = new System.Drawing.Point(24, 59);
             this.btnRescanFileHash.Name = "btnRescanFileHash";
             this.btnRescanFileHash.Size = new System.Drawing.Size(159, 34);
             this.btnRescanFileHash.TabIndex = 25;
-            this.btnRescanFileHash.Text = "Rescan hash for all files.";
+            this.btnRescanFileHash.Text = "Scan File Hashes";
             this.btnRescanFileHash.UseVisualStyleBackColor = true;
+            this.btnRescanFileHash.Click += new System.EventHandler(this.btnRescanFileHash_Click);
             // 
             // btnRescanFileSize
             // 
-            this.btnRescanFileSize.Location = new System.Drawing.Point(3, 300);
+            this.btnRescanFileSize.Location = new System.Drawing.Point(24, 99);
             this.btnRescanFileSize.Name = "btnRescanFileSize";
             this.btnRescanFileSize.Size = new System.Drawing.Size(159, 34);
             this.btnRescanFileSize.TabIndex = 24;
             this.btnRescanFileSize.Text = "Rescan size for all files.";
             this.btnRescanFileSize.UseVisualStyleBackColor = true;
+            this.btnRescanFileSize.Click += new System.EventHandler(this.btnRescanFileSize_Click);
             // 
             // btnCheckAllFiles
             // 
@@ -197,32 +190,43 @@
             this.btnCheckAllFiles.TabIndex = 27;
             this.btnCheckAllFiles.Text = "Check Files Exist";
             this.btnCheckAllFiles.UseVisualStyleBackColor = true;
+            this.btnCheckAllFiles.Click += new System.EventHandler(this.btnCheckAllFiles_Click);
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.lblUnhashedFiles);
+            this.groupBox2.Controls.Add(this.btnRescanFileSize);
             this.groupBox2.Controls.Add(this.btnCheckAllFiles);
-            this.groupBox2.Location = new System.Drawing.Point(168, 300);
+            this.groupBox2.Controls.Add(this.btnRescanFileHash);
+            this.groupBox2.Location = new System.Drawing.Point(3, 300);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(200, 66);
+            this.groupBox2.Size = new System.Drawing.Size(337, 179);
             this.groupBox2.TabIndex = 28;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "All Software";
+            this.groupBox2.Text = "All Software (Process uses SMB Server)";
+            // 
+            // lblUnhashedFiles
+            // 
+            this.lblUnhashedFiles.AutoSize = true;
+            this.lblUnhashedFiles.Location = new System.Drawing.Point(189, 70);
+            this.lblUnhashedFiles.Name = "lblUnhashedFiles";
+            this.lblUnhashedFiles.Size = new System.Drawing.Size(83, 13);
+            this.lblUnhashedFiles.TabIndex = 29;
+            this.lblUnhashedFiles.Text = "Unhashed Files:";
             // 
             // Files
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.btnGenerateNewFilehashes);
-            this.Controls.Add(this.btnRescanFileHash);
-            this.Controls.Add(this.btnRescanFileSize);
             this.Controls.Add(this.groupBox1);
             this.Name = "Files";
-            this.Size = new System.Drawing.Size(758, 419);
+            this.Size = new System.Drawing.Size(758, 497);
             this.Load += new System.EventHandler(this.Files_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -241,10 +245,10 @@
         public System.Windows.Forms.TextBox txtScanfolder;
         public System.Windows.Forms.Button btnAddFolder;
         public System.Windows.Forms.Button btnScan;
-        public System.Windows.Forms.Button btnGenerateNewFilehashes;
         public System.Windows.Forms.Button btnRescanFileHash;
         public System.Windows.Forms.Button btnRescanFileSize;
         public System.Windows.Forms.Button btnCheckAllFiles;
         private System.Windows.Forms.GroupBox groupBox2;
+        public System.Windows.Forms.Label lblUnhashedFiles;
     }
 }

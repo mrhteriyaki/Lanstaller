@@ -88,7 +88,7 @@ namespace Lanstaller
             this.txtAuth.Location = new System.Drawing.Point(12, 113);
             this.txtAuth.Name = "txtAuth";
             this.txtAuth.Size = new System.Drawing.Size(601, 26);
-            this.txtAuth.TabIndex = 3;
+            this.txtAuth.TabIndex = 1;
             // 
             // label2
             // 
@@ -107,7 +107,7 @@ namespace Lanstaller
             this.btnCancel.Location = new System.Drawing.Point(410, 145);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(100, 30);
-            this.btnCancel.TabIndex = 6;
+            this.btnCancel.TabIndex = 3;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);

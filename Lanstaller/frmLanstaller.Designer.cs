@@ -56,15 +56,12 @@ namespace Lanstaller
             this.lblStatus = new System.Windows.Forms.Label();
             this.txtChatMessages = new System.Windows.Forms.TextBox();
             this.txtChatSendMessage = new System.Windows.Forms.TextBox();
-            this.btnOpenTool = new System.Windows.Forms.Button();
-            this.cmbxTool = new System.Windows.Forms.ComboBox();
             this.lblMIQ = new System.Windows.Forms.Label();
             this.lblSpaceRequired = new System.Windows.Forms.Label();
             this.pbTitleExpanded = new System.Windows.Forms.PictureBox();
             this.btnExit = new System.Windows.Forms.Button();
             this.pbTitle = new System.Windows.Forms.PictureBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.tmrRefresh = new System.Windows.Forms.Timer(this.components);
             this.gbxActions.SuspendLayout();
@@ -93,7 +90,7 @@ namespace Lanstaller
             this.lbxInstallList.FormattingEnabled = true;
             this.lbxInstallList.Location = new System.Drawing.Point(11, 235);
             this.lbxInstallList.Name = "lbxInstallList";
-            this.lbxInstallList.Size = new System.Drawing.Size(302, 147);
+            this.lbxInstallList.Size = new System.Drawing.Size(302, 186);
             this.lbxInstallList.TabIndex = 1;
             // 
             // btnInstall
@@ -372,28 +369,6 @@ namespace Lanstaller
             this.txtChatSendMessage.TabIndex = 12;
             this.txtChatSendMessage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtChatSendMessage_KeyUp);
             // 
-            // btnOpenTool
-            // 
-            this.btnOpenTool.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnOpenTool.Location = new System.Drawing.Point(238, 388);
-            this.btnOpenTool.Name = "btnOpenTool";
-            this.btnOpenTool.Size = new System.Drawing.Size(75, 32);
-            this.btnOpenTool.TabIndex = 1;
-            this.btnOpenTool.Text = "Open";
-            this.btnOpenTool.UseVisualStyleBackColor = true;
-            this.btnOpenTool.Click += new System.EventHandler(this.btnOpenTool_Click);
-            // 
-            // cmbxTool
-            // 
-            this.cmbxTool.BackColor = System.Drawing.Color.Black;
-            this.cmbxTool.ForeColor = System.Drawing.Color.White;
-            this.cmbxTool.FormattingEnabled = true;
-            this.cmbxTool.Location = new System.Drawing.Point(11, 399);
-            this.cmbxTool.Name = "cmbxTool";
-            this.cmbxTool.Size = new System.Drawing.Size(220, 21);
-            this.cmbxTool.TabIndex = 0;
-            this.cmbxTool.KeyDown += new System.Windows.Forms.KeyEventHandler(this.cmbxTool_KeyDown);
-            // 
             // lblMIQ
             // 
             this.lblMIQ.AutoSize = true;
@@ -462,16 +437,6 @@ namespace Lanstaller
             this.label4.TabIndex = 7;
             this.label4.Text = "Chat:";
             // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.ForeColor = System.Drawing.Color.White;
-            this.label7.Location = new System.Drawing.Point(8, 385);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(36, 13);
-            this.label7.TabIndex = 19;
-            this.label7.Text = "Tools:";
-            // 
             // label8
             // 
             this.label8.AutoSize = true;
@@ -495,9 +460,6 @@ namespace Lanstaller
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(920, 426);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.btnOpenTool);
-            this.Controls.Add(this.cmbxTool);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtChatSendMessage);
             this.Controls.Add(this.txtChatMessages);
@@ -563,8 +525,6 @@ namespace Lanstaller
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.TextBox txtChatMessages;
         private System.Windows.Forms.TextBox txtChatSendMessage;
-        private System.Windows.Forms.Button btnOpenTool;
-        private System.Windows.Forms.ComboBox cmbxTool;
         private System.Windows.Forms.Label lblMIQ;
         private System.Windows.Forms.Label lblSpaceRequired;
         private System.Windows.Forms.CheckBox chkWindowsSettings;
@@ -573,7 +533,6 @@ namespace Lanstaller
         private System.Windows.Forms.PictureBox pbTitleExpanded;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Timer tmrRefresh;
     }

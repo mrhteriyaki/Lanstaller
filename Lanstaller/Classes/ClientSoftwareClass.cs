@@ -15,6 +15,7 @@ using System.IO;
 using Lanstaller_Shared;
 
 using static Lanstaller.Classes.APIClient;
+using System.Drawing;
 
 
 namespace Lanstaller
@@ -379,6 +380,7 @@ namespace Lanstaller
 
         
 
+        //Copy files from list provided, directory list for folder generation (Including empty dirs)
         void CopyFiles(List<FileCopyOperation> FileCopyList, List<string> DirectoryList)
         {
 
@@ -391,6 +393,7 @@ namespace Lanstaller
             //Generate any required Directories for Files.
             foreach (string dir in DirectoryList)
             {
+                /*
                 if (Pri.LongPath.Directory.Exists(dir) == true)
                 {
                     //Prompt to remove any existing game folder.
@@ -405,12 +408,11 @@ namespace Lanstaller
                                 {
                                     MessageBox.Show("Removal failed, try again?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                                 }
-                            }
-                            
+                            }                           
                         }
                     }
                 }
-
+                */
                 if (Pri.LongPath.Directory.Exists(dir) == false)
                 {
                     Pri.LongPath.Directory.CreateDirectory(dir);
@@ -432,10 +434,6 @@ namespace Lanstaller
             {
                 FileCopyOperation FCO = FileCopyList[copycount];
                 int copycount2 = (copycount + 1);
-
-                //double mbfilesize = (double)FCO.size / 1048576;
-                double gbsize = (double)bytecounter / 1073741824;
-
                 string sizestring = "";
                 if (FCO.fileinfo.size > 1073741824) //Larger than 1GB.
                 {
@@ -448,15 +446,68 @@ namespace Lanstaller
                     sizestring = " (Current File Size " + Math.Round(currentmbsize, 0).ToString() + "MB)";
                 }
 
-                SetStatus("Installing: " + Identity.Name + Environment.NewLine +
-                    "Copying File:" + copycount2 + " / " + FileCopyList.Count + sizestring + Environment.NewLine +
-                    "Copied (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
+                //Calculate Gigabyte count of transfered files + current progress.
+                //double mbfilesize = (double)FCO.size / 1048576;
+                double gbsize = (double)bytecounter / 1073741824;
+
+               
+
+
+                //Check file exists, verify hash.
+                if (System.IO.File.Exists(FCO.destination))
+                {
+                    SetStatus("Verifying Files: " + Identity.Name + 
+                            "\nFile:" + copycount2 + " / " + FileCopyList.Count + sizestring +
+                            "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
+
+                    string check_hash = CalculateMD5(FCO.destination);
+                    //MessageBox.Show("CH:" + check_hash + "\nFH:" + FCO.fileinfo.hash);
+                    if (!String.IsNullOrEmpty(FCO.fileinfo.hash)) //Check hash value has been scanned into server.
+                    {
+                        if (FCO.fileinfo.hash == check_hash) //Compare server hash value to local.
+                        {
+                            //File exists and matches correct hash.
+                            bytecounter += FCO.fileinfo.size;
+                            SetProgress(bytecounter);
+                            continue; //Skip file copy, go to next.
+                        }
+                    }
+                    
+                }
+
+                //Update status.
+                SetStatus("Installing: " + Identity.Name + 
+                    "\nCopying File:" + copycount2 + " / " + FileCopyList.Count + sizestring + 
+                    "\nCopied (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
+
+
+                //Copy File.
                 try
                 {
                     if (FileServer.protocol == "web")
                     {
                         //Web mode.
-                        DownloadFile(FileServer.path + FCO.fileinfo.source, FCO.destination);
+
+                        //OLD Download.
+                        //DownloadFile(FileServer.path + FCO.fileinfo.source, FCO.destination);
+
+                        
+
+                        //Download File - ASYNC
+                        DownloadWithProgress DLP = new DownloadWithProgress(FileServer.path + FCO.fileinfo.source, FCO.destination);
+                        DLP.Download();
+
+                        while(!DLP.completed)
+                        {
+                            gbsize = ((double)bytecounter + DLP.downloadedbytes) / 1073741824;
+                            SetProgress(bytecounter + DLP.downloadedbytes);
+
+                            SetStatus("Installing: " + Identity.Name + 
+                            "\nCopying File:" + copycount2 + " / " + FileCopyList.Count + sizestring + 
+                            "\nCopied (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
+                        }
+
+                       
                     }
                     else if (FileServer.protocol == "smb")
                     {
@@ -464,6 +515,8 @@ namespace Lanstaller
                         Pri.LongPath.File.Copy(FileServer.path + "\\" + FCO.fileinfo.source, FCO.destination, true);
                         //System.IO.File.Copy(ServerAddress + "\\" + FCO.fileinfo.source, FCO.destination, true);
                     }
+
+                    //Update copy index once complete, failure will cause copy retry.
                     copycount++;
                 }
                 catch (System.Threading.ThreadAbortException ex)

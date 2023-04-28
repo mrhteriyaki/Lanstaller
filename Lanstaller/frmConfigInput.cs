@@ -33,7 +33,13 @@ namespace Lanstaller
             //Validate Server & Authorisation.
             string _Server = txtServer.Text;
             string _regcode = txtAuth.Text;
-            
+
+            if (!_Server.StartsWith("https://"))
+            {
+                _Server = "https://" + _Server;
+            }
+
+
             WebClient WC = new WebClient();
             WC.Headers.Add("Content-Type", "application/json");
 
@@ -42,8 +48,8 @@ namespace Lanstaller
             Rqst.regcode = _regcode;
             
             string _authkey;
-
             string URI = _Server + "/auth/newtoken";
+
             try
             {
                 string MsgData = Newtonsoft.Json.JsonConvert.SerializeObject(Rqst);

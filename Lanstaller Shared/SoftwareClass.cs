@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Web;
+using System.Numerics;
 
 
 //Shared library of functions for client and API (Server).
@@ -30,14 +31,6 @@ namespace Lanstaller_Shared
             public int id;
             public string Name;
         }
-
-        public class Tool
-        {
-            public int id;
-            public string Name;
-            public string path;
-        }
-
 
         public class FileInfoClass
         {
@@ -170,29 +163,7 @@ namespace Lanstaller_Shared
             return tmpList;
         }
 
-        public static List<Tool> GetTools()
-        {
-            string server_path = GetFileServer("web").path;
-
-            List<Tool> tmpList = new List<Tool>();
-            SqlConnection SQLConn = new SqlConnection(ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand("SELECT id,[name],[path] from tblTools", SQLConn);
-            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
-            while (SQLOutput.Read())
-            {
-                Tool tmpTool = new Tool();
-                tmpTool.id = (int)SQLOutput[0];
-                tmpTool.Name = SQLOutput[1].ToString();
-                tmpTool.path = server_path + SQLOutput[2].ToString();
-                tmpList.Add(tmpTool);
-            }
-            SQLConn.Close();
-
-            return tmpList;
-
-        }
-
+        
         public static int AddSoftware(string softwarename)
         {
             string QueryString = "INSERT into tblSoftware ([name]) VALUES (@softname); SELECT SCOPE_IDENTITY();";
@@ -728,7 +699,15 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
-
+        public static int GetUnhashedFileCount()
+        {
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand("SELECT COUNT(id) from tblFiles WHERE hash_md5 is null", SQLConn);
+            int count = (int)SQLCmd.ExecuteScalar();
+            SQLConn.Close();
+            return count;
+        }
 
         public static void RescanFileHashes(bool fullrescan)
         {
