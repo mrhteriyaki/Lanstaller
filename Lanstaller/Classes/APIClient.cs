@@ -105,7 +105,7 @@ namespace Lanstaller.Classes
 
         }
 
-        static JArray GetInstallationList(string ListName, int SoftwareID)
+        static JArray GetListFromAPI(string ListName, int SoftwareID)
         {
             string Reply = WC.DownloadString(APIServer + "InstallationList/" + ListName + "?swid=" + SoftwareID.ToString());
             return JArray.Parse(Reply);
@@ -137,7 +137,7 @@ namespace Lanstaller.Classes
         public static List<FileCopyOperation> GetFilesListFromAPI(int SoftwareID)
         {
             List<FileCopyOperation> FCL = new List<FileCopyOperation>();
-            JArray FileArray = GetInstallationList("Files", SoftwareID);
+            JArray FileArray = GetListFromAPI("Files", SoftwareID);
             foreach (var FC in FileArray)
             {
                 FCL.Add(FC.ToObject<FileCopyOperation>());
@@ -149,7 +149,7 @@ namespace Lanstaller.Classes
         public static List<string> GetDirectoriesFromAPI(int SoftwareID)
         {
             List<string> DirList = new List<string>();
-            JArray DirArray = GetInstallationList("Directories", SoftwareID);
+            JArray DirArray = GetListFromAPI("Directories", SoftwareID);
             foreach (var DO in DirArray)
             {
                 DirList.Add(DO.ToObject<string>());
@@ -162,7 +162,7 @@ namespace Lanstaller.Classes
         public static List<ShortcutOperation> GetShortcutListFromAPI(int SoftwareID)
         {
             List<ShortcutOperation> SCL = new List<ShortcutOperation>();
-            JArray SCArray = GetInstallationList("Shortcuts", SoftwareID);
+            JArray SCArray = GetListFromAPI("Shortcuts", SoftwareID);
             foreach (var SC in SCArray)
             {
                 SCL.Add(SC.ToObject<ShortcutOperation>());
@@ -174,7 +174,7 @@ namespace Lanstaller.Classes
         public static List<RegistryOperation> GetRegistryListFromAPI(int SoftwareID)
         {
             List<RegistryOperation> RGL = new List<RegistryOperation>();
-            JArray RGArray = GetInstallationList("Registry", SoftwareID);
+            JArray RGArray = GetListFromAPI("Registry", SoftwareID);
             foreach (var RG in RGArray)
             {
                 RGL.Add(RG.ToObject<RegistryOperation>());
@@ -185,7 +185,7 @@ namespace Lanstaller.Classes
         public static List<Compatibility> GetCompatibilitiesFromAPI(int SoftwareID)
         {
             List<Compatibility> CPL = new List<Compatibility>();
-            JArray CPArray = GetInstallationList("Compatibility", SoftwareID);
+            JArray CPArray = GetListFromAPI("Compatibility", SoftwareID);
             foreach (var CP in CPArray)
             {
                 CPL.Add(CP.ToObject<Compatibility>());
@@ -198,7 +198,7 @@ namespace Lanstaller.Classes
         public static List<FirewallRule> GetFirewallRulesListFromAPI(int SoftwareID)
         {
             List<FirewallRule> FWL = new List<FirewallRule>();
-            JArray FRArray = GetInstallationList("Firewall", SoftwareID);
+            JArray FRArray = GetListFromAPI("Firewall", SoftwareID);
             foreach (var FR in FRArray)
             {
                 FWL.Add(FR.ToObject<FirewallRule>());
@@ -210,7 +210,7 @@ namespace Lanstaller.Classes
         public static List<PreferenceOperation> GetPreferencesListFromAPI(int SoftwareID)
         {
             List<PreferenceOperation> LST = new List<PreferenceOperation>();
-            JArray Array = GetInstallationList("Preferences", SoftwareID);
+            JArray Array = GetListFromAPI("Preferences", SoftwareID);
             foreach (var itm in Array)
             {
                 LST.Add(itm.ToObject<PreferenceOperation>());
@@ -223,7 +223,7 @@ namespace Lanstaller.Classes
         public static List<Redistributable> GetRedistributablesListFromAPI(int SoftwareID)
         {
             List<Redistributable> LST = new List<Redistributable>();
-            JArray Array = GetInstallationList("Redistributables", SoftwareID);
+            JArray Array = GetListFromAPI("Redistributables", SoftwareID);
             foreach (var itm in Array)
             {
                 LST.Add(itm.ToObject<Redistributable>());
@@ -236,7 +236,7 @@ namespace Lanstaller.Classes
         public static List<SerialNumber> GetSerialsListFromAPI(int SoftwareID)
         {
             List<SerialNumber> LST = new List<SerialNumber>();
-            JArray Array = GetInstallationList("Serials", SoftwareID);
+            JArray Array = GetListFromAPI("Serials", SoftwareID);
             foreach (var itm in Array)
             {
                 LST.Add(itm.ToObject<SerialNumber>());
@@ -244,6 +244,24 @@ namespace Lanstaller.Classes
             return LST;
         }
 
+
+        public static List<string> GetAvailableSerialsFromAPI(int SerialID)
+        {
+            List<string> SerialList = new List<string>();
+            JArray Array = GetListFromAPI("AvailableSerials", SerialID);
+            foreach (var itm in Array)
+            {
+                SerialList.Add(itm.ToObject<string>());
+            }
+            return SerialList;
+
+        }
+
+        public static void SetAvailableSerialsFromAPI(int SerialID, string Serial)
+        {
+            string _serial = HttpUtility.UrlEncode(Serial);
+            WC.DownloadString(APIServer + "Serials?id=" + SerialID.ToString() + "&serial=" + _serial);
+        }
 
 
 

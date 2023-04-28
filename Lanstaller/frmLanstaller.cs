@@ -265,6 +265,7 @@ namespace Lanstaller
 
             lbxInstallList.Enabled = state;
 
+            cmbxSoftware.Enabled = state;
 
             txtInstallDirectory.Enabled = state;
 

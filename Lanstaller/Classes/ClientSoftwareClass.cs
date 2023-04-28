@@ -349,6 +349,7 @@ namespace Lanstaller
                 SF.Text = "Serial Number Prompt";
                 SF.lblTitle.Text = "Input Serial Number for " + SN.name;
                 SF.FormBorderStyle = FormBorderStyle.FixedSingle;
+                SF.serialid = SN.serialid;
 
                 if (!SN.regKey.Equals(""))
                 {
@@ -461,18 +462,20 @@ namespace Lanstaller
                             "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
 
                     string check_hash = CalculateMD5(FCO.destination);
+                    //MessageBox.Show(check_hash);
                     //MessageBox.Show("CH:" + check_hash + "\nFH:" + FCO.fileinfo.hash);
+                   
                     if (!String.IsNullOrEmpty(FCO.fileinfo.hash)) //Check hash value has been scanned into server.
                     {
-                        if (FCO.fileinfo.hash == check_hash) //Compare server hash value to local.
+                        if (FCO.fileinfo.hash.Equals(check_hash)) //Compare server hash value to local.
                         {
                             //File exists and matches correct hash.
                             bytecounter += FCO.fileinfo.size;
                             SetProgress(bytecounter);
+                            copycount++; //increment file counter.
                             continue; //Skip file copy, go to next.
                         }
                     }
-                    
                 }
 
                 //Update status.
@@ -490,8 +493,6 @@ namespace Lanstaller
 
                         //OLD Download.
                         //DownloadFile(FileServer.path + FCO.fileinfo.source, FCO.destination);
-
-                        
 
                         //Download File - ASYNC
                         DownloadWithProgress DLP = new DownloadWithProgress(FileServer.path + FCO.fileinfo.source, FCO.destination);

@@ -734,6 +734,15 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
+        public static int GetUnhashedFileCount()
+        {
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand("SELECT COUNT(id) from tblFiles where hash_md5 is null", SQLConn);
+            int count = (int)SQLCmd.ExecuteScalar();
+            SQLConn.Close();
+            return count;
+        }
 
 
         public static void RescanFileHashes(bool fullrescan)
