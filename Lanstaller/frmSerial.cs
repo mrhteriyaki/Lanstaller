@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows;
 using System.Threading;
+using Lanstaller.Classes;
 
 namespace Lanstaller
 {
     
     public partial class frmSerial : Form
     {
+        public int serialid;
 
         public frmSerial()
         {
@@ -25,7 +27,6 @@ namespace Lanstaller
         private void txtSerial_TextChanged(object sender, EventArgs e)
         {
             txtSerial.Text = txtSerial.Text.Replace("-", "").Replace(" ","");
-
         }
 
         
@@ -36,7 +37,19 @@ namespace Lanstaller
      
         private void btnOK_Click(object sender, EventArgs e)
         {
-            this.Close();
+            if (cmbxServerSerials.SelectedIndex != -1)
+            {
+                //MessageBox.Show(cmbxServerSerials.SelectedIndex.ToString());
+                //Send back Server Serial of confirmation for use.
+                APIClient.SetAvailableSerialsFromAPI(serialid, cmbxServerSerials.Items[cmbxServerSerials.SelectedIndex].ToString());
+
+            }
+
+
+            if (!String.IsNullOrWhiteSpace(txtSerial.Text))
+            {
+                this.Close();
+            }
         }
 
         private void btnPaste_Click(object sender, EventArgs e)
@@ -76,6 +89,27 @@ namespace Lanstaller
             }
         }
 
-        
+        private void frmSerial_Load(object sender, EventArgs e)
+        {
+            List<string> AS = APIClient.GetAvailableSerialsFromAPI(serialid);
+            foreach (string serial in AS)
+            {
+                cmbxServerSerials.Items.Add(serial);
+            }
+            if (AS.Count == 0)
+            {
+                cmbxServerSerials.Visible = false;
+                lblServerSerials.Visible = false;
+            }
+
+        }
+
+        private void cmbxServerSerials_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbxServerSerials.SelectedIndex != -1)
+            {
+                txtSerial.Text = cmbxServerSerials.Text;
+            }
+        }
     }
 }
