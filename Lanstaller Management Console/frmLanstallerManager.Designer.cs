@@ -30,7 +30,6 @@ namespace Lanstaller_Management_Console
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.lbxSoftware = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btnNew = new System.Windows.Forms.Button();
             this.lblVariable = new System.Windows.Forms.Label();
@@ -39,22 +38,14 @@ namespace Lanstaller_Management_Console
             this.btnRemove = new System.Windows.Forms.Button();
             this.btnSecurity = new System.Windows.Forms.Button();
             this.tmrProgress = new System.Windows.Forms.Timer(this.components);
+            this.lvSoftware = new System.Windows.Forms.ListView();
             this.gbxInfo.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // lbxSoftware
-            // 
-            this.lbxSoftware.FormattingEnabled = true;
-            this.lbxSoftware.Location = new System.Drawing.Point(12, 63);
-            this.lbxSoftware.Name = "lbxSoftware";
-            this.lbxSoftware.Size = new System.Drawing.Size(278, 537);
-            this.lbxSoftware.TabIndex = 0;
-            this.lbxSoftware.SelectedIndexChanged += new System.EventHandler(this.lbxSoftware_SelectedIndexChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 47);
+            this.label1.Location = new System.Drawing.Point(5, 44);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(71, 13);
             this.label1.TabIndex = 1;
@@ -62,7 +53,7 @@ namespace Lanstaller_Management_Console
             // 
             // btnNew
             // 
-            this.btnNew.Location = new System.Drawing.Point(215, 39);
+            this.btnNew.Location = new System.Drawing.Point(503, 39);
             this.btnNew.Name = "btnNew";
             this.btnNew.Size = new System.Drawing.Size(75, 23);
             this.btnNew.TabIndex = 2;
@@ -92,16 +83,16 @@ namespace Lanstaller_Management_Console
             // 
             this.gbxInfo.Controls.Add(this.lblVariable);
             this.gbxInfo.Controls.Add(this.lblInstallInfo);
-            this.gbxInfo.Location = new System.Drawing.Point(296, 33);
+            this.gbxInfo.Location = new System.Drawing.Point(584, 62);
             this.gbxInfo.Name = "gbxInfo";
-            this.gbxInfo.Size = new System.Drawing.Size(621, 110);
+            this.gbxInfo.Size = new System.Drawing.Size(754, 110);
             this.gbxInfo.TabIndex = 24;
             this.gbxInfo.TabStop = false;
             this.gbxInfo.Text = "Info";
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(134, 39);
+            this.btnRemove.Location = new System.Drawing.Point(422, 39);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(75, 23);
             this.btnRemove.TabIndex = 25;
@@ -111,7 +102,7 @@ namespace Lanstaller_Management_Console
             // 
             // btnSecurity
             // 
-            this.btnSecurity.Location = new System.Drawing.Point(8, 12);
+            this.btnSecurity.Location = new System.Drawing.Point(8, 4);
             this.btnSecurity.Name = "btnSecurity";
             this.btnSecurity.Size = new System.Drawing.Size(109, 23);
             this.btnSecurity.TabIndex = 26;
@@ -125,17 +116,32 @@ namespace Lanstaller_Management_Console
             this.tmrProgress.Interval = 1000;
             this.tmrProgress.Tick += new System.EventHandler(this.tmrProgress_Tick);
             // 
+            // lvSoftware
+            // 
+            this.lvSoftware.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.lvSoftware.FullRowSelect = true;
+            this.lvSoftware.GridLines = true;
+            this.lvSoftware.HideSelection = false;
+            this.lvSoftware.Location = new System.Drawing.Point(8, 68);
+            this.lvSoftware.Name = "lvSoftware";
+            this.lvSoftware.Size = new System.Drawing.Size(570, 606);
+            this.lvSoftware.TabIndex = 27;
+            this.lvSoftware.UseCompatibleStateImageBehavior = false;
+            this.lvSoftware.View = System.Windows.Forms.View.Details;
+            this.lvSoftware.SelectedIndexChanged += new System.EventHandler(this.lvSoftware_SelectedIndexChanged);
+            // 
             // frmLanstallerManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1182, 631);
+            this.ClientSize = new System.Drawing.Size(1345, 686);
+            this.Controls.Add(this.lvSoftware);
             this.Controls.Add(this.btnSecurity);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.gbxInfo);
             this.Controls.Add(this.btnNew);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.lbxSoftware);
             this.Name = "frmLanstallerManager";
             this.Text = "Lanstaller Management";
             this.Load += new System.EventHandler(this.frmLanstallerMmanager_Load);
@@ -147,8 +153,6 @@ namespace Lanstaller_Management_Console
         }
 
         #endregion
-
-        private System.Windows.Forms.ListBox lbxSoftware;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnNew;
         private System.Windows.Forms.Label lblVariable;
@@ -157,6 +161,7 @@ namespace Lanstaller_Management_Console
         private System.Windows.Forms.Button btnRemove;
         private System.Windows.Forms.Button btnSecurity;
         private System.Windows.Forms.Timer tmrProgress;
+        private System.Windows.Forms.ListView lvSoftware;
     }
 }
 

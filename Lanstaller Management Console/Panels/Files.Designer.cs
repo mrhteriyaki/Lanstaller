@@ -87,6 +87,7 @@
             this.btnAddFolder.TabIndex = 9;
             this.btnAddFolder.Text = "Add to Database";
             this.btnAddFolder.UseVisualStyleBackColor = true;
+            this.btnAddFolder.Click += new System.EventHandler(this.btnAddFolder_Click);
             // 
             // btnScan
             // 

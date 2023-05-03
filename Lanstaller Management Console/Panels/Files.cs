@@ -46,5 +46,10 @@ namespace Lanstaller_Management_Console.Panels
         {
 
         }
+
+        private void btnAddFolder_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

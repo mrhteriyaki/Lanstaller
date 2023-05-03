@@ -20,8 +20,9 @@ namespace Lanstaller_Management_Console
 {
     public partial class frmLanstallerManager : Form
     {
-        int selectedsoftwareid = -1;
         List<SoftwareClass.SoftwareInfo> SoftwareList = new List<SoftwareClass.SoftwareInfo>();
+        SoftwareClass.SoftwareInfo CurrentSelectedSoftware;
+
         //static string status = "Status: Ready";
 
         //Declare Panels.
@@ -32,7 +33,7 @@ namespace Lanstaller_Management_Console
         Panels.Shortcuts ShortcutsPanel = new Panels.Shortcuts();
         Panels.Windows_Settings WindowsSettingsPanel = new Panels.Windows_Settings();
 
-        int panel_button_x = 300;
+        int panel_button_x = 150;
 
 
 
@@ -77,7 +78,11 @@ namespace Lanstaller_Management_Console
 
         private void frmLanstallerMmanager_Load(object sender, EventArgs e)
         {
-
+            lvSoftware.Columns.Add("Software",260);
+            lvSoftware.Columns.Add("Files",60);
+            lvSoftware.Columns.Add("Registry",70);
+            lvSoftware.Columns.Add("Shortcuts", 70);
+            lvSoftware.Columns.Add("Firewall Rules",80);
 
             if (!File.Exists("config.ini"))
             {
@@ -116,11 +121,11 @@ namespace Lanstaller_Management_Console
             RefreshSoftware();
 
 
-            foreach (string val in Registry.LocalMachine.OpenSubKey("SOFTWARE\\Lanstaller", true).GetValueNames())
+            foreach (string val in Registry.CurrentUser.OpenSubKey("SOFTWARE\\Lanstaller", true).GetValueNames())
             {
                 if (val == "management_basefolder")
                 {
-                    FilesPanel.txtServerShare.Text = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Lanstaller").GetValue("management_basefolder", "").ToString();
+                    FilesPanel.txtServerShare.Text = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Lanstaller").GetValue("management_basefolder", "").ToString();
                 }
             }
 
@@ -161,7 +166,7 @@ namespace Lanstaller_Management_Console
             SerialPanel.btnAddSerial.Click += new System.EventHandler(this.btnAddSerial_Click);
             //SerialPanel.txtRegKey.TextChanged += new System.EventHandler(this.
             SerialPanel.txtSerialName.TextChanged += new System.EventHandler(this.txtSerialName_TextChanged);
-
+            SerialPanel.cmbxSerials.SelectedIndexChanged += new System.EventHandler(this.cmbxSerials_SelectedIndexChanged);
 
             //Shortcuts
             ShortcutsPanel.btnAddShortcut.Click += new System.EventHandler(this.btnAddShortcut_Click);
@@ -177,14 +182,23 @@ namespace Lanstaller_Management_Console
 
         void RefreshSoftware()
         {
+            //Full software reload.
             SoftwareList = SoftwareClass.LoadSoftware();
-            lbxSoftware.Items.Clear();
+
+            //for updating listview from local SoftwareList counts.
+            lvSoftware.Items.Clear();
             foreach (SoftwareClass.SoftwareInfo SW in SoftwareList)
             {
-                lbxSoftware.Items.Add(SW.Name);
+                ListViewItem lvi = new ListViewItem(SW.Name);
+                lvi.SubItems.Add(SW.file_count.ToString());
+                lvi.SubItems.Add(SW.registry_count.ToString());
+                lvi.SubItems.Add(SW.shortcut_count.ToString());
+                lvi.SubItems.Add(SW.firewall_count.ToString());
+
+                lvSoftware.Items.Add(lvi);
             }
         }
-
+       
 
         private void btnNew_Click(object sender, EventArgs e)
         {
@@ -201,7 +215,8 @@ namespace Lanstaller_Management_Console
             {
                 if (SW.id == newid)
                 {
-                    lbxSoftware.SelectedIndex = index;
+                    lvSoftware.SelectedItems.Clear();
+                    lvSoftware.SelectedItems[index].Selected = true;
                     return;
                 }
                 index++;
@@ -313,62 +328,16 @@ namespace Lanstaller_Management_Console
 
         }
 
-        private void lbxSoftware_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (lbxSoftware.SelectedIndex == -1)
-            {
-                return;
-            }
-
-            selectedsoftwareid = SoftwareList[lbxSoftware.SelectedIndex].id;
-
-            SerialPanel.txtSerialName.Text = SoftwareList[lbxSoftware.SelectedIndex].Name;
-            SerialPanel.txtSerialInstance.Text = "1";
-
-            UpdateInfo();
-
-        }
-
-        void UpdateInfo()
-        {
-            //Get info for install./
-
-
-            string info = "";
-            //GetScalarInfo("WHERE software_id = @softwareid", selectedsoftwareid);
-            int filecount = GetScalarInfo("SELECT COUNT(id) from tblFiles where software_id = @softwareid", selectedsoftwareid);
-            info += "File Copies: " + filecount.ToString() + Environment.NewLine;
-
-            int firewallcount = GetScalarInfo("SELECT COUNT(id) from tblFirewallExceptions WHERE software_id = @softwareid", selectedsoftwareid);
-            info += "Firewall Rules: " + firewallcount.ToString() + Environment.NewLine;
-
-            int registrycount = GetScalarInfo("SELECT COUNT(id) from tblRegistry WHERE software_id = @softwareid", selectedsoftwareid);
-            info += "Registry Operations: " + registrycount.ToString() + Environment.NewLine;
-
-            int shortcutcount = GetScalarInfo("SELECT COUNT(id) from [tblShortcut] WHERE software_id = @softwareid", selectedsoftwareid);
-            info += "Shortcuts: " + shortcutcount.ToString() + Environment.NewLine;
-
-            lblInstallInfo.Text = "Installation Info:" + Environment.NewLine + info;
-        }
-
-        static int GetScalarInfo(string Query, int softwareid)
-        {
-
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(Query, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
-            int scalarval = (int)SQLCmd.ExecuteScalar();
-            SQLConn.Close();
-            return scalarval;
-        }
+      
+       
+      
 
 
 
 
         private void btnAddFolder_Click(object sender, EventArgs e)
         {
-            if (selectedsoftwareid == -1)
+            if (CurrentSelectedSoftware == null)
             {
                 MessageBox.Show("No software ID.");
                 return;
@@ -403,7 +372,7 @@ namespace Lanstaller_Management_Console
             foreach (string dirname in directories)
             {
                 string dst = destination + dirname.Substring(subfolder.Length);
-                SoftwareClass.AddDirectory(dst, selectedsoftwareid);
+                SoftwareClass.AddDirectory(dst, CurrentSelectedSoftware.id);
 
             }
 
@@ -431,17 +400,28 @@ namespace Lanstaller_Management_Console
                 //MessageBox.Show(src + Environment.NewLine + dst);
 
                 Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(filename);
-                SoftwareClass.AddFile(src, dst, FI.Length, selectedsoftwareid);
+                SoftwareClass.AddFile(src, dst, FI.Length, CurrentSelectedSoftware.id);
 
             }
-            UpdateInfo(); //label info update
+            RefreshSoftware(); 
             FilesPanel.btnScan.Enabled = true;
 
         }
 
+        void RefreshStatusInfo()
+        {
+            SoftwareClass.LoadSoftwareCounts(CurrentSelectedSoftware); //Update counts.
+            string info = "";
+            info += "File Copies: " + CurrentSelectedSoftware.file_count + Environment.NewLine;
+            info += "Registry Operations: " + CurrentSelectedSoftware.registry_count + Environment.NewLine;
+            info += "Shortcuts: " + CurrentSelectedSoftware.shortcut_count + Environment.NewLine;
+            info += "Firewall Rules: " + CurrentSelectedSoftware.firewall_count + Environment.NewLine;
+            lblInstallInfo.Text = "Installation Info:" + Environment.NewLine + info;
+        }
+
         private void txtServerShare_TextChanged(object sender, EventArgs e)
         {
-           Registry.LocalMachine.OpenSubKey("SOFTWARE\\Lanstaller", true).SetValue("management_basefolder", FilesPanel.txtServerShare.Text);
+           Registry.CurrentUser.OpenSubKey("SOFTWARE\\Lanstaller", true).SetValue("management_basefolder", FilesPanel.txtServerShare.Text);
         }
 
         public void txtScanfolder_TextChanged(object sender, EventArgs e)
@@ -480,7 +460,7 @@ namespace Lanstaller_Management_Console
 
         private void btnAddReg_Click(object sender, EventArgs e)
         {
-            if (selectedsoftwareid == -1)
+            if (CurrentSelectedSoftware == null)
             {
                 MessageBox.Show("Invalid software id");
                 return;
@@ -531,7 +511,10 @@ namespace Lanstaller_Management_Console
             //multi string = 7
             //qword = 11
             RegistryPanel.btnAddReg.Enabled = false;
-            SoftwareClass.AddRegistry(selectedsoftwareid, hkeyval, RegistryPanel.txtKey.Text, RegistryPanel.txtValue.Text, regtype, RegistryPanel.txtData.Text);
+            SoftwareClass.AddRegistry(CurrentSelectedSoftware.id, hkeyval, RegistryPanel.txtKey.Text, RegistryPanel.txtValue.Text, regtype, RegistryPanel.txtData.Text);
+
+            RefreshSoftware();
+
         }
 
         private void txtData_TextChanged(object sender, EventArgs e)
@@ -542,13 +525,15 @@ namespace Lanstaller_Management_Console
         private void btnAddShortcut_Click(object sender, EventArgs e)
         {
 
-            if (selectedsoftwareid == -1)
+            if (CurrentSelectedSoftware == null)
             {
                 MessageBox.Show("Select Software");
                 return;
             }
             ShortcutsPanel.btnAddShortcut.Enabled = false;
-            SoftwareClass.AddShortcut(ShortcutsPanel.txtName.Text, ShortcutsPanel.txtLocation.Text, ShortcutsPanel.txtFilepath.Text, ShortcutsPanel.txtWorking.Text, ShortcutsPanel.txtArguments.Text, ShortcutsPanel.txtIcon.Text, selectedsoftwareid);
+            SoftwareClass.AddShortcut(ShortcutsPanel.txtName.Text, ShortcutsPanel.txtLocation.Text, ShortcutsPanel.txtFilepath.Text, ShortcutsPanel.txtWorking.Text, ShortcutsPanel.txtArguments.Text, ShortcutsPanel.txtIcon.Text, CurrentSelectedSoftware.id);
+
+            RefreshSoftware();
 
         }
 
@@ -627,8 +612,8 @@ namespace Lanstaller_Management_Console
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)
         {
             WindowsSettingsPanel.btnFirewallRuleAdd.Enabled = false;
-            SoftwareClass.AddFirewallRule(WindowsSettingsPanel.txtFirewallPath.Text, selectedsoftwareid);
-            UpdateInfo();
+            SoftwareClass.AddFirewallRule(WindowsSettingsPanel.txtFirewallPath.Text, CurrentSelectedSoftware.id);
+            RefreshSoftware();
 
         }
 
@@ -651,13 +636,49 @@ namespace Lanstaller_Management_Console
 
         private void btnAddSerial_Click(object sender, EventArgs e)
         {
-            SoftwareClass.AddSerial(SerialPanel.txtSerialName.Text, int.Parse(SerialPanel.txtSerialInstance.Text), selectedsoftwareid, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text);
+            SoftwareClass.AddSerial(SerialPanel.txtSerialName.Text, int.Parse(SerialPanel.txtSerialInstance.Text), CurrentSelectedSoftware.id, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text);
+        }
+
+        private void cmbxSerials_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (SerialPanel.cmbxSerials.SelectedIndex == 1) return;
+
+            //Load serial list for selected serial.
+            SerialPanel.lvUserSerials.Items.Clear();
+
+            int instance_index = SerialPanel.cmbxSerials.SelectedIndex;
+            int serial_id = SoftwareClass.GetSerials(CurrentSelectedSoftware.id)[instance_index].serialid;
+            foreach (SoftwareClass.UserSerial SN in SoftwareClass.GetUserSerials(serial_id))
+            {
+                //MessageBox.Show(SN.name);
+                ListViewItem LVI = new ListViewItem(SN.name);
+                LVI.SubItems.Add(SN.used);
+                SerialPanel.lvUserSerials.Items.Add(LVI);
+            }
+
+            
+
+
         }
 
         private void txtSerialName_TextChanged(object sender, EventArgs e)
         {
             if (!SerialPanel.txtSerialName.Text.Equals(""))
                 SerialPanel.btnAddSerial.Enabled = true;
+        }
+
+        private void btnAddUserSerial_Click(object sender, EventArgs e)
+        {
+            if (String.IsNullOrEmpty(SerialPanel.txtUserSerial.Text)) return;
+
+
+        }                    
+
+        private void btnDelUserSerial_Click(object sender, EventArgs e)
+        {
+            if (SerialPanel.lvUserSerials.SelectedItems.Count == 0) return;
+
+
         }
 
         private void btnRescanFileSize_Click(object sender, EventArgs e)
@@ -671,12 +692,12 @@ namespace Lanstaller_Management_Console
 
         private void btnAddPrefFile_Click(object sender, EventArgs e)
         {
-            if (selectedsoftwareid == -1)
+            if (CurrentSelectedSoftware == null)
             {
                 MessageBox.Show("Select Software");
                 return;
             }
-            SoftwareClass.AddPreferenceFile(PreferencesPanel.txtPrefFilePath.Text, PreferencesPanel.txtTarget.Text, PreferencesPanel.txtReplace.Text, selectedsoftwareid);
+            SoftwareClass.AddPreferenceFile(PreferencesPanel.txtPrefFilePath.Text, PreferencesPanel.txtTarget.Text, PreferencesPanel.txtReplace.Text, CurrentSelectedSoftware.id);
         }
 
 
@@ -728,12 +749,12 @@ namespace Lanstaller_Management_Console
 
         private void btnRemove_Click(object sender, EventArgs e)
         {
-            if (lbxSoftware.SelectedIndex == -1)
+            if (lvSoftware.SelectedItems[0].Index == -1)
             {
                 return;
             }
             //Delete Software.
-            SoftwareClass.DeleteSoftware(SoftwareList[lbxSoftware.SelectedIndex].id);
+            SoftwareClass.DeleteSoftware(SoftwareList[lvSoftware.SelectedItems[0].Index].id);
 
             RefreshSoftware();
 
@@ -748,6 +769,29 @@ namespace Lanstaller_Management_Console
         private void tmrProgress_Tick(object sender, EventArgs e)
         {
             FilesPanel.lblUnhashedFiles.Text = "Unhashed Files:" + SoftwareClass.GetUnhashedFileCount();
+        }
+
+        private void lvSoftware_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lvSoftware.SelectedItems.Count == 0)
+            {
+                return;
+            }
+            CurrentSelectedSoftware = SoftwareList[lvSoftware.SelectedItems[0].Index];
+
+            SerialPanel.txtSerialName.Text = SoftwareList[lvSoftware.SelectedItems[0].Index].Name;
+            SerialPanel.txtSerialInstance.Text = "1";
+
+            RefreshStatusInfo();
+
+
+            //load serial panel details.
+            SerialPanel.cmbxSerials.Items.Clear();
+            foreach (SoftwareClass.SerialNumber SN in SoftwareClass.GetSerials(CurrentSelectedSoftware.id))
+            {
+                SerialPanel.cmbxSerials.Items.Add(SN.name);
+            }
+
         }
     }
 }

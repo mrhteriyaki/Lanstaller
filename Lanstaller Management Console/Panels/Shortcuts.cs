@@ -16,5 +16,10 @@ namespace Lanstaller_Management_Console.Panels
         {
             InitializeComponent();
         }
+
+        private void btnAddShortcut_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

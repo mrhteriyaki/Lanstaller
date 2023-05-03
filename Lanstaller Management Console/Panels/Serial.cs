@@ -16,5 +16,16 @@ namespace Lanstaller_Management_Console.Panels
         {
             InitializeComponent();
         }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Serial_Load(object sender, EventArgs e)
+        {
+            lvUserSerials.Columns.Add("Serial", 200);
+            lvUserSerials.Columns.Add("Used", 130);
+        }
     }
 }

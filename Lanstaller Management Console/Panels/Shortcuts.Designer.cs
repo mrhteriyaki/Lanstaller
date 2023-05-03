@@ -75,6 +75,7 @@
             this.btnAddShortcut.TabIndex = 20;
             this.btnAddShortcut.Text = "Add to Database";
             this.btnAddShortcut.UseVisualStyleBackColor = true;
+            this.btnAddShortcut.Click += new System.EventHandler(this.btnAddShortcut_Click);
             // 
             // txtIcon
             // 

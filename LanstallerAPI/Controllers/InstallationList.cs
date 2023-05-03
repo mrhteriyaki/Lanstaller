@@ -150,7 +150,7 @@ namespace LanstallerAPI.Controllers
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetAvailableSerials(id));
+            return JsonConvert.SerializeObject(SoftwareClass.GetUserSerials(id));
         }
 
     }

@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Web;
+using System.Data.SqlTypes;
 
 
 //Shared library of functions for client and API (Server).
@@ -29,6 +30,10 @@ namespace Lanstaller_Shared
         {
             public int id;
             public string Name;
+            public int file_count;
+            public int registry_count;
+            public int shortcut_count;
+            public int firewall_count;
         }
 
         public class FileInfoClass
@@ -98,7 +103,7 @@ namespace Lanstaller_Shared
             public string protocol;
         }
 
-       
+
 
         public class RegistryOperation
         {
@@ -139,6 +144,37 @@ namespace Lanstaller_Shared
             return data;
         }
 
+        public static void LoadSoftwareCounts(SoftwareInfo tmpSoftwareInfo)
+        {
+            //Get counts for install items.
+
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
+
+            SQLConn.Open();
+
+            SQLCmd.Parameters.Clear();
+            SQLCmd.Parameters.AddWithValue("@softwareid", tmpSoftwareInfo.id);
+
+            //File count.
+            SQLCmd.CommandText = "SELECT COUNT(id) from tblFiles where software_id = @softwareid";
+            tmpSoftwareInfo.file_count = (int)SQLCmd.ExecuteScalar();
+
+            //registry count
+            SQLCmd.CommandText = "SELECT COUNT(id) from tblRegistry WHERE software_id = @softwareid";
+            tmpSoftwareInfo.registry_count = (int)SQLCmd.ExecuteScalar();
+
+            //shortcut count
+            SQLCmd.CommandText = "SELECT COUNT(id) from [tblShortcut] WHERE software_id = @softwareid";
+            tmpSoftwareInfo.shortcut_count = (int)SQLCmd.ExecuteScalar();
+
+            //Firewall rule count.
+            SQLCmd.CommandText = "SELECT COUNT(id) from tblFirewallExceptions WHERE software_id = @softwareid";
+            tmpSoftwareInfo.firewall_count = (int)SQLCmd.ExecuteScalar();
+
+            SQLConn.Close();
+        }
 
         public static List<SoftwareInfo> LoadSoftware()
         {
@@ -158,12 +194,17 @@ namespace Lanstaller_Shared
                 tmpSoftware.Name = SQLOutput[1].ToString();
                 tmpList.Add(tmpSoftware);
             }
+            SQLOutput.Close();
             SQLConn.Close();
+
+            foreach (SoftwareInfo SW in tmpList)
+            {
+                LoadSoftwareCounts(SW);
+            }
 
             return tmpList;
         }
 
-        
 
         public static int AddSoftware(string softwarename)
         {
@@ -313,7 +354,7 @@ namespace Lanstaller_Shared
                     {
                         encodedsource.Append("/" + Uri.EscapeDataString(pth));
                         //encodedsource.Append("/" + HttpUtility.UrlEncode(pth));
-                        
+
                     }
                     tFCO.fileinfo.source = encodedsource.ToString();
                 }
@@ -411,7 +452,7 @@ namespace Lanstaller_Shared
         {
             List<SerialNumber> SerialList = new List<SerialNumber>();
 
-            string QueryString = "select [id],[name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid";
+            string QueryString = "select [id],[name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid ORDER BY INSTANCE ASC";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -434,12 +475,17 @@ namespace Lanstaller_Shared
 
         }
 
-
-        public static List<string> GetAvailableSerials(int SerialID)
+        public class UserSerial
         {
-            string QueryString = "select [serial_value] from [tblSerialsAvailable] WHERE serial_id = @serialid AND serial_used is NULL";
+            public string name;
+            public string used;
+        }
 
-            List<string> SerialList = new List<string>();
+        public static List<UserSerial> GetUserSerials(int SerialID)
+        {
+            string QueryString = "select [serial_value],[serial_used] from [tblSerialsAvailable] WHERE serial_id = @serialid";
+            
+            List<UserSerial> SerialList = new List<UserSerial>();
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
@@ -447,7 +493,10 @@ namespace Lanstaller_Shared
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
-                SerialList.Add(SQLOutput[0].ToString());
+                UserSerial tmpUserSerial = new UserSerial();
+                tmpUserSerial.name = SQLOutput[0].ToString();
+                tmpUserSerial.used = SQLOutput[1].ToString();
+                SerialList.Add(tmpUserSerial);
             }
             SQLConn.Close();
             return SerialList;
@@ -591,7 +640,7 @@ namespace Lanstaller_Shared
             {
                 filesize = long.Parse(filesizestr);
             }
-           
+
             SQLConn.Close();
             return filesize;
         }
@@ -628,6 +677,19 @@ namespace Lanstaller_Shared
             SQLCmd.Parameters.AddWithValue("regVal", regVal);
             SQLCmd.ExecuteNonQuery();
 
+            SQLConn.Close();
+        }
+
+        public static void AddUserSerial(int SerialID, string Serial)
+        {
+            string QueryString = "INSERT INTO tblSerialsAvailable (serial_id,serial_value) VALUES (@sid,@sval)";
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+
+            SQLConn.Open();
+            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("@sid", SerialID);
+            SQLCmd.Parameters.AddWithValue("@sval", Serial) ;
+            SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
         }
 
