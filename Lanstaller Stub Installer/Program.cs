@@ -20,6 +20,8 @@ namespace Lanstaller_Stub_Installer
             {
                 System.IO.Directory.CreateDirectory(IL);
             }
+            
+            //Reminder to update list of resource check at Lanstaller load.
                        
             DF("Lanstaller.exe");
             DF("Lanstaller Shared.dll");

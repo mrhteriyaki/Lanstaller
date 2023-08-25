@@ -37,8 +37,37 @@ namespace Lanstaller
         }
 
 
+
+        bool CheckResources()
+        {
+            if (!CheckFile("7z.exe")) return false;
+            if (!CheckFile("7z.dll")) return false;
+            if (!CheckFile("Lanstaller Shared.dll")) return false;
+            if (!CheckFile("Newtonsoft.Json.dll")) return false;
+            if (!CheckFile("Pri.LongPath.dll")) return false;
+            return true;
+        }
+
+        bool CheckFile(string cfpath)
+        {
+            //Check if file exists, return false if not.
+            if (!System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + cfpath))
+            {
+                MessageBox.Show("Missing resource file: " + cfpath);
+                return false;
+            }
+            return true;
+        }
+
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
+            if (!CheckResources())
+            {
+                //Missing files, exit.
+                Application.Exit();
+                return;
+            }
+
             //Load Config File.
             if (!File.Exists("config.ini"))
             {

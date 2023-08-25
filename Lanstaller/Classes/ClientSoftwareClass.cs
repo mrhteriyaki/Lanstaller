@@ -16,7 +16,7 @@ using Lanstaller_Shared;
 
 using static Lanstaller.Classes.APIClient;
 using System.Drawing;
-
+using System.Diagnostics.Eventing.Reader;
 
 namespace Lanstaller
 {
@@ -257,11 +257,18 @@ namespace Lanstaller
         void GenerateFirewallRules(List<FirewallRule> FirewallRuleList)
         {
             //FirewallRule
+            string netsh_path = "c:\\windows\\system32\\netsh.exe";
+            if (!System.IO.File.Exists(netsh_path))
+            {
+                MessageBox.Show("netsh.exe missing - unable to add firewall rules");
+                return;
+            }
+            
             foreach (FirewallRule fwr in FirewallRuleList)
             {
                 //netsh advfirewall firewall add rule name="My Application" dir=in action=allow program="C:\games\The Call of Duty\CoDMP.exe" enable=yes
                 Process FWNetSHProc = new Process();
-                FWNetSHProc.StartInfo.FileName = "c:\\windows\\system32\\netsh.exe";
+                FWNetSHProc.StartInfo.FileName = netsh_path;
                 FWNetSHProc.StartInfo.Arguments = "advfirewall firewall add rule name=\"" + fwr.softwarename + "\" dir=in action=allow program=\"" + ReplaceVariable(fwr.exepath) + "\" enable=yes";
                 FWNetSHProc.StartInfo.UseShellExecute = false;
                 FWNetSHProc.StartInfo.RedirectStandardOutput = true;
@@ -285,40 +292,57 @@ namespace Lanstaller
                     }
                 }
 
-
-                string temppath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp" ;
-                
+                string temppath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp" ;              
                 string filename = Redist.path.Substring(Redist.path.Replace("\\", "/").LastIndexOf("/"));
                 string destpath = temppath + filename;
 
-
-
                 DownloadFile(Redist.path, destpath);
 
-                Process RDProc = new Process();
+                if (!System.IO.File.Exists(destpath))
+                {
+                    MessageBox.Show("Missing file for redistributable installation:" + destpath + " Install will skip.");
+                    return;
+                }
 
+                Process RDProc = new Process();
                 if (Redist.compressed == "0" || Redist.compressed == "") //Direct file, run.
                 {
                     RDProc.StartInfo.FileName = destpath;
-                    RDProc.StartInfo.Arguments = Redist.args;
-                   
+                    RDProc.StartInfo.Arguments = Redist.args;                 
                 }
                 else if (Redist.compressed == "1")
                 {
                     string extractpath = temppath + "\\" + Guid.NewGuid().ToString() + "\\";
                     Directory.CreateDirectory(extractpath);
-
+                   
+                   
                     //Extract.
-                    Process SevenZipProc = new Process();                   
+                    Process SevenZipProc = new Process();
                     SevenZipProc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "7z.exe";
                     SevenZipProc.StartInfo.Arguments = "x \"" + destpath + "\" -o\"" + extractpath + "\"";
                     SevenZipProc.StartInfo.UseShellExecute = false;
-                    SevenZipProc.Start();
-                    SevenZipProc.WaitForExit();
-
-                    //Run
-                    RDProc.StartInfo.FileName = extractpath + Redist.compressed_path;
-                    RDProc.StartInfo.Arguments = Redist.args;
+                    try
+                    {
+                        SevenZipProc.Start();
+                        SevenZipProc.WaitForExit();
+                    }
+                    catch(Exception ex)
+                    {
+                        MessageBox.Show("Failed to extract redistributable: " + ex.ToString());
+                        return;
+                    }
+                    
+                    try
+                    {
+                        //Run
+                        RDProc.StartInfo.FileName = extractpath + Redist.compressed_path;
+                        RDProc.StartInfo.Arguments = Redist.args;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Failed to run redistributable installer:" + ex.ToString());
+                        return;
+                    }
                 }
                 else
                 {
