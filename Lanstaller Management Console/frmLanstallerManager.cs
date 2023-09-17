@@ -34,7 +34,7 @@ namespace Lanstaller_Management_Console
         Panels.Windows_Settings WindowsSettingsPanel = new Panels.Windows_Settings();
 
         int panel_button_x = 150;
-
+        int serialid_pool_selected = 0;
 
 
         public frmLanstallerManager()
@@ -164,9 +164,13 @@ namespace Lanstaller_Management_Console
 
             //Serials
             SerialPanel.btnAddSerial.Click += new System.EventHandler(this.btnAddSerial_Click);
-            //SerialPanel.txtRegKey.TextChanged += new System.EventHandler(this.
             SerialPanel.txtSerialName.TextChanged += new System.EventHandler(this.txtSerialName_TextChanged);
-            SerialPanel.cmbxSerials.SelectedIndexChanged += new System.EventHandler(this.cmbxSerials_SelectedIndexChanged);
+
+            //User Serials - Serial Pool.
+            SerialPanel.cmbxSerialPoolInstance.SelectedIndexChanged += new System.EventHandler(this.cmbxSerialPoolInstance_SelectedIndexChanged);
+            SerialPanel.btnAddUserSerial.Click += new System.EventHandler(this.btnAddUserSerial_Click);
+            SerialPanel.btnDelUserSerial.Click += new System.EventHandler(this.btnDelUserSerial_Click);
+            SerialPanel.lvUserSerials.SelectedIndexChanged += new System.EventHandler(this.lvUserSerials_SelectedIndexChanged);
 
             //Shortcuts
             ShortcutsPanel.btnAddShortcut.Click += new System.EventHandler(this.btnAddShortcut_Click);
@@ -624,41 +628,12 @@ namespace Lanstaller_Management_Console
 
 
 
-        private void groupBox5_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-
-        }
 
         private void btnAddSerial_Click(object sender, EventArgs e)
         {
-            SoftwareClass.AddSerial(SerialPanel.txtSerialName.Text, int.Parse(SerialPanel.txtSerialInstance.Text), CurrentSelectedSoftware.id, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text);
-        }
-
-        private void cmbxSerials_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (SerialPanel.cmbxSerials.SelectedIndex == 1) return;
-
-            //Load serial list for selected serial.
-            SerialPanel.lvUserSerials.Items.Clear();
-
-            int instance_index = SerialPanel.cmbxSerials.SelectedIndex;
-            int serial_id = SoftwareClass.GetSerials(CurrentSelectedSoftware.id)[instance_index].serialid;
-            foreach (SoftwareClass.UserSerial SN in SoftwareClass.GetUserSerials(serial_id))
-            {
-                //MessageBox.Show(SN.name);
-                ListViewItem LVI = new ListViewItem(SN.name);
-                LVI.SubItems.Add(SN.used);
-                SerialPanel.lvUserSerials.Items.Add(LVI);
-            }
-
-            
-
-
+            string filtered_serial = SoftwareClass.SerialNumber.FilterSerial(SerialPanel.txtSerialName.Text);
+            SerialPanel.txtSerialName.Text = filtered_serial;
+            SoftwareClass.AddSerial(filtered_serial, int.Parse(SerialPanel.txtSerialInstance.Text), CurrentSelectedSoftware.id, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text);
         }
 
         private void txtSerialName_TextChanged(object sender, EventArgs e)
@@ -667,17 +642,63 @@ namespace Lanstaller_Management_Console
                 SerialPanel.btnAddSerial.Enabled = true;
         }
 
+
+        private void cmbxSerialPoolInstance_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SerialPanel.btnAddUserSerial.Enabled = false;
+            SerialPanel.btnDelUserSerial.Enabled = false;
+            serialid_pool_selected = 0;
+            if (SerialPanel.cmbxSerialPoolInstance.SelectedIndex == 1) return; //No serials to select for software, exit.
+
+            //Load serial list for selected serial.
+            int instance_index = SerialPanel.cmbxSerialPoolInstance.SelectedIndex;
+            serialid_pool_selected = SoftwareClass.GetSerials(CurrentSelectedSoftware.id)[instance_index].serialid;
+            RefreshSerialPoolList(); //Load serial pool into listview.
+            SerialPanel.btnAddUserSerial.Enabled = true;
+           
+        }
+
+        private void RefreshSerialPoolList()
+        {
+            SerialPanel.lvUserSerials.Items.Clear();
+            foreach (SoftwareClass.UserSerial SN in SoftwareClass.UserSerial.GetUserSerials(serialid_pool_selected))
+            {
+                //MessageBox.Show(SN.name);
+                ListViewItem LVI = new ListViewItem(SN.serial);
+                LVI.SubItems.Add(SN.used_timestamp);
+                LVI.Tag = SN.id;
+
+                SerialPanel.lvUserSerials.Items.Add(LVI);
+            }
+        }
+
+      
         private void btnAddUserSerial_Click(object sender, EventArgs e)
         {
-            if (String.IsNullOrEmpty(SerialPanel.txtUserSerial.Text)) return;
-
-
+            if (String.IsNullOrEmpty(SerialPanel.txtUserSerial.Text)) return; //Skip empty input.
+            //add serial to pool.
+            string serial_value = SoftwareClass.SerialNumber.FilterSerial(SerialPanel.txtUserSerial.Text);
+            SoftwareClass.UserSerial.AddAvailableSerial(serialid_pool_selected, serial_value);
+            SerialPanel.txtUserSerial.Text = serial_value;
+            RefreshSerialPoolList();
         }                    
 
         private void btnDelUserSerial_Click(object sender, EventArgs e)
         {
             if (SerialPanel.lvUserSerials.SelectedItems.Count == 0) return;
+            //Delete serial from pool.
+            int userserialid = (int)SerialPanel.lvUserSerials.SelectedItems[0].Tag;
+            SoftwareClass.UserSerial.DeleteAvailableSerial(userserialid);
+            RefreshSerialPoolList();
+        }
 
+       
+
+        private void lvUserSerials_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (SerialPanel.lvUserSerials.SelectedItems.Count == 0) return;
+
+            SerialPanel.btnDelUserSerial.Enabled = true;
 
         }
 
@@ -786,10 +807,10 @@ namespace Lanstaller_Management_Console
 
 
             //load serial panel details.
-            SerialPanel.cmbxSerials.Items.Clear();
+            SerialPanel.cmbxSerialPoolInstance.Items.Clear();
             foreach (SoftwareClass.SerialNumber SN in SoftwareClass.GetSerials(CurrentSelectedSoftware.id))
             {
-                SerialPanel.cmbxSerials.Items.Add(SN.name);
+                SerialPanel.cmbxSerialPoolInstance.Items.Add(SN.name);
             }
 
         }

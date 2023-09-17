@@ -17,6 +17,7 @@ using System.Net.Http.Headers;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.ComponentModel;
 using System.Threading;
+using Lanstaller_Shared;
 
 namespace Lanstaller.Classes
 {
@@ -254,22 +255,24 @@ namespace Lanstaller.Classes
         }
 
 
-        public static List<string> GetAvailableSerialsFromAPI(int SerialID)
+        public static List<SoftwareClass.UserSerial> GetAvailableSerialsFromAPI(int SerialID)
         {
-            List<string> SerialList = new List<string>();
+            List<SoftwareClass.UserSerial> SerialList = new List<SoftwareClass.UserSerial>();
             JArray Array = GetListFromAPI("AvailableSerials", SerialID);
             foreach (var itm in Array)
             {
-                SerialList.Add(itm.ToObject<string>());
+                SerialList.Add(itm.ToObject<SoftwareClass.UserSerial>());
             }
             return SerialList;
 
         }
 
-        public static void SetAvailableSerialsFromAPI(int SerialID, string Serial)
+        public static void SetAvailableSerialsFromAPI(int UserSerialID)
         {
-            string _serial = HttpUtility.UrlEncode(Serial);
-            WC.DownloadString(APIServer + "Serials?id=" + SerialID.ToString() + "&serial=" + _serial);
+            if (UserSerialID > 0)
+            {
+                WC.DownloadString(APIServer + "Serials?id=" + UserSerialID.ToString());
+            }
         }
 
 

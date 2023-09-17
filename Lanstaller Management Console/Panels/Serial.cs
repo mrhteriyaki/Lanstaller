@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lanstaller_Shared;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -26,6 +27,21 @@ namespace Lanstaller_Management_Console.Panels
         {
             lvUserSerials.Columns.Add("Serial", 200);
             lvUserSerials.Columns.Add("Used", 130);
+        }
+
+        private void txtUserSerial_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnAddUserSerial_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cmbxSerials_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

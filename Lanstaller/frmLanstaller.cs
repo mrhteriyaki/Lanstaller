@@ -298,6 +298,7 @@ namespace Lanstaller
 
             txtInstallDirectory.Enabled = state;
 
+            gbxActions.Visible = state;
             /*
             chkFiles.Enabled = state;
             chkRegistry.Enabled = state;

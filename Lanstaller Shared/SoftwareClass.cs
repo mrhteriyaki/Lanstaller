@@ -71,6 +71,14 @@ namespace Lanstaller_Shared
             public string regKey;
             public string regVal;
             public int softwareid;
+
+
+            //Filter symbols from serial key input boxes (management and client)
+            public static string FilterSerial(string serial_value)
+            {
+                return serial_value.Replace("-", "").Replace(" ", "");
+            }
+
         }
 
         public class FirewallRule
@@ -477,41 +485,71 @@ namespace Lanstaller_Shared
 
         public class UserSerial
         {
-            public string name;
-            public string used;
-        }
+            public int id;
+            public string serial;
+            public string used_timestamp;
 
-        public static List<UserSerial> GetUserSerials(int SerialID)
-        {
-            string QueryString = "select [serial_value],[serial_used] from [tblSerialsAvailable] WHERE serial_id = @serialid";
-            
-            List<UserSerial> SerialList = new List<UserSerial>();
-            SqlConnection SQLConn = new SqlConnection(ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("@serialid", SerialID);
-            SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
-            while (SQLOutput.Read())
+
+            //Get available serial numbers.
+            public static List<UserSerial> GetUserSerials(int SerialID)
             {
-                UserSerial tmpUserSerial = new UserSerial();
-                tmpUserSerial.name = SQLOutput[0].ToString();
-                tmpUserSerial.used = SQLOutput[1].ToString();
-                SerialList.Add(tmpUserSerial);
+                string QueryString = "select [id],[serial_value],[serial_used] from [tblSerialsAvailable] WHERE serial_id = @serialid";
+
+                List<UserSerial> SerialList = new List<UserSerial>();
+                SqlConnection SQLConn = new SqlConnection(ConnectionString);
+                SQLConn.Open();
+                SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+                SQLCmd.Parameters.AddWithValue("@serialid", SerialID);
+                SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
+                while (SQLOutput.Read())
+                {
+                    UserSerial tmpUserSerial = new UserSerial();
+                    tmpUserSerial.id = (int)SQLOutput[0];
+                    tmpUserSerial.serial = SQLOutput[1].ToString();
+                    tmpUserSerial.used_timestamp = SQLOutput[2].ToString();
+                    SerialList.Add(tmpUserSerial);
+                }
+                SQLConn.Close();
+                return SerialList;
             }
-            SQLConn.Close();
-            return SerialList;
+
+            //Mark available serial as used.
+            public static void SetAvailableSerial(int PoolSerialID)
+            {
+                SqlConnection SQLConn = new SqlConnection(ConnectionString);
+                SQLConn.Open();
+                SqlCommand SQLCmd = new SqlCommand("UPDATE [tblSerialsAvailable] SET serial_used = GETDATE() WHERE id = @sid", SQLConn);
+                SQLCmd.Parameters.AddWithValue("@sid", PoolSerialID);
+                SQLCmd.ExecuteNonQuery();
+                SQLConn.Close();
+            }
+
+
+            //Add serial to pool.
+            public static void AddAvailableSerial(int SerialID, string Serial)
+            {
+                SqlConnection SQLConn = new SqlConnection(ConnectionString);
+                SQLConn.Open();
+                SqlCommand SQLCmd = new SqlCommand("INSERT INTO [tblSerialsAvailable] ([serial_id],[serial_value]) VALUES (@sid,@sval)", SQLConn);
+                SQLCmd.Parameters.AddWithValue("@sid", SerialID);
+                SQLCmd.Parameters.AddWithValue("@sval", Serial);
+                SQLCmd.ExecuteNonQuery();
+                SQLConn.Close();
+            }
+
+            //Remove serial from pool.
+            public static void DeleteAvailableSerial(int UserSerialID)
+            {
+                SqlConnection SQLConn = new SqlConnection(ConnectionString);
+                SQLConn.Open();
+                SqlCommand SQLCmd = new SqlCommand("DELETE FROM [tblSerialsAvailable] WHERE id = @usersid", SQLConn);
+                SQLCmd.Parameters.AddWithValue("@usersid", UserSerialID);
+                SQLCmd.ExecuteNonQuery();
+                SQLConn.Close();
+            }
         }
 
-        public static void SetAvailableSerial(int SerialID, string Serial)
-        {
-            SqlConnection SQLConn = new SqlConnection(ConnectionString);
-            SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand("UPDATE [tblSerialsAvailable] SET serial_used = GETDATE() WHERE serial_id = @sid AND serial_value = @sval", SQLConn);
-            SQLCmd.Parameters.AddWithValue("@sid", SerialID);
-            SQLCmd.Parameters.AddWithValue("@sval", Serial);
-            SQLCmd.ExecuteNonQuery();
-            SQLConn.Close();
-        }
+        
 
         public static List<ShortcutOperation> GetShortcuts(int SoftwareID)
         {

@@ -7,13 +7,13 @@ namespace LanstallerAPI.Controllers
     [Route("Serials")]
     public class Serials : ControllerBase
     {
-        public string Index(int id, string serial)
+        public string Index(int id)
         {
             if (Authentication.CheckLogon(HttpContext.Request) == false)
             {
                 return "auth fail";
             }
-            SoftwareClass.SetAvailableSerial(id, serial);
+            SoftwareClass.UserSerial.SetAvailableSerial(id);
 
             return "ok";
         }

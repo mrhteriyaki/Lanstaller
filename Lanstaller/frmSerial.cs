@@ -10,6 +10,8 @@ using System.Windows.Forms;
 using System.Windows;
 using System.Threading;
 using Lanstaller.Classes;
+using Lanstaller_Shared;
+using static Lanstaller_Shared.SoftwareClass;
 
 namespace Lanstaller
 {
@@ -17,6 +19,7 @@ namespace Lanstaller
     public partial class frmSerial : Form
     {
         public int serialid;
+        List<UserSerial> serial_pool = new List<UserSerial>();
 
         public frmSerial()
         {
@@ -26,10 +29,8 @@ namespace Lanstaller
        
         private void txtSerial_TextChanged(object sender, EventArgs e)
         {
-            txtSerial.Text = txtSerial.Text.Replace("-", "").Replace(" ","");
+            txtSerial.Text = SoftwareClass.SerialNumber.FilterSerial(txtSerial.Text);
         }
-
-        
 
      
         private void btnOK_Click(object sender, EventArgs e)
@@ -38,7 +39,8 @@ namespace Lanstaller
             {
                 //MessageBox.Show(cmbxServerSerials.SelectedIndex.ToString());
                 //Send back Server Serial of confirmation for use.
-                APIClient.SetAvailableSerialsFromAPI(serialid, cmbxServerSerials.Items[cmbxServerSerials.SelectedIndex].ToString());
+                APIClient.SetAvailableSerialsFromAPI(serial_pool[cmbxServerSerials.SelectedIndex].id);
+
 
             }
 
@@ -88,12 +90,14 @@ namespace Lanstaller
 
         private void frmSerial_Load(object sender, EventArgs e)
         {
-            List<string> AS = APIClient.GetAvailableSerialsFromAPI(serialid);
-            foreach (string serial in AS)
+            serial_pool = APIClient.GetAvailableSerialsFromAPI(serialid);
+
+            foreach (UserSerial serial in serial_pool)
             {
-                cmbxServerSerials.Items.Add(serial);
+                cmbxServerSerials.Items.Add(serial.serial);
+
             }
-            if (AS.Count == 0)
+            if (serial_pool.Count == 0)
             {
                 cmbxServerSerials.Visible = false;
                 lblServerSerials.Visible = false;

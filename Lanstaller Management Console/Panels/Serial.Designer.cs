@@ -39,13 +39,13 @@
             this.txtSerialInstance = new System.Windows.Forms.TextBox();
             this.txtSerialName = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cmbxSerialPoolInstance = new System.Windows.Forms.ComboBox();
+            this.lvUserSerials = new System.Windows.Forms.ListView();
+            this.btnDelUserSerial = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.txtUserSerial = new System.Windows.Forms.TextBox();
             this.btnAddUserSerial = new System.Windows.Forms.Button();
-            this.btnDelUserSerial = new System.Windows.Forms.Button();
-            this.lvUserSerials = new System.Windows.Forms.ListView();
-            this.cmbxSerials = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.groupBox5.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -146,7 +146,7 @@
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.cmbxSerials);
+            this.groupBox1.Controls.Add(this.cmbxSerialPoolInstance);
             this.groupBox1.Controls.Add(this.lvUserSerials);
             this.groupBox1.Controls.Add(this.btnDelUserSerial);
             this.groupBox1.Controls.Add(this.label1);
@@ -159,6 +159,46 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Serial Pool for Users";
             this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(7, 51);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(36, 13);
+            this.label2.TabIndex = 31;
+            this.label2.Text = "Serial:";
+            // 
+            // cmbxSerialPoolInstance
+            // 
+            this.cmbxSerialPoolInstance.FormattingEnabled = true;
+            this.cmbxSerialPoolInstance.Location = new System.Drawing.Point(64, 19);
+            this.cmbxSerialPoolInstance.Name = "cmbxSerialPoolInstance";
+            this.cmbxSerialPoolInstance.Size = new System.Drawing.Size(283, 21);
+            this.cmbxSerialPoolInstance.TabIndex = 30;
+            this.cmbxSerialPoolInstance.SelectedIndexChanged += new System.EventHandler(this.cmbxSerials_SelectedIndexChanged);
+            // 
+            // lvUserSerials
+            // 
+            this.lvUserSerials.FullRowSelect = true;
+            this.lvUserSerials.GridLines = true;
+            this.lvUserSerials.HideSelection = false;
+            this.lvUserSerials.Location = new System.Drawing.Point(6, 77);
+            this.lvUserSerials.Name = "lvUserSerials";
+            this.lvUserSerials.Size = new System.Drawing.Size(341, 210);
+            this.lvUserSerials.TabIndex = 29;
+            this.lvUserSerials.UseCompatibleStateImageBehavior = false;
+            this.lvUserSerials.View = System.Windows.Forms.View.Details;
+            // 
+            // btnDelUserSerial
+            // 
+            this.btnDelUserSerial.Enabled = false;
+            this.btnDelUserSerial.Location = new System.Drawing.Point(294, 43);
+            this.btnDelUserSerial.Name = "btnDelUserSerial";
+            this.btnDelUserSerial.Size = new System.Drawing.Size(53, 28);
+            this.btnDelUserSerial.TabIndex = 28;
+            this.btnDelUserSerial.Text = "Delete";
+            this.btnDelUserSerial.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -175,6 +215,7 @@
             this.txtUserSerial.Name = "txtUserSerial";
             this.txtUserSerial.Size = new System.Drawing.Size(177, 20);
             this.txtUserSerial.TabIndex = 26;
+            this.txtUserSerial.TextChanged += new System.EventHandler(this.txtUserSerial_TextChanged);
             // 
             // btnAddUserSerial
             // 
@@ -185,45 +226,7 @@
             this.btnAddUserSerial.TabIndex = 25;
             this.btnAddUserSerial.Text = "Add";
             this.btnAddUserSerial.UseVisualStyleBackColor = true;
-            // 
-            // btnDelUserSerial
-            // 
-            this.btnDelUserSerial.Enabled = false;
-            this.btnDelUserSerial.Location = new System.Drawing.Point(294, 43);
-            this.btnDelUserSerial.Name = "btnDelUserSerial";
-            this.btnDelUserSerial.Size = new System.Drawing.Size(53, 28);
-            this.btnDelUserSerial.TabIndex = 28;
-            this.btnDelUserSerial.Text = "Delete";
-            this.btnDelUserSerial.UseVisualStyleBackColor = true;
-            // 
-            // lvUserSerials
-            // 
-            this.lvUserSerials.FullRowSelect = true;
-            this.lvUserSerials.GridLines = true;
-            this.lvUserSerials.HideSelection = false;
-            this.lvUserSerials.Location = new System.Drawing.Point(6, 77);
-            this.lvUserSerials.Name = "lvUserSerials";
-            this.lvUserSerials.Size = new System.Drawing.Size(341, 210);
-            this.lvUserSerials.TabIndex = 29;
-            this.lvUserSerials.UseCompatibleStateImageBehavior = false;
-            this.lvUserSerials.View = System.Windows.Forms.View.Details;
-            // 
-            // cmbxSerials
-            // 
-            this.cmbxSerials.FormattingEnabled = true;
-            this.cmbxSerials.Location = new System.Drawing.Point(64, 19);
-            this.cmbxSerials.Name = "cmbxSerials";
-            this.cmbxSerials.Size = new System.Drawing.Size(283, 21);
-            this.cmbxSerials.TabIndex = 30;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 51);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(36, 13);
-            this.label2.TabIndex = 31;
-            this.label2.Text = "Serial:";
+            this.btnAddUserSerial.Click += new System.EventHandler(this.btnAddUserSerial_Click);
             // 
             // Serial
             // 
@@ -261,6 +264,6 @@
         public System.Windows.Forms.Button btnAddUserSerial;
         public System.Windows.Forms.ListView lvUserSerials;
         private System.Windows.Forms.Label label2;
-        public System.Windows.Forms.ComboBox cmbxSerials;
+        public System.Windows.Forms.ComboBox cmbxSerialPoolInstance;
     }
 }

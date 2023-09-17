@@ -146,7 +146,6 @@ namespace LanstallerAPI.Controllers
             return JsonConvert.SerializeObject(SoftwareClass.GetSerials(id));
         }
 
-
         [Route("AvailableSerials")]
         public string AvailableSerials(int id)
         {
@@ -154,7 +153,7 @@ namespace LanstallerAPI.Controllers
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetUserSerials(id));
+            return JsonConvert.SerializeObject(SoftwareClass.UserSerial.GetUserSerials(id));
         }
 
     }
