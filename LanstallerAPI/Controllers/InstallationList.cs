@@ -107,6 +107,10 @@ namespace LanstallerAPI.Controllers
             {
                 return "auth fail";
             }
+            if (id == null || id == 0)
+            {
+                return "id missing";
+            }
             return JsonConvert.SerializeObject(SoftwareClass.GetFirewallRules(id));
         }
 

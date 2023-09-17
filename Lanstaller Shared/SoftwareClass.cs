@@ -137,7 +137,7 @@ namespace Lanstaller_Shared
         {
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("SELECT [data] from tblSystem WHERE setting = @setval", SQLConn);
-            SQLCmd.Parameters.AddWithValue("setval", setting);
+            SQLCmd.Parameters.AddWithValue("@setval", setting);
             SQLConn.Open();
             string data = SQLCmd.ExecuteScalar().ToString();
             SQLConn.Close();
@@ -213,7 +213,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softname", softwarename);
+            SQLCmd.Parameters.AddWithValue("@softname", softwarename);
             object output = SQLCmd.ExecuteScalar();
             int idval = int.Parse(output.ToString());
             SQLConn.Close();
@@ -225,7 +225,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
-            SQLCmd.Parameters.AddWithValue("softid", software_id);
+            SQLCmd.Parameters.AddWithValue("@softid", software_id);
 
             SQLConn.Open();
 
@@ -292,7 +292,7 @@ namespace Lanstaller_Shared
             if (servertype != "")
             {
                 SQLCmd.CommandText = "SELECT TOP (1) [address],[type] FROM [tblServers] WHERE [type] = @servertype ORDER BY [Priority] ASC";
-                SQLCmd.Parameters.AddWithValue("servertype", servertype);
+                SQLCmd.Parameters.AddWithValue("@servertype", servertype);
             }
 
             SQLConn.Open();
@@ -315,7 +315,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("sid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@sid", softwareid);
             string softwarename = "";
             softwarename = SQLCmd.ExecuteScalar().ToString();
 
@@ -335,7 +335,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID); //Identity.id
+            SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID); //Identity.id
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -383,7 +383,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand("SELECT [path] FROM tblDirectories WHERE software_id = @softwareid", SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID); //Identity.id
+            SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID); //Identity.id
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -404,7 +404,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -433,7 +433,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", swid);
+            SQLCmd.Parameters.AddWithValue("@softwareid", swid);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -457,7 +457,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -489,7 +489,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("serialid", SerialID);
+            SQLCmd.Parameters.AddWithValue("@serialid", SerialID);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -507,8 +507,8 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand("UPDATE [tblSerialsAvailable] SET serial_used = GETDATE() WHERE serial_id = @sid AND serial_value = @sval", SQLConn);
-            SQLCmd.Parameters.AddWithValue("sid", SerialID);
-            SQLCmd.Parameters.AddWithValue("sval", Serial);
+            SQLCmd.Parameters.AddWithValue("@sid", SerialID);
+            SQLCmd.Parameters.AddWithValue("@sval", Serial);
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
         }
@@ -523,7 +523,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -550,7 +550,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -579,7 +579,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -603,7 +603,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
             {
@@ -633,7 +633,7 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("softwareid", SoftwareID);
+            SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);
             long filesize = 0;
             string filesizestr = SQLCmd.ExecuteScalar().ToString();
             if (filesizestr != "")
@@ -653,8 +653,8 @@ namespace Lanstaller_Shared
 
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("instancenumb", instancenumber);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@instancenumb", instancenumber);
+            SQLCmd.Parameters.AddWithValue("@softwareid", softwareid);
             int counter = (int)SQLCmd.ExecuteScalar();
             SQLConn.Close();
 
@@ -670,11 +670,11 @@ namespace Lanstaller_Shared
 
             SQLConn.Open();
             SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("name", name);
-            SQLCmd.Parameters.AddWithValue("instancenumb", instancenumber);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
-            SQLCmd.Parameters.AddWithValue("regKey", regKey);
-            SQLCmd.Parameters.AddWithValue("regVal", regVal);
+            SQLCmd.Parameters.AddWithValue("@name", name);
+            SQLCmd.Parameters.AddWithValue("@instancenumb", instancenumber);
+            SQLCmd.Parameters.AddWithValue(@"softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@regKey", regKey);
+            SQLCmd.Parameters.AddWithValue("@regVal", regVal);
             SQLCmd.ExecuteNonQuery();
 
             SQLConn.Close();
@@ -703,13 +703,13 @@ namespace Lanstaller_Shared
             SQLConn.Open();
 
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("name", name);
-            SQLCmd.Parameters.AddWithValue("location", location);
-            SQLCmd.Parameters.AddWithValue("filepath", filepath);
-            SQLCmd.Parameters.AddWithValue("runpath", runpath);
-            SQLCmd.Parameters.AddWithValue("arguments", arguments);
-            SQLCmd.Parameters.AddWithValue("icon", icon);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@name", name);
+            SQLCmd.Parameters.AddWithValue("@location", location);
+            SQLCmd.Parameters.AddWithValue("@filepath", filepath);
+            SQLCmd.Parameters.AddWithValue("@runpath", runpath);
+            SQLCmd.Parameters.AddWithValue("@arguments", arguments);
+            SQLCmd.Parameters.AddWithValue("@icon", icon);
+            SQLCmd.Parameters.AddWithValue("@softwareid", softwareid);
             SQLCmd.ExecuteNonQuery();
 
             SQLConn.Close();
@@ -723,8 +723,8 @@ namespace Lanstaller_Shared
             SQLConn.Open();
 
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("filepath", filepath);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@filepath", filepath);
+            SQLCmd.Parameters.AddWithValue("@softwareid", softwareid);
             SQLCmd.ExecuteNonQuery();
 
             SQLConn.Close();
@@ -738,10 +738,10 @@ namespace Lanstaller_Shared
             SQLConn.Open();
 
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("filepath", filepath);
-            SQLCmd.Parameters.AddWithValue("target", target);
-            SQLCmd.Parameters.AddWithValue("replace", replace);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@filepath", filepath);
+            SQLCmd.Parameters.AddWithValue("@target", target);
+            SQLCmd.Parameters.AddWithValue("@replace", replace);
+            SQLCmd.Parameters.AddWithValue("@softwareid", softwareid);
             SQLCmd.ExecuteNonQuery();
 
             SQLConn.Close();
@@ -755,12 +755,12 @@ namespace Lanstaller_Shared
             SQLConn.Open();
 
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("hkey", hkey);
-            SQLCmd.Parameters.AddWithValue("subkey", subkey);
-            SQLCmd.Parameters.AddWithValue("value", value);
-            SQLCmd.Parameters.AddWithValue("type", regtype);
-            SQLCmd.Parameters.AddWithValue("data", data);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@hkey", hkey);
+            SQLCmd.Parameters.AddWithValue("@subkey", subkey);
+            SQLCmd.Parameters.AddWithValue("@value", value);
+            SQLCmd.Parameters.AddWithValue("@type", regtype);
+            SQLCmd.Parameters.AddWithValue("@data", data);
+            SQLCmd.Parameters.AddWithValue("@softwareid", softwareid);
             SQLCmd.ExecuteNonQuery();
 
             SQLConn.Close();
@@ -775,10 +775,10 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("sourcefile", source);
-            SQLCmd.Parameters.AddWithValue("destinationfile", destination);
-            SQLCmd.Parameters.AddWithValue("filesize", filesize);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@sourcefile", source);
+            SQLCmd.Parameters.AddWithValue("@destinationfile", destination);
+            SQLCmd.Parameters.AddWithValue("@filesize", filesize);
+            SQLCmd.Parameters.AddWithValue("@softwareid", softwareid);
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
         }
@@ -790,8 +790,8 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("dirpath", directorypath);
-            SQLCmd.Parameters.AddWithValue("softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@dirpath", directorypath);
+            SQLCmd.Parameters.AddWithValue("@softwareid", softwareid);
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
         }
@@ -845,8 +845,8 @@ namespace Lanstaller_Shared
                 FH.hash = CalculateMD5(SA.path + "\\" + FH.source);
                 SQLConn = new SqlConnection(ConnectionString);
                 SQLCmd = new SqlCommand(QueryString, SQLConn);
-                SQLCmd.Parameters.AddWithValue("fileid", FH.id);
-                SQLCmd.Parameters.AddWithValue("hash", FH.hash);
+                SQLCmd.Parameters.AddWithValue("@fileid", FH.id);
+                SQLCmd.Parameters.AddWithValue("@hash", FH.hash);
 
                 SQLConn.Open();
                 SQLCmd.ExecuteNonQuery();

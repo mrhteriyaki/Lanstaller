@@ -26,7 +26,7 @@ namespace Lanstaller_Shared
             //tblSecurityTokens
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("SELECT COUNT(token) FROM tblSecurityTokens WHERE token = @tkval", SQLConn);
-            SQLCmd.Parameters.AddWithValue("tkval", token);
+            SQLCmd.Parameters.AddWithValue("@tkval", token);
 
             int tokencount = 0;
             SQLConn.Open();
@@ -64,7 +64,7 @@ namespace Lanstaller_Shared
         {
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("SELECT id,name,token FROM tblSecurityTokens where id = @tkid", SQLConn);
-            SQLCmd.Parameters.AddWithValue("tkid", id);
+            SQLCmd.Parameters.AddWithValue("@tkid", id);
 
             SQLConn.Open();
             Token tST = new Token();
@@ -83,7 +83,7 @@ namespace Lanstaller_Shared
         {
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("SELECT id FROM tblSecurityTokens where token = @tkval", SQLConn);
-            SQLCmd.Parameters.AddWithValue("tkval", token);
+            SQLCmd.Parameters.AddWithValue("@tkval", token);
             SQLConn.Open();
             int tokenid = (int)SQLCmd.ExecuteScalar();
             SQLConn.Close();
@@ -100,7 +100,7 @@ namespace Lanstaller_Shared
 
             //Validate registration code.
             SQLCmd.CommandText = "SELECT COUNT(id) FROM tblSecurityRegistration WHERE regcode = @rcode AND ([expiry] > GETDATE() OR [expiry] is null)";
-            SQLCmd.Parameters.AddWithValue("rcode", registration_code);
+            SQLCmd.Parameters.AddWithValue("@rcode", registration_code);
             int valid_count = 0;
             SQLConn.Open();
             valid_count = (int)SQLCmd.ExecuteScalar();
@@ -130,8 +130,8 @@ namespace Lanstaller_Shared
 
 
             SQLCmd.CommandText = "INSERT INTO tblSecurityTokens (name,token,registration_date) OUTPUT INSERTED.id VALUES (@nval,@tkval,GETDATE())";
-            SQLCmd.Parameters.AddWithValue("nval", Name);
-            SQLCmd.Parameters.AddWithValue("tkval", tokenstring);
+            SQLCmd.Parameters.AddWithValue("@nval", Name);
+            SQLCmd.Parameters.AddWithValue("@tkval", tokenstring);
 
             SQLConn.Open();
             int id = 0;
@@ -146,7 +146,7 @@ namespace Lanstaller_Shared
         {
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("DELETE FROM tblSecurityTokens WHERE id = @tokenid", SQLConn);
-            SQLCmd.Parameters.AddWithValue("tokenid", id);
+            SQLCmd.Parameters.AddWithValue("@tokenid", id);
 
             SQLConn.Open();
             SQLCmd.ExecuteScalar();
@@ -160,9 +160,9 @@ namespace Lanstaller_Shared
         {
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("INSERT INTO tblSecurityRegistration (name,regcode,expiry) VALUES (@rname, @rcode, @rexp)", SQLConn);
-            SQLCmd.Parameters.AddWithValue("rname", Name);
-            SQLCmd.Parameters.AddWithValue("rcode", RegistrationCode);
-            SQLCmd.Parameters.AddWithValue("rexp", Expiry);
+            SQLCmd.Parameters.AddWithValue("@rname", Name);
+            SQLCmd.Parameters.AddWithValue("@rcode", RegistrationCode);
+            SQLCmd.Parameters.AddWithValue("@rexp", Expiry);
 
             SQLConn.Open();
             SQLCmd.ExecuteNonQuery();
@@ -173,7 +173,7 @@ namespace Lanstaller_Shared
         {
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("DELETE FROM tblSecurityRegistration WHERE id = @rid", SQLConn);
-            SQLCmd.Parameters.AddWithValue("rid", reg_id);
+            SQLCmd.Parameters.AddWithValue("@rid", reg_id);
             SQLConn.Open();
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();

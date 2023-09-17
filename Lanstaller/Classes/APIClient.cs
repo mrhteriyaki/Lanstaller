@@ -89,7 +89,7 @@ namespace Lanstaller.Classes
 
         static string DownloadString(string ListName, int SoftwareID)
         {
-            return WC.DownloadString(APIServer + "InstallationList/" + ListName + "?swid=" + SoftwareID.ToString());
+            return WC.DownloadString(APIServer + "InstallationList/" + ListName + "?id=" + SoftwareID.ToString());
         }
 
         public static string GetSystemInfo(string setting)
@@ -107,8 +107,17 @@ namespace Lanstaller.Classes
 
         static JArray GetListFromAPI(string ListName, int SoftwareID)
         {
-            string Reply = WC.DownloadString(APIServer + "InstallationList/" + ListName + "?swid=" + SoftwareID.ToString());
-            return JArray.Parse(Reply);
+            string url = APIServer + "InstallationList/" + ListName + "?id=" + SoftwareID.ToString();
+            try
+            {
+                string Reply = WC.DownloadString(url);
+                return JArray.Parse(Reply);
+            }catch (Exception ex)
+            {
+                MessageBox.Show("Failed to download install list details from URL:" + url + ex.Message + "\nInstall will terminate.");
+            }
+            Application.Exit();
+            return null;
         }
 
         //Get Software.

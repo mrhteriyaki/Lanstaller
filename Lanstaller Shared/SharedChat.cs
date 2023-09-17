@@ -27,7 +27,7 @@ namespace Lanstaller_Shared
 
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("lid", lastId);
+            SQLCmd.Parameters.AddWithValue("@lid", lastId);
             int count = 0;
             count = (int)SQLCmd.ExecuteScalar();           
             SQLConn.Close();
@@ -67,8 +67,8 @@ namespace Lanstaller_Shared
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand("INSERT INTO tblMessages (timestamp,message,sender) VALUES (GETDATE(),@message,@sender)", SQLConn);
-            SQLCmd.Parameters.AddWithValue("message", Message);
-            SQLCmd.Parameters.AddWithValue("sender", Sender);
+            SQLCmd.Parameters.AddWithValue("@message", Message);
+            SQLCmd.Parameters.AddWithValue("@sender", Sender);
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
         }

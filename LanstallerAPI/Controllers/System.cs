@@ -19,7 +19,5 @@ namespace LanstallerAPI.Controllers
         }
 
 
-      
-
     }
 }

@@ -521,8 +521,10 @@ namespace Lanstaller
                         //Download File - ASYNC
                         DownloadWithProgress DLP = new DownloadWithProgress(FileServer.path + FCO.fileinfo.source, FCO.destination);
                         DLP.Download();
+                        //Need to test retry / verification process.
 
-                        while(!DLP.completed)
+
+                        while(!DLP.completed) //Do until download is completed.
                         {
                             gbsize = ((double)bytecounter + DLP.downloadedbytes) / 1073741824;
                             SetProgress(bytecounter + DLP.downloadedbytes);
