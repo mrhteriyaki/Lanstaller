@@ -10,4 +10,3 @@ Include Updates and Mods not provided by original release.
 - Installs pre-requisite software.
 
 
-![Lanstaller](Docs/Lanstaller.png)
