@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -22,9 +24,7 @@ namespace Lanstaller_Shared
     public class SoftwareClass
     {
         public static string ConnectionString;
-
         public SoftwareInfo Identity = new SoftwareInfo();
-
 
         public class SoftwareInfo
         {
@@ -34,6 +34,8 @@ namespace Lanstaller_Shared
             public int registry_count;
             public int shortcut_count;
             public int firewall_count;
+
+            public string image_small; //Icon Image for List.
         }
 
         public class FileInfoClass
@@ -189,7 +191,7 @@ namespace Lanstaller_Shared
             List<SoftwareInfo> tmpList = new List<SoftwareInfo>();
 
             //Get List of Software from Server
-            string QueryString = "SELECT [id],[name] from tblSoftware order by [name]";
+            string QueryString = "SELECT tblSoftware.[id],tblSoftware.[name],tblImages.small_image FROM tblSoftware LEFT JOIN tblImages on tblSoftware.id = tblImages.software_id order by [name]";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -200,6 +202,7 @@ namespace Lanstaller_Shared
                 SoftwareInfo tmpSoftware = new SoftwareInfo();
                 tmpSoftware.id = (int)SQLOutput[0];
                 tmpSoftware.Name = SQLOutput[1].ToString();
+                tmpSoftware.image_small = SQLOutput[2].ToString();
                 tmpList.Add(tmpSoftware);
             }
             SQLOutput.Close();
@@ -283,12 +286,8 @@ namespace Lanstaller_Shared
 
         }
 
-        public static Server GetFileServer()
-        {
-            return GetFileServer("");
-        }
-
-        public static Server GetFileServer(string servertype)
+        
+        public static Server GetFileServer(string servertype) //web or smb for type.
         {
             //ServerList.Clear();
             SqlConnection SQLConn = new SqlConnection(ConnectionString);

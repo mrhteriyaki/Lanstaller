@@ -30,7 +30,7 @@ namespace LanstallerAPI.Controllers
             {
                 return "auth fail";
             }
-            return JsonConvert.SerializeObject(SoftwareClass.GetFileServer());
+            return JsonConvert.SerializeObject(SoftwareClass.GetFileServer("web"));
         }
 
         //Get Installation Size
