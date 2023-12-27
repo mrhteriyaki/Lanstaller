@@ -30,10 +30,7 @@ namespace Lanstaller
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.lbxInstallList = new System.Windows.Forms.ListBox();
             this.btnInstall = new System.Windows.Forms.Button();
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.btnClear = new System.Windows.Forms.Button();
             this.txtInstallDirectory = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.gbxActions = new System.Windows.Forms.GroupBox();
@@ -55,7 +52,6 @@ namespace Lanstaller
             this.lblStatus = new System.Windows.Forms.Label();
             this.txtChatMessages = new System.Windows.Forms.TextBox();
             this.txtChatSendMessage = new System.Windows.Forms.TextBox();
-            this.lblMIQ = new System.Windows.Forms.Label();
             this.lblSpaceRequired = new System.Windows.Forms.Label();
             this.pbTitleExpanded = new System.Windows.Forms.PictureBox();
             this.btnExit = new System.Windows.Forms.Button();
@@ -71,57 +67,23 @@ namespace Lanstaller
             ((System.ComponentModel.ISupportInitialize)(this.pbTitle)).BeginInit();
             this.SuspendLayout();
             // 
-            // lbxInstallList
-            // 
-            this.lbxInstallList.BackColor = System.Drawing.Color.Black;
-            this.lbxInstallList.ForeColor = System.Drawing.Color.White;
-            this.lbxInstallList.FormattingEnabled = true;
-            this.lbxInstallList.Location = new System.Drawing.Point(319, 489);
-            this.lbxInstallList.Name = "lbxInstallList";
-            this.lbxInstallList.Size = new System.Drawing.Size(302, 82);
-            this.lbxInstallList.TabIndex = 1;
-            // 
             // btnInstall
             // 
             this.btnInstall.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnInstall.ForeColor = System.Drawing.Color.White;
-            this.btnInstall.Location = new System.Drawing.Point(446, 189);
+            this.btnInstall.Location = new System.Drawing.Point(441, 257);
             this.btnInstall.Name = "btnInstall";
             this.btnInstall.Size = new System.Drawing.Size(174, 139);
             this.btnInstall.TabIndex = 2;
             this.btnInstall.UseVisualStyleBackColor = true;
             this.btnInstall.Click += new System.EventHandler(this.btnInstall_Click);
             // 
-            // btnAdd
-            // 
-            this.btnAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAdd.ForeColor = System.Drawing.Color.White;
-            this.btnAdd.Location = new System.Drawing.Point(319, 437);
-            this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(84, 26);
-            this.btnAdd.TabIndex = 3;
-            this.btnAdd.Text = "Queue Install";
-            this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
-            // 
-            // btnClear
-            // 
-            this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClear.ForeColor = System.Drawing.Color.White;
-            this.btnClear.Location = new System.Drawing.Point(409, 437);
-            this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(79, 26);
-            this.btnClear.TabIndex = 4;
-            this.btnClear.Text = "Clear Queue";
-            this.btnClear.UseVisualStyleBackColor = true;
-            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
-            // 
             // txtInstallDirectory
             // 
             this.txtInstallDirectory.BackColor = System.Drawing.Color.Black;
             this.txtInstallDirectory.ForeColor = System.Drawing.Color.White;
-            this.txtInstallDirectory.Location = new System.Drawing.Point(672, 462);
+            this.txtInstallDirectory.Location = new System.Drawing.Point(314, 200);
             this.txtInstallDirectory.Name = "txtInstallDirectory";
             this.txtInstallDirectory.Size = new System.Drawing.Size(183, 20);
             this.txtInstallDirectory.TabIndex = 5;
@@ -131,7 +93,7 @@ namespace Lanstaller
             // 
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(669, 446);
+            this.label1.Location = new System.Drawing.Point(311, 184);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 6;
@@ -146,7 +108,7 @@ namespace Lanstaller
             this.gbxActions.Controls.Add(this.chkRegistry);
             this.gbxActions.Controls.Add(this.chkFiles);
             this.gbxActions.ForeColor = System.Drawing.Color.White;
-            this.gbxActions.Location = new System.Drawing.Point(319, 183);
+            this.gbxActions.Location = new System.Drawing.Point(314, 251);
             this.gbxActions.Name = "gbxActions";
             this.gbxActions.Size = new System.Drawing.Size(121, 146);
             this.gbxActions.TabIndex = 8;
@@ -240,7 +202,7 @@ namespace Lanstaller
             this.gbxPref.Controls.Add(this.label2);
             this.gbxPref.Controls.Add(this.txtUsername);
             this.gbxPref.ForeColor = System.Drawing.Color.White;
-            this.gbxPref.Location = new System.Drawing.Point(319, 103);
+            this.gbxPref.Location = new System.Drawing.Point(314, 103);
             this.gbxPref.Name = "gbxPref";
             this.gbxPref.Size = new System.Drawing.Size(301, 74);
             this.gbxPref.TabIndex = 9;
@@ -311,7 +273,7 @@ namespace Lanstaller
             this.gbxStatus.Controls.Add(this.pbInstall);
             this.gbxStatus.Controls.Add(this.lblStatus);
             this.gbxStatus.ForeColor = System.Drawing.Color.White;
-            this.gbxStatus.Location = new System.Drawing.Point(319, 331);
+            this.gbxStatus.Location = new System.Drawing.Point(314, 399);
             this.gbxStatus.Name = "gbxStatus";
             this.gbxStatus.Size = new System.Drawing.Size(301, 90);
             this.gbxStatus.TabIndex = 10;
@@ -344,34 +306,24 @@ namespace Lanstaller
             this.txtChatMessages.Name = "txtChatMessages";
             this.txtChatMessages.ReadOnly = true;
             this.txtChatMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtChatMessages.Size = new System.Drawing.Size(288, 286);
+            this.txtChatMessages.Size = new System.Drawing.Size(288, 353);
             this.txtChatMessages.TabIndex = 11;
             // 
             // txtChatSendMessage
             // 
             this.txtChatSendMessage.BackColor = System.Drawing.Color.Black;
             this.txtChatSendMessage.ForeColor = System.Drawing.Color.White;
-            this.txtChatSendMessage.Location = new System.Drawing.Point(626, 400);
+            this.txtChatSendMessage.Location = new System.Drawing.Point(626, 467);
             this.txtChatSendMessage.Name = "txtChatSendMessage";
             this.txtChatSendMessage.Size = new System.Drawing.Size(288, 20);
             this.txtChatSendMessage.TabIndex = 12;
             this.txtChatSendMessage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtChatSendMessage_KeyUp);
             // 
-            // lblMIQ
-            // 
-            this.lblMIQ.AutoSize = true;
-            this.lblMIQ.ForeColor = System.Drawing.Color.White;
-            this.lblMIQ.Location = new System.Drawing.Point(319, 469);
-            this.lblMIQ.Name = "lblMIQ";
-            this.lblMIQ.Size = new System.Drawing.Size(111, 13);
-            this.lblMIQ.TabIndex = 15;
-            this.lblMIQ.Text = "Multiple Install Queue:";
-            // 
             // lblSpaceRequired
             // 
             this.lblSpaceRequired.AutoSize = true;
             this.lblSpaceRequired.ForeColor = System.Drawing.Color.White;
-            this.lblSpaceRequired.Location = new System.Drawing.Point(316, 419);
+            this.lblSpaceRequired.Location = new System.Drawing.Point(311, 232);
             this.lblSpaceRequired.Name = "lblSpaceRequired";
             this.lblSpaceRequired.Size = new System.Drawing.Size(87, 13);
             this.lblSpaceRequired.TabIndex = 16;
@@ -429,7 +381,7 @@ namespace Lanstaller
             // 
             this.label8.AutoSize = true;
             this.label8.ForeColor = System.Drawing.Color.White;
-            this.label8.Location = new System.Drawing.Point(316, 93);
+            this.label8.Location = new System.Drawing.Point(311, 93);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(92, 13);
             this.label8.TabIndex = 20;
@@ -449,17 +401,18 @@ namespace Lanstaller
             this.lvSoftware.Location = new System.Drawing.Point(0, 93);
             this.lvSoftware.Margin = new System.Windows.Forms.Padding(2);
             this.lvSoftware.Name = "lvSoftware";
-            this.lvSoftware.Size = new System.Drawing.Size(300, 487);
+            this.lvSoftware.Size = new System.Drawing.Size(300, 396);
             this.lvSoftware.TabIndex = 21;
             this.lvSoftware.UseCompatibleStateImageBehavior = false;
             this.lvSoftware.SelectedIndexChanged += new System.EventHandler(this.lvSoftware_SelectedIndexChanged);
+            this.lvSoftware.DoubleClick += new System.EventHandler(this.lvSoftware_DoubleClick);
             // 
             // frmLanstaller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(920, 583);
+            this.ClientSize = new System.Drawing.Size(920, 491);
             this.Controls.Add(this.lvSoftware);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label4);
@@ -468,15 +421,11 @@ namespace Lanstaller
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.pbTitle);
             this.Controls.Add(this.lblSpaceRequired);
-            this.Controls.Add(this.lblMIQ);
             this.Controls.Add(this.gbxStatus);
             this.Controls.Add(this.gbxPref);
             this.Controls.Add(this.gbxActions);
-            this.Controls.Add(this.lbxInstallList);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtInstallDirectory);
-            this.Controls.Add(this.btnClear);
-            this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.btnInstall);
             this.Controls.Add(this.pbTitleExpanded);
             this.ForeColor = System.Drawing.Color.White;
@@ -500,10 +449,7 @@ namespace Lanstaller
         }
 
         #endregion
-        private System.Windows.Forms.ListBox lbxInstallList;
         private System.Windows.Forms.Button btnInstall;
-        private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.TextBox txtInstallDirectory;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pbTitle;
@@ -523,7 +469,6 @@ namespace Lanstaller
         private System.Windows.Forms.Label lblStatus;
         private System.Windows.Forms.TextBox txtChatMessages;
         private System.Windows.Forms.TextBox txtChatSendMessage;
-        private System.Windows.Forms.Label lblMIQ;
         private System.Windows.Forms.Label lblSpaceRequired;
         private System.Windows.Forms.CheckBox chkWindowsSettings;
         private System.Windows.Forms.ProgressBar pbInstall;

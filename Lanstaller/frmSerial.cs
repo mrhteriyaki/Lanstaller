@@ -83,7 +83,7 @@ namespace Lanstaller
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception.Message);
+                MessageBox.Show(exception.Message);
                 return string.Empty;
             }
         }

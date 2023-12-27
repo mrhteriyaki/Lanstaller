@@ -492,7 +492,7 @@ namespace Lanstaller_Shared
             //Get available serial numbers.
             public static List<UserSerial> GetUserSerials(int SerialID)
             {
-                string QueryString = "select [id],[serial_value],[serial_used] from [tblSerialsAvailable] WHERE serial_id = @serialid";
+                string QueryString = "select [id],[serial_value],[serial_used] from [tblSerialsAvailable] WHERE serial_id = @serialid AND [serial_used] IS NULL";
 
                 List<UserSerial> SerialList = new List<UserSerial>();
                 SqlConnection SQLConn = new SqlConnection(ConnectionString);

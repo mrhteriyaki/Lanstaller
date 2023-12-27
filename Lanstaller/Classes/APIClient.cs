@@ -33,9 +33,24 @@ namespace Lanstaller.Classes
         public static void Setup(string authkey)
         {
             _authkey = authkey;
-            WC.Headers.Clear();
-            WC.Headers.Add("authorization", _authkey);
+            SetHeaders( WC);
         }
+
+        public static void SetHeaders(WebClient newWebClient)
+        {
+            newWebClient.Headers.Clear();
+            newWebClient.Headers.Add("authorization", _authkey);
+        }
+
+        //Use local Webclient variable for DownloadString - Error occured on high load 'WebClient does not support concurrent I/O Operations' indicating issue with rapid connections with shared static object.
+        public static string GetString(string requestUri)
+        {
+            WebClient _WC = new System.Net.WebClient();
+            SetHeaders( _WC);
+            return _WC.DownloadString(requestUri);
+        }
+
+
 
         public static void DownloadFile(string Source, string Destination)
         {
@@ -88,20 +103,20 @@ namespace Lanstaller.Classes
         }
                 
 
-        static string DownloadString(string ListName, int SoftwareID)
+        static string GetString(string ListName, int SoftwareID)
         {
-            return WC.DownloadString(APIServer + "InstallationList/" + ListName + "?id=" + SoftwareID.ToString());
+            return GetString(APIServer + "InstallationList/" + ListName + "?id=" + SoftwareID.ToString());
         }
 
         public static string GetSystemInfo(string setting)
         {
-            return WC.DownloadString(APIServer + "System/" + setting);
+            return GetString(APIServer + "System/" + setting);
         }
 
         public static Server GetFileServerFromAPI()
         {
             //return (Server)JsonConvert.DeserializeObject(WC.DownloadString(APIServer + "InstallationList/Server"));
-            Server FS = JObject.Parse(WC.DownloadString(APIServer + "InstallationList/Server")).ToObject<Server>();
+            Server FS = JObject.Parse(GetString(APIServer + "InstallationList/Server")).ToObject<Server>();
             return FS;
 
         }
@@ -111,7 +126,7 @@ namespace Lanstaller.Classes
             string url = APIServer + "InstallationList/" + ListName + "?id=" + SoftwareID.ToString();
             try
             {
-                string Reply = WC.DownloadString(url);
+                string Reply = GetString(url);
                 return JArray.Parse(Reply);
             }catch (Exception ex)
             {
@@ -125,7 +140,7 @@ namespace Lanstaller.Classes
         public static List<SoftwareInfo> GetSoftwareListFromAPI()
         {
             List<SoftwareInfo> SWL = new List<SoftwareInfo>();
-            JArray SoftwareArray = JArray.Parse(WC.DownloadString(APIServer + "InstallationList/Software"));
+            JArray SoftwareArray = JArray.Parse(GetString(APIServer + "InstallationList/Software"));
             foreach (var SW in SoftwareArray)
             {
                 SWL.Add(SW.ToObject<SoftwareInfo>());
@@ -137,7 +152,7 @@ namespace Lanstaller.Classes
         public static long GetInstallSizeFromAPI(int SoftwareID)
         {
             List<FileCopyOperation> FCL = new List<FileCopyOperation>();
-            string returnstr = DownloadString("InstallSize", SoftwareID);
+            string returnstr = GetString("InstallSize", SoftwareID);
             return long.Parse(returnstr);
         }
 
@@ -271,7 +286,7 @@ namespace Lanstaller.Classes
         {
             if (UserSerialID > 0)
             {
-                WC.DownloadString(APIServer + "Serials?id=" + UserSerialID.ToString());
+                GetString(APIServer + "Serials?id=" + UserSerialID.ToString());
             }
         }
 

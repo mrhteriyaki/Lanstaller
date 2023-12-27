@@ -34,10 +34,16 @@ namespace Lanstaller
 
         public List<SerialNumber> SerialList = new List<SerialNumber>();
 
-        
+        public string InstallDir;
+        public bool installfiles;
+        public bool installregistry;
+        public bool installshortcuts;
+        public bool apply_windowssettings;
+        public bool apply_preferences;
+        public bool install_redist;
 
 
-        public void Install(bool installfiles, bool installregistry, bool installshortcuts, bool apply_windowssettings, bool apply_preferences, bool install_redist)
+        public void Install()
         {
             //Run Installation
 
@@ -70,7 +76,6 @@ namespace Lanstaller
                 //Get Directories, split up all sub directory paths and add to generation list.
                 foreach (string Dir in GetDirectoriesFromAPI(Identity.id))
                 {
-                    Console.WriteLine(Dir);
                     GetSubFolders(ReplaceVariable(Dir), DirectoryList);
                 }
 
@@ -394,7 +399,7 @@ namespace Lanstaller
                     catch (Exception ex)
                     {
                         //occurs on null exception due to missing key.
-                        Console.WriteLine(ex.Message);
+                        MessageBox.Show(ex.Message);
                     }
 
                 }
@@ -548,7 +553,7 @@ namespace Lanstaller
                 }
                 catch (System.Threading.ThreadAbortException ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    MessageBox.Show(ex.ToString());
                     SetStatus("File copy stopped - thread Abort Exception");
                     return;
                 }
