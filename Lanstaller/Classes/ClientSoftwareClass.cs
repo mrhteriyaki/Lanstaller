@@ -168,7 +168,7 @@ namespace Lanstaller
         {
             lock (_statuslock)
             {
-                status = "Status: " + message.Replace("&", "&&");
+                status =  message.Replace("&", "&&");
 
             }
         }
@@ -468,12 +468,12 @@ namespace Lanstaller
                 if (FCO.fileinfo.size > 1073741824) //Larger than 1GB.
                 {
                     double currentgbsize = (double)FCO.fileinfo.size / 1073741824;
-                    sizestring = " (Current File Size " + Math.Round(currentgbsize, 2).ToString() + "GB)";
+                    sizestring = "Current File Size: " + Math.Round(currentgbsize, 2).ToString() + "GB";
                 }
                 else if (FCO.fileinfo.size > 1048576) //larger than 1MB
                 {
                     double currentmbsize = (double)FCO.fileinfo.size / 1048576;
-                    sizestring = " (Current File Size " + Math.Round(currentmbsize, 0).ToString() + "MB)";
+                    sizestring = "Current File Size: " + Math.Round(currentmbsize, 0).ToString() + "MB";
                 }
 
                 //Calculate Gigabyte count of transfered files + current progress.
@@ -487,8 +487,9 @@ namespace Lanstaller
                 if (System.IO.File.Exists(FCO.destination))
                 {
                     SetStatus("Verifying Files: " + Identity.Name + 
-                            "\nFile:" + copycount2 + " / " + FileCopyList.Count + sizestring +
-                            "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
+                            "\nFile:" + copycount2 + " / " + FileCopyList.Count + 
+                            "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
+                            "\n" + sizestring);
 
                     string check_hash = CalculateMD5(FCO.destination);
                     //MessageBox.Show(check_hash);
@@ -506,13 +507,7 @@ namespace Lanstaller
                         }
                     }
                 }
-
-                //Update status.
-                SetStatus("Installing: " + Identity.Name + 
-                    "\nCopying File:" + copycount2 + " / " + FileCopyList.Count + sizestring + 
-                    "\nCopied (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
-
-
+               
                 //Copy File.
                 try
                 {
@@ -535,8 +530,9 @@ namespace Lanstaller
                             SetProgress(bytecounter + DLP.downloadedbytes);
 
                             SetStatus("Installing: " + Identity.Name + 
-                            "\nCopying File:" + copycount2 + " / " + FileCopyList.Count + sizestring + 
-                            "\nCopied (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2));
+                            "\nCopying File:" + copycount2 + " / " + FileCopyList.Count + 
+                            "\nCopied (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
+                            "\n" + sizestring);
                         }
 
                        
@@ -553,7 +549,7 @@ namespace Lanstaller
                 }
                 catch (System.Threading.ThreadAbortException ex)
                 {
-                    MessageBox.Show(ex.ToString());
+                    //MessageBox.Show(ex.ToString());
                     SetStatus("File copy stopped - thread Abort Exception");
                     return;
                 }

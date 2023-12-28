@@ -15,6 +15,8 @@ using System.Runtime.Remoting.Channels;
 using System.Security.Policy;
 using System.Web;
 using System.Collections.Concurrent;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using System.Net.Http;
 
 namespace Lanstaller
 {
@@ -37,7 +39,7 @@ namespace Lanstaller
 
         bool shutdown = false;
         bool InstallThreadRunning = false;
-        private static object lock_InstallThreadRunning = new object(); 
+        private static object lock_InstallThreadRunning = new object();
 
         Size StartSize;
 
@@ -126,10 +128,9 @@ namespace Lanstaller
             VersionCheck();
 
             //Set initial status.
-            btnInstall.Text = "Start" + Environment.NewLine + "Install";
             lblSpaceRequired.Text = "";
-            //Hide progress bar.
-            pbInstall.Visible = false;
+            //Hide status box.
+            gbxStatus.Visible = false;
 
             //Get list of installed programs.
             WindowsInstallerClass.CheckProgram();
@@ -332,7 +333,7 @@ namespace Lanstaller
 
         void InstallSelected()
         {
-            foreach(ListViewItem sItm in lvSoftware.SelectedItems)
+            foreach (ListViewItem sItm in lvSoftware.SelectedItems)
             {
                 //Prepare install request.
                 ClientSoftwareClass InstallSW = new ClientSoftwareClass();
@@ -390,7 +391,7 @@ namespace Lanstaller
                     }
                 }
             }
-           
+
         }
 
         void InstallThread()
@@ -404,7 +405,7 @@ namespace Lanstaller
                     if (Directory.Exists(CSW.InstallDir) == false) Directory.CreateDirectory(CSW.InstallDir); //Generate installation path.
 
                     //Enable progress bar.
-                    this.BeginInvoke((MethodInvoker)(() => pbInstall.Visible = true));
+                    this.BeginInvoke((MethodInvoker)(() => gbxStatus.Visible = true));
 
                     //Run Installation.
                     CSW.Install();
@@ -425,7 +426,7 @@ namespace Lanstaller
             } //End of installer queue.
 
             //Disable progress bar while no installs running.
-            this.BeginInvoke((MethodInvoker)(() => pbInstall.Visible = false));
+            this.BeginInvoke((MethodInvoker)(() => gbxStatus.Visible = false));
 
             //Mark installer thread as not running.
             lock (lock_InstallThreadRunning)
@@ -512,8 +513,7 @@ namespace Lanstaller
         public const int HT_CAPTION = 0x2;
 
         [DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd,
-                         int Msg, int wParam, int lParam);
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
 
@@ -538,7 +538,7 @@ namespace Lanstaller
         {
             ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.White, ButtonBorderStyle.Solid);
         }
-
+              
 
         private void tmrRefresh_Tick(object sender, EventArgs e)
         {
@@ -566,25 +566,6 @@ namespace Lanstaller
 
         private void lvSoftware_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lvSoftware.SelectedItems.Count != 1) return;
-
-
-            long filesize = APIClient.GetInstallSizeFromAPI(SList[lvSoftware.SelectedItems[0].Index].id);
-
-            double mbfilesize = (double)filesize / (double)1048576;
-            string space_req_str = String.Empty;
-            if (mbfilesize < 1000)
-            {
-                space_req_str = Math.Round(mbfilesize, 2).ToString() + "MB";
-            }
-            else
-            {
-                double gbfilesize = filesize / (double)1073741824;
-                space_req_str = Math.Round(gbfilesize, 2).ToString() + "GB";
-            }
-            lblSpaceRequired.Text = space_req_str + " required for " + SList[lvSoftware.SelectedItems[0].Index].Name;
-
-
 
         }
 
@@ -592,6 +573,109 @@ namespace Lanstaller
         {
             InstallSelected();
         }
-    }
 
+
+        private void lvSoftware_MouseClick(object sender, MouseEventArgs e)
+        {
+            UpdateSpaceRequired();
+        }
+
+        void UpdateSpaceRequired()
+        {
+            long filesize = 0;
+            foreach (ListViewItem lvi in lvSoftware.SelectedItems)
+            {
+                filesize += APIClient.GetInstallSizeFromAPI(SList[lvi.Index].id);
+            }
+
+            string space_req_str = String.Empty;
+
+            if (filesize > 0)
+            {
+                double mbfilesize = (double)filesize / (double)1048576;
+
+                if (mbfilesize < 1000)
+                {
+                    space_req_str = Math.Round(mbfilesize, 2).ToString() + "MB";
+                }
+                else
+                {
+                    double gbfilesize = filesize / (double)1073741824;
+                    space_req_str = Math.Round(gbfilesize, 2).ToString() + "GB";
+                }
+            }
+
+            lblSpaceRequired.Text = "Space required: " + space_req_str;
+        }
+
+
+
+
+        private const int WM_NCHITTEST = 0x84;
+        private const int HTCLIENT = 0x1;
+        private const int HTCAPTION = 0x2;
+        private bool isResizing = false;
+        private Point resizeStartPoint;
+
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+
+            // Handle the WM_NCHITTEST message to allow resizing the form
+            if (m.Msg == WM_NCHITTEST && (int)m.Result == HTCLIENT)
+            {
+                m.Result = (IntPtr)HTCAPTION;
+            }
+        }
+
+        private void pbTitleExpanded_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pbBottomright_MouseDown(object sender, MouseEventArgs e)
+        {
+            isResizing = true;
+            resizeStartPoint = Cursor.Position;
+        }
+
+        private void pbBottomright_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isResizing)
+            {
+                // Get the cursor position relative to the screen
+                Point cursorPos = Cursor.Position;
+
+                // Convert cursor position to client coordinates
+                Point clientCursorPos = PointToClient(cursorPos);
+
+                // Set the new size of the form based on the cursor position
+                int newWidth = clientCursorPos.X + pbBottomright.Width;
+                int newHeight = clientCursorPos.Y + pbBottomright.Height;
+
+                // Adjust the size to ensure it's not too small
+                newWidth = Math.Max(newWidth, MinimumSize.Width);
+                newHeight = Math.Max(newHeight, MinimumSize.Height);
+
+                // Set the new size of the form
+                Size = new Size(newWidth, newHeight);
+
+                // Update the resize start point for the next iteration
+                resizeStartPoint = Cursor.Position;
+
+                //redraw border.
+                this.Invalidate();
+                this.Update();
+                this.Refresh();
+
+
+            }
+        }
+
+        private void pbBottomright_MouseUp(object sender, MouseEventArgs e)
+        {
+            isResizing = false;
+        }
+    }
 }
