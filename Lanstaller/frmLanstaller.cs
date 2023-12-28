@@ -147,7 +147,7 @@ namespace Lanstaller
             lvSoftware.View = View.Details;
             lvSoftware.HeaderStyle = ColumnHeaderStyle.None;
             lvSoftware.FullRowSelect = true;
-            lvSoftware.Columns.Add("Name", 190);
+            lvSoftware.Columns.Add("Name", 275);
             LoadSoftwareList();
 
             //Start installation progress bar thread.
