@@ -616,7 +616,7 @@ namespace Lanstaller_Management_Console
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)
         {
             WindowsSettingsPanel.btnFirewallRuleAdd.Enabled = false;
-            SoftwareClass.AddFirewallRule(WindowsSettingsPanel.txtFirewallPath.Text, CurrentSelectedSoftware.id);
+            SoftwareClass.AddFirewallRule(WindowsSettingsPanel.txtFirewallPath.Text, WindowsSettingsPanel.txtRuleName.Text ,CurrentSelectedSoftware.id);
             RefreshSoftware();
 
         }

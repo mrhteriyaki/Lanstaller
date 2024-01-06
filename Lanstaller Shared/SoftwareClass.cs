@@ -130,6 +130,7 @@ namespace Lanstaller_Shared
         {
             public string softwarename;
             public string exepath;
+            public string rulename;
         }
 
         public class PreferenceOperation
@@ -656,7 +657,7 @@ namespace Lanstaller_Shared
 
             FirewallRuleList.Clear(); //Reset list.
 
-            string QueryString = "select [filepath] from tblFirewallExceptions WHERE software_id = @softwareid";
+            string QueryString = "select [filepath],[rulename] from tblFirewallExceptions WHERE software_id = @softwareid";
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
@@ -667,6 +668,7 @@ namespace Lanstaller_Shared
                 FirewallRule rule = new FirewallRule();
                 rule.softwarename = softwarename;
                 rule.exepath = SQLOutput[0].ToString();
+                rule.rulename = SQLOutput[1].ToString();
                 FirewallRuleList.Add(rule);
             }
             SQLConn.Close();
@@ -798,9 +800,9 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
-        public static void AddFirewallRule(string filepath, int softwareid)
+        public static void AddFirewallRule(string filepath, string rulename, int softwareid)
         {
-            string QueryString = "INSERT into tblFirewallExceptions ([filepath],[software_id]) VALUES (@filepath,@softwareid)";
+            string QueryString = "INSERT into tblFirewallExceptions ([filepath],[software_id],[rulename]) VALUES (@filepath,@softwareid,@rulename)";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
@@ -808,6 +810,15 @@ namespace Lanstaller_Shared
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@filepath", filepath);
             SQLCmd.Parameters.AddWithValue("@softwareid", softwareid);
+            if (string.IsNullOrEmpty(rulename))
+            {
+                SQLCmd.Parameters.AddWithValue("@rulename", DBNull.Value);
+            }
+            else
+            {
+                SQLCmd.Parameters.AddWithValue("@rulename", rulename);
+            }
+
             SQLCmd.ExecuteNonQuery();
 
             SQLConn.Close();

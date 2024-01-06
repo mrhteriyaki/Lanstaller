@@ -261,24 +261,52 @@ namespace Lanstaller
 
         void GenerateFirewallRules(List<FirewallRule> FirewallRuleList)
         {
-            //FirewallRule
+            //Add Firewall rules to Windows.
             string netsh_path = "c:\\windows\\system32\\netsh.exe";
             if (!System.IO.File.Exists(netsh_path))
             {
-                MessageBox.Show("netsh.exe missing - unable to add firewall rules");
+                MessageBox.Show("netsh.exe missing - unable to add firewall rules"); //just incase.
                 return;
             }
-            
+
+            Process FWNetSHProc = new Process();
+            FWNetSHProc.StartInfo.FileName = netsh_path;
+            FWNetSHProc.StartInfo.UseShellExecute = false;
+            FWNetSHProc.StartInfo.RedirectStandardOutput = true;
+            FWNetSHProc.StartInfo.CreateNoWindow = true;
+
             foreach (FirewallRule fwr in FirewallRuleList)
             {
-                //netsh advfirewall firewall add rule name="My Application" dir=in action=allow program="C:\games\The Call of Duty\CoDMP.exe" enable=yes
-                Process FWNetSHProc = new Process();
-                FWNetSHProc.StartInfo.FileName = netsh_path;
-                FWNetSHProc.StartInfo.Arguments = "advfirewall firewall add rule name=\"" + fwr.softwarename + "\" dir=in action=allow program=\"" + ReplaceVariable(fwr.exepath) + "\" enable=yes";
-                FWNetSHProc.StartInfo.UseShellExecute = false;
-                FWNetSHProc.StartInfo.RedirectStandardOutput = true;
-                FWNetSHProc.StartInfo.CreateNoWindow = true;
+                string procpath = ReplaceVariable(fwr.exepath);
+                string rulename = fwr.rulename;
+                if (string.IsNullOrEmpty(rulename)) rulename = fwr.softwarename;
+
+                //Check if rule exists.
+                FWNetSHProc.StartInfo.Arguments = "advfirewall firewall show rule name=\"" + rulename + "\" verbose";
                 FWNetSHProc.Start();
+                FWNetSHProc.WaitForExit();
+                bool rule_required = true;
+                while (!FWNetSHProc.StandardOutput.EndOfStream)
+                {
+                    string line = FWNetSHProc.StandardOutput.ReadLine();
+                    if (line.StartsWith("Program:"))
+                    {
+                        string program_path = line.Substring(8).Trim();
+                        if (program_path.Equals(procpath))
+                        {
+                            //Founding matching rule name and path - skip adding rule.
+                            rule_required = false;
+                        }
+                    }
+                }
+                
+                //netsh advfirewall firewall add rule name="My Application" dir=in action=allow program="C:\games\The Call of Duty\CoDMP.exe" enable=yes
+                if (rule_required)
+                {
+                    FWNetSHProc.StartInfo.Arguments = "advfirewall firewall add rule name=\"" + rulename + "\" dir=in action=allow program=\"" + procpath + "\" enable=yes";
+                    FWNetSHProc.Start();
+                }
+                
             }
         }
 

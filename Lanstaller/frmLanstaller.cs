@@ -17,6 +17,7 @@ using System.Web;
 using System.Collections.Concurrent;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using System.Net.Http;
+using static Lanstaller_Shared.SoftwareClass;
 
 namespace Lanstaller
 {
