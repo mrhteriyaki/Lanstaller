@@ -43,5 +43,10 @@ namespace Lanstaller_Management_Console.Panels
         {
 
         }
+
+        private void btnAddSerial_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

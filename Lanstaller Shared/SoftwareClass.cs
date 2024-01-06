@@ -73,12 +73,55 @@ namespace Lanstaller_Shared
             public string regKey;
             public string regVal;
             public int softwareid;
-
+            public string format;
 
             //Filter symbols from serial key input boxes (management and client)
             public static string FilterSerial(string serial_value)
             {
                 return serial_value.Replace("-", "").Replace(" ", "");
+            }
+
+            public static string FormatSerial(string serial_value, string format, bool UnformatMode = false)
+            {
+                //Converts serial into formatted version for registry.
+                //Eg add hypen to *****-*****-*****
+                
+                if (String.IsNullOrEmpty(format)) return serial_value; //return serial if no format provided.
+
+                //Check if serial length long enough for unformat.
+                if (UnformatMode)
+                {
+                    if (serial_value.Length < format.Length) return serial_value;
+                }
+                
+                char[] keyChars = serial_value.ToCharArray();
+                char[] formatChars = format.ToCharArray();
+
+                string output_value = String.Empty;
+                int kc_i = 0;
+                for (int fc_i = 0; fc_i < formatChars.Length; fc_i++)
+                {
+                    if (formatChars[fc_i] == '*') //Regular Character
+                    {
+                        if (kc_i < keyChars.Length) //Check if input too short for requested format.
+                        {
+                            output_value += keyChars[kc_i];
+                        }
+                        kc_i++;
+                    }
+                    else if (formatChars[fc_i] == '-') //Hyphen
+                    {
+                        if (!UnformatMode) output_value += '-';
+                        if (UnformatMode) kc_i++; 
+                    }
+
+                }
+                return output_value;
+            }
+
+            public static string UnformatSerial(string serial_value, string format)
+            {
+                return FormatSerial(serial_value, format, true);
             }
 
         }
@@ -286,7 +329,7 @@ namespace Lanstaller_Shared
 
         }
 
-        
+
         public static Server GetFileServer(string servertype) //web or smb for type.
         {
             //ServerList.Clear();
@@ -458,12 +501,12 @@ namespace Lanstaller_Shared
         public static List<SerialNumber> GetSerials(int SoftwareID)
         {
             List<SerialNumber> SerialList = new List<SerialNumber>();
-
-            string QueryString = "select [id],[name],[instance],[regKey],[regVal] from [tblSerials] WHERE software_id = @softwareid ORDER BY INSTANCE ASC";
-
+            SqlCommand SQLCmd = new SqlCommand();
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SQLCmd.Connection = SQLConn;
+
             SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.CommandText = "select [id],[name],[instance],[regKey],[regVal],[format] from [tblSerials] WHERE software_id = @softwareid ORDER BY INSTANCE ASC";
             SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
@@ -475,6 +518,7 @@ namespace Lanstaller_Shared
                 tSerial.instancenumber = (int)SQLOutput[2];
                 tSerial.regKey = SQLOutput[3].ToString();
                 tSerial.regVal = SQLOutput[4].ToString();
+                tSerial.format = SQLOutput[5].ToString();
                 SerialList.Add(tSerial);
             }
             SQLConn.Close();
@@ -548,7 +592,7 @@ namespace Lanstaller_Shared
             }
         }
 
-        
+
 
         public static List<ShortcutOperation> GetShortcuts(int SoftwareID)
         {
@@ -682,7 +726,7 @@ namespace Lanstaller_Shared
             return filesize;
         }
 
-        public static void AddSerial(string name, int instancenumber, int softwareid, string regKey, string regVal)
+        public static void AddSerial(string name, int instancenumber, int softwareid, string regKey, string regVal, string SerialFormat)
         {
             //Check no existing serial present with same software id and instance number.
             string QueryString = "SELECT COUNT(instance) from tblSerials where [instance] = @instancenumb and [software_id] = @softwareid";
@@ -703,15 +747,16 @@ namespace Lanstaller_Shared
             }
 
 
-            QueryString = "INSERT into tblSerials ([name],[instance],[regKey],[regVal],[software_id]) VALUES (@name,@instancenumb,@regKey,@regVal,@softwareid)";
+            QueryString = "INSERT into tblSerials ([name],[instance],[regKey],[regVal],[software_id],[format]) VALUES (@name,@instancenumb,@regKey,@regVal,@softwareid,@serformat)";
 
             SQLConn.Open();
             SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@name", name);
             SQLCmd.Parameters.AddWithValue("@instancenumb", instancenumber);
-            SQLCmd.Parameters.AddWithValue(@"softwareid", softwareid);
+            SQLCmd.Parameters.AddWithValue("@softwareid", softwareid);
             SQLCmd.Parameters.AddWithValue("@regKey", regKey);
             SQLCmd.Parameters.AddWithValue("@regVal", regVal);
+            SQLCmd.Parameters.AddWithValue("@serformat", SerialFormat);
             SQLCmd.ExecuteNonQuery();
 
             SQLConn.Close();
@@ -719,13 +764,14 @@ namespace Lanstaller_Shared
 
         public static void AddUserSerial(int SerialID, string Serial)
         {
-            string QueryString = "INSERT INTO tblSerialsAvailable (serial_id,serial_value) VALUES (@sid,@sval)";
+            //Add serial number 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
-
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
             SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@sid", SerialID);
-            SQLCmd.Parameters.AddWithValue("@sval", Serial) ;
+            SQLCmd.CommandText = "INSERT INTO tblSerialsAvailable (serial_id,serial_value) VALUES (@sid,@sval)";
+            SQLCmd.Parameters.AddWithValue("@sval", Serial);
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
         }

@@ -24,7 +24,8 @@ namespace Lanstaller
 
     public partial class frmLanstaller : Form
     {
-        Double Version = 0.2;
+        Double Version = 0.21; //Increment Version in tblSystem when changed.
+
         ConcurrentQueue<ClientSoftwareClass> InstallQueue = new ConcurrentQueue<ClientSoftwareClass>();
 
         List<int> InstallQueueIDs = new List<int>();
@@ -47,8 +48,6 @@ namespace Lanstaller
         {
             InitializeComponent();
         }
-
-
 
         bool CheckResources()
         {
@@ -353,8 +352,6 @@ namespace Lanstaller
                     }
                     InstallQueueIDs.Add(InstallSW.Identity.id);
                 }
-
-
 
                 InstallSW.InstallDir = LanstallerSettings.InstallDirectory;
                 //Set current selections for installation.

@@ -40,8 +40,6 @@ namespace Lanstaller
                 //MessageBox.Show(cmbxServerSerials.SelectedIndex.ToString());
                 //Send back Server Serial of confirmation for use.
                 APIClient.SetAvailableSerialsFromAPI(serial_pool[cmbxServerSerials.SelectedIndex].id);
-
-
             }
 
 
@@ -76,6 +74,7 @@ namespace Lanstaller
                             threadEx = ex;
                         }
                     });
+                staThread.Name = "Clipboard Thread";
                 staThread.SetApartmentState(ApartmentState.STA);
                 staThread.Start();
                 staThread.Join();

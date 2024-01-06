@@ -309,12 +309,12 @@ namespace Lanstaller
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtChatMessages.BackColor = System.Drawing.Color.Black;
             this.txtChatMessages.ForeColor = System.Drawing.Color.White;
-            this.txtChatMessages.Location = new System.Drawing.Point(514, 108);
+            this.txtChatMessages.Location = new System.Drawing.Point(514, 96);
             this.txtChatMessages.Multiline = true;
             this.txtChatMessages.Name = "txtChatMessages";
             this.txtChatMessages.ReadOnly = true;
             this.txtChatMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtChatMessages.Size = new System.Drawing.Size(297, 445);
+            this.txtChatMessages.Size = new System.Drawing.Size(297, 457);
             this.txtChatMessages.TabIndex = 11;
             // 
             // txtChatSendMessage
@@ -323,9 +323,9 @@ namespace Lanstaller
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtChatSendMessage.BackColor = System.Drawing.Color.Black;
             this.txtChatSendMessage.ForeColor = System.Drawing.Color.White;
-            this.txtChatSendMessage.Location = new System.Drawing.Point(515, 559);
+            this.txtChatSendMessage.Location = new System.Drawing.Point(552, 559);
             this.txtChatSendMessage.Name = "txtChatSendMessage";
-            this.txtChatSendMessage.Size = new System.Drawing.Size(297, 20);
+            this.txtChatSendMessage.Size = new System.Drawing.Size(250, 20);
             this.txtChatSendMessage.TabIndex = 12;
             this.txtChatSendMessage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtChatSendMessage_KeyUp);
             // 
@@ -380,9 +380,11 @@ namespace Lanstaller
             // 
             // label4
             // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
             this.label4.ForeColor = System.Drawing.Color.White;
-            this.label4.Location = new System.Drawing.Point(512, 94);
+            this.label4.Location = new System.Drawing.Point(514, 562);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(32, 13);
             this.label4.TabIndex = 7;
@@ -418,7 +420,7 @@ namespace Lanstaller
             this.pbBottomright.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbBottomright.BackgroundImage")));
             this.pbBottomright.ErrorImage = null;
             this.pbBottomright.InitialImage = null;
-            this.pbBottomright.Location = new System.Drawing.Point(813, 572);
+            this.pbBottomright.Location = new System.Drawing.Point(807, 567);
             this.pbBottomright.Name = "pbBottomright";
             this.pbBottomright.Size = new System.Drawing.Size(15, 15);
             this.pbBottomright.TabIndex = 22;

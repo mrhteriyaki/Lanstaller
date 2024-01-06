@@ -220,7 +220,7 @@ namespace Lanstaller_Management_Console
                 if (SW.id == newid)
                 {
                     lvSoftware.SelectedItems.Clear();
-                    lvSoftware.SelectedItems[index].Selected = true;
+                    lvSoftware.Items[index].Selected = true;
                     return;
                 }
                 index++;
@@ -633,7 +633,7 @@ namespace Lanstaller_Management_Console
         {
             string filtered_serial = SoftwareClass.SerialNumber.FilterSerial(SerialPanel.txtSerialName.Text);
             SerialPanel.txtSerialName.Text = filtered_serial;
-            SoftwareClass.AddSerial(filtered_serial, int.Parse(SerialPanel.txtSerialInstance.Text), CurrentSelectedSoftware.id, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text);
+            SoftwareClass.AddSerial(filtered_serial, int.Parse(SerialPanel.txtSerialInstance.Text), CurrentSelectedSoftware.id, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text, SerialPanel.txtFormat.Text);
         }
 
         private void txtSerialName_TextChanged(object sender, EventArgs e)
@@ -678,6 +678,7 @@ namespace Lanstaller_Management_Console
             if (String.IsNullOrEmpty(SerialPanel.txtUserSerial.Text)) return; //Skip empty input.
             //add serial to pool.
             string serial_value = SoftwareClass.SerialNumber.FilterSerial(SerialPanel.txtUserSerial.Text);
+            
             SoftwareClass.UserSerial.AddAvailableSerial(serialid_pool_selected, serial_value);
             SerialPanel.txtUserSerial.Text = serial_value;
             RefreshSerialPoolList();
@@ -729,6 +730,7 @@ namespace Lanstaller_Management_Console
             
             //GetUnhashedFileCount
             Thread ST = new Thread(GenerateFileHash);
+            ST.Name = "File Hashing";
             ST.Start();
 
         }

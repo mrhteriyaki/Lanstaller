@@ -380,7 +380,7 @@ namespace Lanstaller
                 SF.FormBorderStyle = FormBorderStyle.FixedSingle;
                 SF.serialid = SN.serialid;
 
-                if (!SN.regKey.Equals(""))
+                if (!string.IsNullOrEmpty(SN.regKey))
                 {
                     try
                     {
@@ -390,7 +390,8 @@ namespace Lanstaller
                             RegistryKey RK = Registry.LocalMachine.OpenSubKey(SN.regKey.Substring(19));
                             if (RK != null)
                             {
-                                SF.txtSerial.Text = RK.GetValue(SN.regVal, "").ToString();
+                                string serialkey = SerialNumber.UnformatSerial(SN.regVal,SN.format);
+                                SF.txtSerial.Text = RK.GetValue(SN.regVal, serialkey).ToString();
                             }
                         }
 
@@ -399,12 +400,12 @@ namespace Lanstaller
                     catch (Exception ex)
                     {
                         //occurs on null exception due to missing key.
-                        MessageBox.Show(ex.Message);
+                        MessageBox.Show("Error in GenerateSerials() : " + ex.Message);
                     }
 
                 }
                 SF.ShowDialog();
-                SN.serialnumber = SF.txtSerial.Text;
+                SN.serialnumber = SerialNumber.FormatSerial(SF.txtSerial.Text,SN.format);
             }
         }
 
@@ -462,6 +463,7 @@ namespace Lanstaller
             long bytecounter = 0;
             while (copycount < FileCopyList.Count)
             {
+                //Info for status update.
                 FileCopyOperation FCO = FileCopyList[copycount];
                 int copycount2 = (copycount + 1);
                 string sizestring = "";
@@ -479,15 +481,17 @@ namespace Lanstaller
                 //Calculate Gigabyte count of transfered files + current progress.
                 //double mbfilesize = (double)FCO.size / 1048576;
                 double gbsize = (double)bytecounter / 1073741824;
-
-               
-
+                
 
                 //Check file exists, verify hash.
                 if (System.IO.File.Exists(FCO.destination))
                 {
-                    SetStatus("Verifying Files: " + Identity.Name + 
-                            "\nFile:" + copycount2 + " / " + FileCopyList.Count + 
+                    if (string.IsNullOrEmpty(FCO.fileinfo.hash))
+                    {
+                        MessageBox.Show("Error - file hash not available from server - alert Lanlord.");
+                    }
+                    SetStatus("Installing: \n" + Identity.Name + 
+                            "\nVerifying File:" + copycount2 + " / " + FileCopyList.Count + 
                             "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
                             "\n" + sizestring);
 
@@ -508,6 +512,7 @@ namespace Lanstaller
                     }
                 }
                
+
                 //Copy File.
                 try
                 {
@@ -529,9 +534,9 @@ namespace Lanstaller
                             gbsize = ((double)bytecounter + DLP.downloadedbytes) / 1073741824;
                             SetProgress(bytecounter + DLP.downloadedbytes);
 
-                            SetStatus("Installing: " + Identity.Name + 
-                            "\nCopying File:" + copycount2 + " / " + FileCopyList.Count + 
-                            "\nCopied (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
+                            SetStatus("Installing: \n" + Identity.Name + 
+                            "\nCopying File:" + copycount2 + " / " + FileCopyList.Count +
+                            "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
                             "\n" + sizestring);
                         }
 

@@ -46,12 +46,16 @@
             this.label1 = new System.Windows.Forms.Label();
             this.txtUserSerial = new System.Windows.Forms.TextBox();
             this.btnAddUserSerial = new System.Windows.Forms.Button();
+            this.txtFormat = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.groupBox5.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.label3);
+            this.groupBox5.Controls.Add(this.txtFormat);
             this.groupBox5.Controls.Add(this.label21);
             this.groupBox5.Controls.Add(this.txtRegVal);
             this.groupBox5.Controls.Add(this.label20);
@@ -63,7 +67,7 @@
             this.groupBox5.Controls.Add(this.txtSerialName);
             this.groupBox5.Location = new System.Drawing.Point(3, 3);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(353, 137);
+            this.groupBox5.Size = new System.Drawing.Size(353, 168);
             this.groupBox5.TabIndex = 12;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Serial Numbers";
@@ -71,7 +75,7 @@
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(7, 72);
+            this.label21.Location = new System.Drawing.Point(7, 96);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(105, 13);
             this.label21.TabIndex = 24;
@@ -79,7 +83,7 @@
             // 
             // txtRegVal
             // 
-            this.txtRegVal.Location = new System.Drawing.Point(118, 69);
+            this.txtRegVal.Location = new System.Drawing.Point(118, 93);
             this.txtRegVal.Name = "txtRegVal";
             this.txtRegVal.Size = new System.Drawing.Size(224, 20);
             this.txtRegVal.TabIndex = 23;
@@ -87,7 +91,7 @@
             // label20
             // 
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(7, 50);
+            this.label20.Location = new System.Drawing.Point(7, 74);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(108, 13);
             this.label20.TabIndex = 22;
@@ -95,7 +99,7 @@
             // 
             // txtRegKey
             // 
-            this.txtRegKey.Location = new System.Drawing.Point(118, 43);
+            this.txtRegKey.Location = new System.Drawing.Point(118, 67);
             this.txtRegKey.Name = "txtRegKey";
             this.txtRegKey.Size = new System.Drawing.Size(224, 20);
             this.txtRegKey.TabIndex = 21;
@@ -103,17 +107,18 @@
             // btnAddSerial
             // 
             this.btnAddSerial.Enabled = false;
-            this.btnAddSerial.Location = new System.Drawing.Point(242, 103);
+            this.btnAddSerial.Location = new System.Drawing.Point(242, 127);
             this.btnAddSerial.Name = "btnAddSerial";
             this.btnAddSerial.Size = new System.Drawing.Size(100, 28);
             this.btnAddSerial.TabIndex = 19;
             this.btnAddSerial.Text = "Add to Database";
             this.btnAddSerial.UseVisualStyleBackColor = true;
+            this.btnAddSerial.Click += new System.EventHandler(this.btnAddSerial_Click);
             // 
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(22, 98);
+            this.label19.Location = new System.Drawing.Point(22, 122);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(91, 13);
             this.label19.TabIndex = 20;
@@ -130,7 +135,7 @@
             // 
             // txtSerialInstance
             // 
-            this.txtSerialInstance.Location = new System.Drawing.Point(118, 95);
+            this.txtSerialInstance.Location = new System.Drawing.Point(118, 119);
             this.txtSerialInstance.Name = "txtSerialInstance";
             this.txtSerialInstance.Size = new System.Drawing.Size(44, 20);
             this.txtSerialInstance.TabIndex = 11;
@@ -152,7 +157,7 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.txtUserSerial);
             this.groupBox1.Controls.Add(this.btnAddUserSerial);
-            this.groupBox1.Location = new System.Drawing.Point(3, 146);
+            this.groupBox1.Location = new System.Drawing.Point(3, 177);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(353, 301);
             this.groupBox1.TabIndex = 13;
@@ -228,6 +233,22 @@
             this.btnAddUserSerial.UseVisualStyleBackColor = true;
             this.btnAddUserSerial.Click += new System.EventHandler(this.btnAddUserSerial_Click);
             // 
+            // txtFormat
+            // 
+            this.txtFormat.Location = new System.Drawing.Point(118, 41);
+            this.txtFormat.Name = "txtFormat";
+            this.txtFormat.Size = new System.Drawing.Size(224, 20);
+            this.txtFormat.TabIndex = 25;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(74, 44);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(42, 13);
+            this.label3.TabIndex = 26;
+            this.label3.Text = "Format:";
+            // 
             // Serial
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -235,7 +256,7 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox5);
             this.Name = "Serial";
-            this.Size = new System.Drawing.Size(365, 454);
+            this.Size = new System.Drawing.Size(365, 508);
             this.Load += new System.EventHandler(this.Serial_Load);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
@@ -265,5 +286,7 @@
         public System.Windows.Forms.ListView lvUserSerials;
         private System.Windows.Forms.Label label2;
         public System.Windows.Forms.ComboBox cmbxSerialPoolInstance;
+        private System.Windows.Forms.Label label3;
+        public System.Windows.Forms.TextBox txtFormat;
     }
 }
