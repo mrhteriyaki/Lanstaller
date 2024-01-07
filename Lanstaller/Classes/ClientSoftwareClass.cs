@@ -108,7 +108,7 @@ namespace Lanstaller
                 GenerateShortcuts(SCO);
             }
 
-            SetStatus("Updating Windows Settings (Firewall, Compatibility) - " + Identity.Name);
+            SetStatus(Identity.Name + Environment.NewLine + "Updating Windows Settings" + Environment.NewLine + "(Firewall Rules and Compatibility)");
             //Windows Settings (Firewall rules, Compatibility)
             if (apply_windowssettings)
             {
@@ -282,6 +282,7 @@ namespace Lanstaller
                 if (string.IsNullOrEmpty(rulename)) rulename = fwr.softwarename;
 
                 //Check if rule exists.
+                MessageBox.Show(rulename);
                 FWNetSHProc.StartInfo.Arguments = "advfirewall firewall show rule name=\"" + rulename + "\" verbose";
                 FWNetSHProc.Start();
                 FWNetSHProc.WaitForExit();

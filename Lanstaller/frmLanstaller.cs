@@ -71,6 +71,7 @@ namespace Lanstaller
             return true;
         }
 
+
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
             if (!CheckResources())

@@ -28,6 +28,7 @@ namespace Lanstaller
             
             //Install Directory
             InstallDirectory = LanstallerKey.GetValue("installdir", defaultinstalldir).ToString();
+            //Screen.PrimaryScreen requires app.manifest settings DpiAwareness and DpiAware to show correct value after Windows scaling.
             ScreenWidth = int.Parse(LanstallerKey.GetValue("screenwidth", Screen.PrimaryScreen.Bounds.Width).ToString());
             ScreenHeight = int.Parse(LanstallerKey.GetValue("screenheight", Screen.PrimaryScreen.Bounds.Height).ToString());
             Username = LanstallerKey.GetValue("username", System.Environment.UserName).ToString();
