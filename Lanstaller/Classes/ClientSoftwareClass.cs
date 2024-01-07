@@ -282,10 +282,9 @@ namespace Lanstaller
                 if (string.IsNullOrEmpty(rulename)) rulename = fwr.softwarename;
 
                 //Check if rule exists.
-                MessageBox.Show(rulename);
                 FWNetSHProc.StartInfo.Arguments = "advfirewall firewall show rule name=\"" + rulename + "\" verbose";
                 FWNetSHProc.Start();
-                FWNetSHProc.WaitForExit();
+                
                 bool rule_required = true;
                 while (!FWNetSHProc.StandardOutput.EndOfStream)
                 {
@@ -300,6 +299,7 @@ namespace Lanstaller
                         }
                     }
                 }
+                
                 
                 //netsh advfirewall firewall add rule name="My Application" dir=in action=allow program="C:\games\The Call of Duty\CoDMP.exe" enable=yes
                 if (rule_required)

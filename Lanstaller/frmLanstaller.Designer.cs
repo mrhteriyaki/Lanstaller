@@ -72,6 +72,7 @@ namespace Lanstaller
             // btnInstall
             // 
             this.btnInstall.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnInstall.BackgroundImage")));
+            this.btnInstall.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.btnInstall.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnInstall.ForeColor = System.Drawing.Color.White;
@@ -418,9 +419,10 @@ namespace Lanstaller
             this.pbBottomright.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.pbBottomright.BackColor = System.Drawing.Color.Transparent;
             this.pbBottomright.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbBottomright.BackgroundImage")));
+            this.pbBottomright.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.pbBottomright.ErrorImage = null;
             this.pbBottomright.InitialImage = null;
-            this.pbBottomright.Location = new System.Drawing.Point(807, 567);
+            this.pbBottomright.Location = new System.Drawing.Point(806, 566);
             this.pbBottomright.Name = "pbBottomright";
             this.pbBottomright.Size = new System.Drawing.Size(15, 15);
             this.pbBottomright.TabIndex = 22;
