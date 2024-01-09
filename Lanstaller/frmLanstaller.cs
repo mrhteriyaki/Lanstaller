@@ -565,7 +565,7 @@ namespace Lanstaller
 
         private void lvSoftware_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            UpdateInstallOptions();
         }
 
         private void lvSoftware_DoubleClick(object sender, EventArgs e)
@@ -584,7 +584,7 @@ namespace Lanstaller
             long filesize = 0;
             foreach (ListViewItem lvi in lvSoftware.SelectedItems)
             {
-                filesize += APIClient.GetInstallSizeFromAPI(SList[lvi.Index].id);
+                filesize += SList[lvi.Index].install_size;
             }
 
             string space_req_str = String.Empty;
@@ -605,6 +605,12 @@ namespace Lanstaller
             }
 
             lblSpaceRequired.Text = "Space required: " + space_req_str;
+        }
+
+        void UpdateInstallOptions()
+        {
+
+            
         }
 
 

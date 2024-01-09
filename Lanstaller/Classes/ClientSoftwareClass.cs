@@ -88,7 +88,7 @@ namespace Lanstaller
                 }
 
                 InstalledSize = 0; //reset install size.
-                InstallSize = GetInstallSizeFromAPI(Identity.id);
+                InstallSize = Identity.install_size;
 
                 SetStatus("Copying Files - " + Identity.Name);
                 CopyFiles(FCL, DirectoryList);
@@ -445,7 +445,7 @@ namespace Lanstaller
         {
 
             //Calculate total copy size.
-            long totalbytes = GetInstallSizeFromAPI(Identity.id);
+            long totalbytes = Identity.install_size;
             double totalgbytes = (double)totalbytes / 1073741824;
 
 

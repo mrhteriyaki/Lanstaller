@@ -149,8 +149,7 @@ namespace Lanstaller_Management_Console
             FilesPanel.btnRescanFileHash.Click += new System.EventHandler(this.btnRescanFileHash_Click);
             FilesPanel.btnRescanFileSize.Click += new System.EventHandler(this.btnRescanFileSize_Click);
             FilesPanel.btnCheckAllFiles.Click += new System.EventHandler(this.btnCheckAllFiles_Click);
-
-            
+                        
 
             //Preferences
             PreferencesPanel.btnAddPrefFile.Click += new System.EventHandler(this.btnAddPrefFile_Click);
@@ -299,7 +298,8 @@ namespace Lanstaller_Management_Console
                 serveradd = serveradd + "\\";
             }
 
-            SQLCmd.CommandText = "SELECT id,source from tblFiles";
+            SQLCmd.CommandText = "SELECT id,source from tblFiles WHERE software_id = @swid";
+            SQLCmd.Parameters.AddWithValue("@swid", CurrentSelectedSoftware.id);
             SqlDataReader SR = SQLCmd.ExecuteReader();
             List<string> OutputList = new List<string>();
             int filecount = 0;
@@ -328,16 +328,7 @@ namespace Lanstaller_Management_Console
             {
                 MessageBox.Show("No missing files - checked: " + filecount.ToString());
             }
-
-
         }
-
-      
-       
-      
-
-
-
 
         private void btnAddFolder_Click(object sender, EventArgs e)
         {
@@ -706,7 +697,7 @@ namespace Lanstaller_Management_Console
         private void btnRescanFileSize_Click(object sender, EventArgs e)
         {
             FilesPanel.btnRescanFileSize.Enabled = false;
-            LanstallerManagement.RescanFileSize();
+            LanstallerManagement.RescanFileSize(CurrentSelectedSoftware.id);
             FilesPanel.btnRescanFileSize.Enabled = true;
         }
 
@@ -739,11 +730,11 @@ namespace Lanstaller_Management_Console
         {
             if (MessageBox.Show("Also verify existing hashes?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                SoftwareClass.RescanFileHashes(true);
+                SoftwareClass.RescanFileHashes(true,CurrentSelectedSoftware.id);
             }
             else
             {
-                SoftwareClass.RescanFileHashes(false);
+                SoftwareClass.RescanFileHashes(false, CurrentSelectedSoftware.id);
             }
 
             FilesPanel.lblCopyActionInfo.Invoke((MethodInvoker)delegate {
@@ -759,11 +750,6 @@ namespace Lanstaller_Management_Console
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-
-            SoftwareClass.RescanFileHashes(false);
-        }
 
         private void btnAuthNew_Click(object sender, EventArgs e)
         {

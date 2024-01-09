@@ -35,9 +35,12 @@ namespace Lanstaller_Shared
             public int shortcut_count;
             public int firewall_count;
 
+            public long install_size;
+
             public string image_small; //Icon Image for List.
         }
 
+       
         public class FileInfoClass
         {
             public int id;
@@ -255,6 +258,7 @@ namespace Lanstaller_Shared
             foreach (SoftwareInfo SW in tmpList)
             {
                 LoadSoftwareCounts(SW);
+                SW.install_size = GetInstallSize(SW.id); 
             }
 
             return tmpList;
@@ -901,20 +905,25 @@ namespace Lanstaller_Shared
         }
 
 
-        public static void RescanFileHashes(bool fullrescan)
+        public static void RescanFileHashes(bool fullrescan, int software_id)
         {
             Server SA = GetFileServer("smb");
 
-            string QueryString = "SELECT [id],[source],[hash_md5] from tblFiles";
+            string QueryString = "SELECT [id],[source],[hash_md5] from tblFiles WHERE software_id = @swid";
             if (fullrescan == false)
             {
-                QueryString += " WHERE [hash_md5] is null";
+                QueryString += " AND [hash_md5] is null";
             }
-
+            else
+            {
+                //Full Rescan, clear existing hashes for progress check.
+                QueryString += "; UPDATE tblFiles SET [hash_md5] = NULL WHERE software_id = @swid"; 
+            }
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SQLCmd.Parameters.AddWithValue("@swid", software_id);
             SqlDataReader SR = SQLCmd.ExecuteReader();
 
             List<FileInfoClass> FileHashList = new List<FileInfoClass>();

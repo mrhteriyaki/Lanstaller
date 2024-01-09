@@ -33,17 +33,6 @@ namespace LanstallerAPI.Controllers
             return JsonConvert.SerializeObject(SoftwareClass.GetFileServer("web"));
         }
 
-        //Get Installation Size
-        [Route("InstallSize")]
-        public string InstallSize(int id)
-        {
-            if (Authentication.CheckLogon(HttpContext.Request) == false)
-            {
-                return "auth fail";
-            }
-            return SoftwareClass.GetInstallSize(id).ToString();
-        }
-
         //GetFiles
         [Route("Files")]
         public string Files(int id)
@@ -156,5 +145,6 @@ namespace LanstallerAPI.Controllers
             return JsonConvert.SerializeObject(SoftwareClass.UserSerial.GetUserSerials(id));
         }
 
+        
     }
 }

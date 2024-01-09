@@ -14,14 +14,15 @@ namespace Lanstaller_Management_Console
 
 
         //Rescan file size and update database (use of Pri.Longpath only on windows / .net framework).
-        public static void RescanFileSize()
+        public static void RescanFileSize(int software_id)
         {
             string SA = SoftwareClass.GetFileServer("smb").path;
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 
-            SQLCmd.CommandText = "SELECT [id],[source] from tblFiles";
+            SQLCmd.CommandText = "SELECT [id],[source] from tblFiles WHERE software_id = @swid";
+            SQLCmd.Parameters.AddWithValue("@swid", software_id);
             SQLConn.Open();
             SqlDataReader SR = SQLCmd.ExecuteReader();
             List<SoftwareClass.FileCopyOperation> FileList = new List<SoftwareClass.FileCopyOperation>();
@@ -34,6 +35,7 @@ namespace Lanstaller_Management_Console
                 tmpFCO.fileinfo.size = FI.Length;
                 FileList.Add(tmpFCO);
             }
+            SR.Close();
 
             SQLCmd.CommandText = "UPDATE tblFiles SET filesize = @filesize WHERE id = @fileid";
             foreach (SoftwareClass.FileCopyOperation FCO in FileList)

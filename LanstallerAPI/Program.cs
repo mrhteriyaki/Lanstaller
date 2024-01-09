@@ -28,8 +28,8 @@ var extensionProvider = new FileExtensionContentTypeProvider();
 extensionProvider.Mappings.Add(".dll", "application/octet-stream");
 
 
-//static files disabled by mitchell - folder does not auto generate when empty.
-/*
+//static files warning: folder does not auto generate when empty.
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
@@ -38,7 +38,7 @@ app.UseStaticFiles(new StaticFileOptions
     ContentTypeProvider = extensionProvider
 
 });
-*/
+
 
 app.UseAuthorization();
 

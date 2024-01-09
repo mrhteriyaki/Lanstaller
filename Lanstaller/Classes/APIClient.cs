@@ -148,15 +148,6 @@ namespace Lanstaller.Classes
             return SWL;
         }
 
-        //Get Installation Size.
-        public static long GetInstallSizeFromAPI(int SoftwareID)
-        {
-            List<FileCopyOperation> FCL = new List<FileCopyOperation>();
-            string returnstr = GetString("InstallSize", SoftwareID);
-            return long.Parse(returnstr);
-        }
-
-
 
         //Get Files.
         public static List<FileCopyOperation> GetFilesListFromAPI(int SoftwareID)

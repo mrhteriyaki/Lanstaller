@@ -419,7 +419,6 @@ namespace Lanstaller
             this.pbBottomright.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.pbBottomright.BackColor = System.Drawing.Color.Transparent;
             this.pbBottomright.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbBottomright.BackgroundImage")));
-            this.pbBottomright.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.pbBottomright.ErrorImage = null;
             this.pbBottomright.InitialImage = null;
             this.pbBottomright.Location = new System.Drawing.Point(806, 566);
