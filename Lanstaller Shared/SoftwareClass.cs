@@ -34,6 +34,8 @@ namespace Lanstaller_Shared
             public int registry_count;
             public int shortcut_count;
             public int firewall_count;
+            public int preference_count;
+            public int redist_count;
 
             public long install_size;
 
@@ -229,6 +231,14 @@ namespace Lanstaller_Shared
             //Firewall rule count.
             SQLCmd.CommandText = "SELECT COUNT(id) from tblFirewallExceptions WHERE software_id = @softwareid";
             tmpSoftwareInfo.firewall_count = (int)SQLCmd.ExecuteScalar();
+
+            //Preference files.
+            SQLCmd.CommandText = "SELECT COUNT(id) from tblPreferenceFiles WHERE software_id = @softwareid";
+            tmpSoftwareInfo.preference_count = (int)SQLCmd.ExecuteScalar();
+
+            //Redist 
+            SQLCmd.CommandText = "SELECT COUNT(redist_id) from tblRedistUsage WHERE software_id = @softwareid";
+            tmpSoftwareInfo.redist_count = (int)SQLCmd.ExecuteScalar();
 
             SQLConn.Close();
         }

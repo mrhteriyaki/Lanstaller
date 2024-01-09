@@ -18,6 +18,7 @@ using System.Collections.Concurrent;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using System.Net.Http;
 using static Lanstaller_Shared.SoftwareClass;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Lanstaller
 {
@@ -609,8 +610,79 @@ namespace Lanstaller
 
         void UpdateInstallOptions()
         {
+            //Only show relevant options for installation.
+            int fil_ops = 0;
+            int reg_ops = 0;
+            int sht_ops = 0;
+            int usr_ops = 0;
+            int set_ops = 0;
+            int dis_ops = 0;
 
-            
+            foreach (ListViewItem lvi in lvSoftware.SelectedItems)
+            {
+                SoftwareInfo SI = SList[lvi.Index];
+                fil_ops += SI.file_count;
+                reg_ops += SI.registry_count;
+                sht_ops += SI.shortcut_count;
+                usr_ops += SI.preference_count;
+                set_ops += SI.firewall_count;
+                dis_ops += SI.redist_count;
+            }
+
+            if (fil_ops == 0)
+            {
+                CVis(chkFiles, false);
+            }
+            else
+            {
+                CVis(chkFiles,true);
+            }
+            if (reg_ops == 0)
+            {
+                CVis(chkRegistry,false);
+            }
+            else
+            {
+                CVis(chkRegistry,true);
+            }
+            if (sht_ops == 0)
+            {
+                CVis(chkShortcuts,false);
+            }
+            else
+            {
+                CVis(chkShortcuts,true);
+            }
+            if (usr_ops == 0)
+            {
+                CVis(chkPreferences, false);
+            }
+            else
+            {
+                CVis(chkPreferences,true);
+            }
+            if (set_ops == 0)
+            {
+                CVis(chkWindowsSettings,false);
+            }
+            else
+            {
+                CVis(chkWindowsSettings,true);
+            }
+            if (dis_ops == 0)
+            {
+                CVis(chkRedist,false);
+            }
+            else
+            {
+                CVis(chkRedist,true);
+            }
+        }
+
+        void CVis(Control _control,bool State)
+        {
+            _control.Enabled = State;
+            _control.Visible = State;
         }
 
 
