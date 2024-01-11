@@ -22,6 +22,8 @@ namespace Lanstaller_Management_Console
     {
         List<SoftwareClass.SoftwareInfo> SoftwareList = new List<SoftwareClass.SoftwareInfo>();
         SoftwareClass.SoftwareInfo CurrentSelectedSoftware;
+        
+        List<SoftwareClass.Redistributable> RedistList = new List<SoftwareClass.Redistributable>();
 
         //static string status = "Status: Ready";
 
@@ -176,10 +178,38 @@ namespace Lanstaller_Management_Console
             ShortcutsPanel.txtName.TextChanged += new System.EventHandler(this.txtName_TextChanged);
 
 
+            //Windows:
             //Firewall
             WindowsSettingsPanel.btnFirewallRuleAdd.Click += new System.EventHandler(this.btnFirewallRuleAdd_Click);
             WindowsSettingsPanel.txtFirewallPath.TextChanged += new System.EventHandler(this.txtFirewallPath_TextChanged);
 
+            //Redist
+            LoadRedist();
+            WindowsSettingsPanel.btnAddRedist.Click += new System.EventHandler(this.btnAddRedist_Click);
+
+
+
+        }
+
+
+       void LoadRedist()
+        {
+            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
+            SQLCmd.CommandText = "SELECT ID,Name FROM [tblRedist]";
+
+            SQLConn.Open();
+            SqlDataReader SR = SQLCmd.ExecuteReader();
+            while (SR.Read())
+            {
+                SoftwareClass.Redistributable RED = new SoftwareClass.Redistributable();
+                RED.id = (int)SR[0];
+                RED.name = SR[1].ToString();
+                RedistList.Add(RED);
+                WindowsSettingsPanel.cmbxRedist.Items.Add(RED.name);
+            }
+            SQLConn.Close();
 
         }
 
@@ -200,6 +230,9 @@ namespace Lanstaller_Management_Console
 
                 lvSoftware.Items.Add(lvi);
             }
+
+            
+
         }
        
 
@@ -618,13 +651,25 @@ namespace Lanstaller_Management_Console
         }
 
 
+        private void btnAddRedist_Click(object sender,EventArgs e)
+        {
+            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
+
+            SQLCmd.CommandText = "INSERT into tblRedistUsage ([redist_id],[software_id]) VALUES (@redistid,@softwareid)";
+            SQLConn.Open();
+            SQLCmd.Parameters.AddWithValue("@redistid", RedistList[WindowsSettingsPanel.cmbxRedist.SelectedIndex].id);
+            SQLCmd.Parameters.AddWithValue("@softwareid", CurrentSelectedSoftware.id);
+            SQLCmd.ExecuteNonQuery();
+
+            SQLConn.Close();
+        }
 
 
         private void btnAddSerial_Click(object sender, EventArgs e)
         {
-            string filtered_serial = SoftwareClass.SerialNumber.FilterSerial(SerialPanel.txtSerialName.Text);
-            SerialPanel.txtSerialName.Text = filtered_serial;
-            SoftwareClass.AddSerial(filtered_serial, int.Parse(SerialPanel.txtSerialInstance.Text), CurrentSelectedSoftware.id, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text, SerialPanel.txtFormat.Text);
+            SoftwareClass.AddSerial(SerialPanel.txtSerialName.Text, int.Parse(SerialPanel.txtSerialInstance.Text), CurrentSelectedSoftware.id, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text, SerialPanel.txtFormat.Text);
         }
 
         private void txtSerialName_TextChanged(object sender, EventArgs e)
@@ -639,7 +684,7 @@ namespace Lanstaller_Management_Console
             SerialPanel.btnAddUserSerial.Enabled = false;
             SerialPanel.btnDelUserSerial.Enabled = false;
             serialid_pool_selected = 0;
-            if (SerialPanel.cmbxSerialPoolInstance.SelectedIndex == 1) return; //No serials to select for software, exit.
+            if (SerialPanel.cmbxSerialPoolInstance.SelectedIndex == -1) return; //No serials to select for software, exit.
 
             //Load serial list for selected serial.
             int instance_index = SerialPanel.cmbxSerialPoolInstance.SelectedIndex;
@@ -673,6 +718,7 @@ namespace Lanstaller_Management_Console
             SoftwareClass.UserSerial.AddAvailableSerial(serialid_pool_selected, serial_value);
             SerialPanel.txtUserSerial.Text = serial_value;
             RefreshSerialPoolList();
+            SerialPanel.txtUserSerial.Text = string.Empty;
         }                    
 
         private void btnDelUserSerial_Click(object sender, EventArgs e)
@@ -728,13 +774,25 @@ namespace Lanstaller_Management_Console
 
         void GenerateFileHash()
         {
-            if (MessageBox.Show("Also verify existing hashes?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            int scanid = 0;
+            if (MessageBox.Show("All software?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.No)
             {
-                SoftwareClass.RescanFileHashes(true,CurrentSelectedSoftware.id);
+                if (CurrentSelectedSoftware == null)
+                {
+                    MessageBox.Show("No software selected.");
+                    return;
+                }
+                scanid = CurrentSelectedSoftware.id;
+            }
+
+
+            if(MessageBox.Show("Also verify existing hashes?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                SoftwareClass.RescanFileHashes(true,scanid);
             }
             else
             {
-                SoftwareClass.RescanFileHashes(false, CurrentSelectedSoftware.id);
+                SoftwareClass.RescanFileHashes(false, scanid);
             }
 
             FilesPanel.lblCopyActionInfo.Invoke((MethodInvoker)delegate {
@@ -801,6 +859,10 @@ namespace Lanstaller_Management_Console
                 SerialPanel.cmbxSerialPoolInstance.Items.Add(SN.name);
             }
 
+            foreach(SoftwareClass.Redistributable RS in SoftwareClass.GetRedistributables(CurrentSelectedSoftware.id))
+            {
+                WindowsSettingsPanel.cmbxRedist.Items.Add(RS.name);
+            }
         }
     }
 }

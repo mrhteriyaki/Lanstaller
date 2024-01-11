@@ -74,16 +74,16 @@
             // 
             // txtData
             // 
-            this.txtData.Location = new System.Drawing.Point(65, 97);
+            this.txtData.Location = new System.Drawing.Point(124, 96);
             this.txtData.Name = "txtData";
-            this.txtData.Size = new System.Drawing.Size(150, 20);
+            this.txtData.Size = new System.Drawing.Size(178, 20);
             this.txtData.TabIndex = 9;
             // 
             // txtValue
             // 
-            this.txtValue.Location = new System.Drawing.Point(65, 70);
+            this.txtValue.Location = new System.Drawing.Point(79, 70);
             this.txtValue.Name = "txtValue";
-            this.txtValue.Size = new System.Drawing.Size(237, 20);
+            this.txtValue.Size = new System.Drawing.Size(223, 20);
             this.txtValue.TabIndex = 8;
             // 
             // txtKey
@@ -99,7 +99,7 @@
             this.cmbxType.Items.AddRange(new object[] {
             "STRING",
             "DWORD"});
-            this.cmbxType.Location = new System.Drawing.Point(65, 121);
+            this.cmbxType.Location = new System.Drawing.Point(152, 122);
             this.cmbxType.Name = "cmbxType";
             this.cmbxType.Size = new System.Drawing.Size(150, 21);
             this.cmbxType.TabIndex = 6;
@@ -107,7 +107,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(25, 124);
+            this.label9.Location = new System.Drawing.Point(112, 125);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(34, 13);
             this.label9.TabIndex = 5;
@@ -116,20 +116,20 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(25, 100);
+            this.label8.Location = new System.Drawing.Point(0, 99);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(33, 13);
+            this.label8.Size = new System.Drawing.Size(118, 13);
             this.label8.TabIndex = 4;
-            this.label8.Text = "Data:";
+            this.label8.Text = "Data (DEC for Dwords):";
             // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(22, 73);
+            this.label7.Location = new System.Drawing.Point(0, 73);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(37, 13);
+            this.label7.Size = new System.Drawing.Size(73, 13);
             this.label7.TabIndex = 3;
-            this.label7.Text = "Value:";
+            this.label7.Text = "Name / Value";
             // 
             // label6
             // 
@@ -143,7 +143,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 20);
+            this.label5.Location = new System.Drawing.Point(69, 16);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(53, 13);
             this.label5.TabIndex = 1;
@@ -156,7 +156,7 @@
             "HKEY_LOCAL_MACHINE",
             "HKEY_CURRENT_USER",
             "HKEY_USERS"});
-            this.cmbxHiveKey.Location = new System.Drawing.Point(65, 17);
+            this.cmbxHiveKey.Location = new System.Drawing.Point(128, 13);
             this.cmbxHiveKey.Name = "cmbxHiveKey";
             this.cmbxHiveKey.Size = new System.Drawing.Size(174, 21);
             this.cmbxHiveKey.TabIndex = 0;

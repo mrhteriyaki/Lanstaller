@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtFormat = new System.Windows.Forms.TextBox();
             this.label21 = new System.Windows.Forms.Label();
             this.txtRegVal = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();
@@ -46,8 +48,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.txtUserSerial = new System.Windows.Forms.TextBox();
             this.btnAddUserSerial = new System.Windows.Forms.Button();
-            this.txtFormat = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.groupBox5.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -71,6 +71,22 @@
             this.groupBox5.TabIndex = 12;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "Serial Numbers";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(74, 44);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(42, 13);
+            this.label3.TabIndex = 26;
+            this.label3.Text = "Format:";
+            // 
+            // txtFormat
+            // 
+            this.txtFormat.Location = new System.Drawing.Point(118, 41);
+            this.txtFormat.Name = "txtFormat";
+            this.txtFormat.Size = new System.Drawing.Size(224, 20);
+            this.txtFormat.TabIndex = 25;
             // 
             // label21
             // 
@@ -204,6 +220,7 @@
             this.btnDelUserSerial.TabIndex = 28;
             this.btnDelUserSerial.Text = "Delete";
             this.btnDelUserSerial.UseVisualStyleBackColor = true;
+            this.btnDelUserSerial.Click += new System.EventHandler(this.btnDelUserSerial_Click);
             // 
             // label1
             // 
@@ -232,22 +249,6 @@
             this.btnAddUserSerial.Text = "Add";
             this.btnAddUserSerial.UseVisualStyleBackColor = true;
             this.btnAddUserSerial.Click += new System.EventHandler(this.btnAddUserSerial_Click);
-            // 
-            // txtFormat
-            // 
-            this.txtFormat.Location = new System.Drawing.Point(118, 41);
-            this.txtFormat.Name = "txtFormat";
-            this.txtFormat.Size = new System.Drawing.Size(224, 20);
-            this.txtFormat.TabIndex = 25;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(74, 44);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(42, 13);
-            this.label3.TabIndex = 26;
-            this.label3.Text = "Format:";
             // 
             // Serial
             // 

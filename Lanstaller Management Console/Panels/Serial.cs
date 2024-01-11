@@ -48,5 +48,10 @@ namespace Lanstaller_Management_Console.Panels
         {
 
         }
+
+        private void btnDelUserSerial_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -125,7 +125,7 @@ namespace Lanstaller_Management_Console
             this.lvSoftware.HideSelection = false;
             this.lvSoftware.Location = new System.Drawing.Point(8, 68);
             this.lvSoftware.Name = "lvSoftware";
-            this.lvSoftware.Size = new System.Drawing.Size(570, 606);
+            this.lvSoftware.Size = new System.Drawing.Size(570, 623);
             this.lvSoftware.TabIndex = 27;
             this.lvSoftware.UseCompatibleStateImageBehavior = false;
             this.lvSoftware.View = System.Windows.Forms.View.Details;
@@ -135,7 +135,7 @@ namespace Lanstaller_Management_Console
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1345, 686);
+            this.ClientSize = new System.Drawing.Size(1349, 703);
             this.Controls.Add(this.lvSoftware);
             this.Controls.Add(this.btnSecurity);
             this.Controls.Add(this.btnRemove);

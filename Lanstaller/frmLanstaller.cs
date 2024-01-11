@@ -26,7 +26,7 @@ namespace Lanstaller
 
     public partial class frmLanstaller : Form
     {
-        Double Version = 0.21; //Increment Version in tblSystem when changed.
+        Double Version = 0.22; //Increment Version in tblSystem when changed.
 
         ConcurrentQueue<ClientSoftwareClass> InstallQueue = new ConcurrentQueue<ClientSoftwareClass>();
 
@@ -164,9 +164,7 @@ namespace Lanstaller
             //Direct to database.
             //SList = SoftwareClass.LoadSoftware();
 
-
             lvSoftware.Items.Clear();
-
 
             string tmpImages = Path.GetTempPath() + "Lanstaller\\Images";
             if (!Directory.Exists(tmpImages))
@@ -174,12 +172,13 @@ namespace Lanstaller
                 Directory.CreateDirectory(tmpImages);
             }
 
-
             //Get a file server path.
             SoftwareClass.Server FileServer = APIClient.GetFileServerFromAPI();
 
-            //Load from web api.
+            //Load Software list from web api.
             SList = APIClient.GetSoftwareListFromAPI();
+
+            //Load Icons.
             ImageList SmallImageList = new ImageList();
             lvSoftware.SmallImageList = SmallImageList;
             foreach (SoftwareClass.SoftwareInfo SWI in SList)
@@ -753,6 +752,11 @@ namespace Lanstaller
         private void pbBottomright_MouseUp(object sender, MouseEventArgs e)
         {
             isResizing = false;
+        }
+
+        private void btnMin_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
         }
     }
 }

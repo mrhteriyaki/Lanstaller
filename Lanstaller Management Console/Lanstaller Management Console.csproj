@@ -104,11 +104,11 @@
     <Compile Include="Panels\Shortcuts.Designer.cs">
       <DependentUpon>Shortcuts.cs</DependentUpon>
     </Compile>
-    <Compile Include="Panels\Windows Settings.cs">
+    <Compile Include="Panels\Windows.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Panels\Windows Settings.Designer.cs">
-      <DependentUpon>Windows Settings.cs</DependentUpon>
+    <Compile Include="Panels\Windows.Designer.cs">
+      <DependentUpon>Windows.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -133,8 +133,8 @@
     <EmbeddedResource Include="Panels\Shortcuts.resx">
       <DependentUpon>Shortcuts.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Panels\Windows Settings.resx">
-      <DependentUpon>Windows Settings.cs</DependentUpon>
+    <EmbeddedResource Include="Panels\Windows.resx">
+      <DependentUpon>Windows.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

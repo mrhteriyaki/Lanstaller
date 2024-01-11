@@ -17,6 +17,7 @@ using Lanstaller_Shared;
 using static Lanstaller.Classes.APIClient;
 using System.Drawing;
 using System.Diagnostics.Eventing.Reader;
+using Microsoft.VisualBasic;
 
 namespace Lanstaller
 {
@@ -277,7 +278,6 @@ namespace Lanstaller
 
             foreach (FirewallRule fwr in FirewallRuleList)
             {
-                string procpath = ReplaceVariable(fwr.exepath);
                 string rulename = fwr.rulename;
                 if (string.IsNullOrEmpty(rulename)) rulename = fwr.softwarename;
 
@@ -285,26 +285,100 @@ namespace Lanstaller
                 FWNetSHProc.StartInfo.Arguments = "advfirewall firewall show rule name=\"" + rulename + "\" verbose";
                 FWNetSHProc.Start();
                 
-                bool rule_required = true;
+                //Get existing firewall rules.
+                List<FirewallRule> existingFWList = new List<FirewallRule>();
                 while (!FWNetSHProc.StandardOutput.EndOfStream)
                 {
                     string line = FWNetSHProc.StandardOutput.ReadLine();
-                    if (line.StartsWith("Program:"))
+                    if (line.StartsWith("Enabled:"))
+                    {
+                        existingFWList.Add(new FirewallRule());
+                        existingFWList[existingFWList.Count - 1].enabled = false;
+                        if (line.EndsWith("Yes"))
+                        {
+                            existingFWList[existingFWList.Count - 1].enabled = true;
+                        }
+                    }
+                    else if (line.StartsWith("Program:"))
                     {
                         string program_path = line.Substring(8).Trim();
-                        if (program_path.Equals(procpath))
+                        existingFWList[existingFWList.Count - 1].exepath = program_path;
+                    }
+                    else if (line.StartsWith("Direction:"))
+                    {
+                        existingFWList[existingFWList.Count - 1].direction = false;
+                        if (line.EndsWith("In"))
                         {
-                            //Founding matching rule name and path - skip adding rule.
-                            rule_required = false;
+                            existingFWList[existingFWList.Count - 1].direction = true;
+                        }
+                    }
+                    else if (line.StartsWith("LocalPort:"))
+                    {
+                        if (!line.EndsWith("Any"))
+                        {
+                            existingFWList[existingFWList.Count - 1].port_number = int.Parse(line.Substring(11).Trim());
+                        }
+                    }
+                    else if (line.StartsWith("Protocol:"))
+                    {
+                        existingFWList[existingFWList.Count - 1].protocol_value = 0;
+                        if (line.EndsWith("TCP"))
+                        {
+                            existingFWList[existingFWList.Count - 1].protocol_value = 6;
+                        }
+                        else if (line.EndsWith("UDP"))
+                        {
+                            existingFWList[existingFWList.Count - 1].protocol_value = 17;
+                        }
+                    }
+                    else if (line.StartsWith("Action:"))
+                    {
+                        existingFWList[existingFWList.Count - 1].action = false;
+                        if (line.EndsWith("Allow"))
+                        {
+                            existingFWList[existingFWList.Count - 1].action = true;
+                        }
+                    }
+                }
+
+                string procpath = ReplaceVariable(fwr.exepath);
+                bool rule_required = true;
+                //Check if any existing rule matches properties of requested.
+                foreach(FirewallRule EFW in existingFWList)
+                {
+                    if (EFW.enabled && EFW.action && EFW.direction) //skip disabled, blocked and outbound rules.
+                    {
+                        if (procpath.ToLower().Equals(procpath.ToLower())) //Process path matched.
+                        {
+                            if (EFW.protocol_value == fwr.protocol_value && EFW.port_number == fwr.port_number) //Port and IP Protocol matched.
+                            {
+                                rule_required = false;
+                                break;
+                            }
                         }
                     }
                 }
                 
                 
+                //Generates firewall rule using netsh, eg:
                 //netsh advfirewall firewall add rule name="My Application" dir=in action=allow program="C:\games\The Call of Duty\CoDMP.exe" enable=yes
                 if (rule_required)
                 {
-                    FWNetSHProc.StartInfo.Arguments = "advfirewall firewall add rule name=\"" + rulename + "\" dir=in action=allow program=\"" + procpath + "\" enable=yes";
+                    string protocol_str = String.Empty;
+                    if (fwr.protocol_value == 6) //IP Protocol value for TCP
+                    {
+                        protocol_str = " protocol=tcp";
+                    }else if (fwr.protocol_value == 17) //IP Protocol value for UDP
+                    {
+                        protocol_str = " protocol=udp";
+                    }
+                    string port_str = String.Empty;
+                    if (fwr.port_number > 0)
+                    {
+                        port_str = " localport=" + fwr.port_number.ToString();
+                    }
+
+                    FWNetSHProc.StartInfo.Arguments = "advfirewall firewall add rule name=\"" + rulename + "\" dir=in action=allow" + protocol_str + port_str + " program=\"" + procpath + "\" enable=yes";
                     FWNetSHProc.Start();
                 }
                 
@@ -638,6 +712,7 @@ namespace Lanstaller
                     Registry.Users.CreateSubKey(REGOP.subkey, true);
                     HKEY = Registry.Users.OpenSubKey(REGOP.subkey, true);
                 }
+
                 if ((RegistryValueKind)REGOP.regtype == RegistryValueKind.String || (RegistryValueKind)REGOP.regtype == RegistryValueKind.ExpandString)
                 {
                     //Update data with variable for string.
@@ -646,7 +721,16 @@ namespace Lanstaller
                     //Update data with serials.
                     REGOP.data = ReplaceSerial(REGOP.data);
                 }
-                HKEY.SetValue(REGOP.value, REGOP.data, (RegistryValueKind)REGOP.regtype);
+                try
+                {
+                    HKEY.SetValue(REGOP.value, REGOP.data, (RegistryValueKind)REGOP.regtype);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error setting registry key " + REGOP.subkey + ":" + REGOP.value + "\n" + ex.ToString());
+                    
+                }
+                
             }
         }
 

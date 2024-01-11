@@ -21,5 +21,10 @@ namespace Lanstaller_Management_Console.Panels
         {
 
         }
+
+        private void btnAddRedist_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

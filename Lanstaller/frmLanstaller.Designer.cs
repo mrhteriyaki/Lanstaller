@@ -61,6 +61,7 @@ namespace Lanstaller
             this.tmrRefresh = new System.Windows.Forms.Timer(this.components);
             this.lvSoftware = new System.Windows.Forms.ListView();
             this.pbBottomright = new System.Windows.Forms.PictureBox();
+            this.btnMin = new System.Windows.Forms.Button();
             this.gbxActions.SuspendLayout();
             this.gbxPref.SuspendLayout();
             this.gbxStatus.SuspendLayout();
@@ -374,7 +375,7 @@ namespace Lanstaller
             this.pbTitle.InitialImage = null;
             this.pbTitle.Location = new System.Drawing.Point(8, 7);
             this.pbTitle.Name = "pbTitle";
-            this.pbTitle.Size = new System.Drawing.Size(791, 83);
+            this.pbTitle.Size = new System.Drawing.Size(748, 83);
             this.pbTitle.TabIndex = 7;
             this.pbTitle.TabStop = false;
             this.pbTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Caption_MouseDown);
@@ -430,12 +431,27 @@ namespace Lanstaller
             this.pbBottomright.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pbBottomright_MouseMove);
             this.pbBottomright.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pbBottomright_MouseUp);
             // 
+            // btnMin
+            // 
+            this.btnMin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMin.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnMin.ForeColor = System.Drawing.Color.White;
+            this.btnMin.Location = new System.Drawing.Point(762, 0);
+            this.btnMin.Name = "btnMin";
+            this.btnMin.Size = new System.Drawing.Size(30, 29);
+            this.btnMin.TabIndex = 23;
+            this.btnMin.Text = "_";
+            this.btnMin.UseVisualStyleBackColor = true;
+            this.btnMin.Click += new System.EventHandler(this.btnMin_Click);
+            // 
             // frmLanstaller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(823, 583);
+            this.Controls.Add(this.btnMin);
             this.Controls.Add(this.pbBottomright);
             this.Controls.Add(this.lvSoftware);
             this.Controls.Add(this.label4);
@@ -503,6 +519,7 @@ namespace Lanstaller
         private System.Windows.Forms.Timer tmrRefresh;
         private System.Windows.Forms.ListView lvSoftware;
         private System.Windows.Forms.PictureBox pbBottomright;
+        private System.Windows.Forms.Button btnMin;
     }
 }
 

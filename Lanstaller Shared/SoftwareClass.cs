@@ -136,6 +136,16 @@ namespace Lanstaller_Shared
             public string softwarename;
             public string exepath;
             public string rulename;
+            public int protocol_value = 0;
+            public int port_number = 0;
+
+            //Only netsh usage, possible expanded future use.
+            public bool enabled;
+            public bool direction; //true = in.
+            public string localip;
+            public string remoteip;
+            public int remoteport = 0;
+            public bool action; //true = allow.
         }
 
         public class PreferenceOperation
@@ -147,6 +157,7 @@ namespace Lanstaller_Shared
 
         public class Redistributable
         {
+            public int id;
             public string name;
             public string path;
             public string filecheck;
@@ -671,7 +682,7 @@ namespace Lanstaller_Shared
 
             FirewallRuleList.Clear(); //Reset list.
 
-            string QueryString = "select [filepath],[rulename] from tblFirewallExceptions WHERE software_id = @softwareid";
+            string QueryString = "select [filepath],[rulename],[proto_scope],[port_scope] from tblFirewallExceptions WHERE software_id = @softwareid";
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
@@ -683,6 +694,14 @@ namespace Lanstaller_Shared
                 rule.softwarename = softwarename;
                 rule.exepath = SQLOutput[0].ToString();
                 rule.rulename = SQLOutput[1].ToString();
+                if (SQLOutput[2] != DBNull.Value)
+                {
+                    rule.protocol_value = (int)SQLOutput[2];
+                }
+                if (SQLOutput[3] != DBNull.Value)
+                {
+                    rule.port_number = (int)SQLOutput[3];
+                }
                 FirewallRuleList.Add(rule);
             }
             SQLConn.Close();
@@ -855,6 +874,7 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
+       
         public static void AddRegistry(int softwareid, int hkey, string subkey, string value, int regtype, string data)
         {
             string QueryString = "INSERT into tblRegistry ([hkey],[subkey],[value],[type],[data],[software_id]) VALUES (@hkey,@subkey,@value,@type,@data,@softwareid)";
@@ -918,11 +938,26 @@ namespace Lanstaller_Shared
         public static void RescanFileHashes(bool fullrescan, int software_id)
         {
             Server SA = GetFileServer("smb");
+            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
 
-            string QueryString = "SELECT [id],[source],[hash_md5] from tblFiles WHERE software_id = @swid";
+            string QueryString = "SELECT [id],[source],[hash_md5] from tblFiles ";
+            if (software_id != 0)
+            {
+                QueryString += "WHERE software_id = @swid";
+            }
+
             if (fullrescan == false)
             {
-                QueryString += " AND [hash_md5] is null";
+                if (software_id == 0)
+                {
+                    QueryString += " WHERE [hash_md5] is null";
+                }
+                else
+                {
+                    QueryString += " AND [hash_md5] is null";
+                }              
             }
             else
             {
@@ -930,10 +965,14 @@ namespace Lanstaller_Shared
                 QueryString += "; UPDATE tblFiles SET [hash_md5] = NULL WHERE software_id = @swid"; 
             }
 
-            SqlConnection SQLConn = new SqlConnection(ConnectionString);
+
+            SQLCmd.CommandText = QueryString;
             SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-            SQLCmd.Parameters.AddWithValue("@swid", software_id);
+            if (software_id > 0)
+            {
+                SQLCmd.Parameters.AddWithValue("@swid", software_id);
+            }
+
             SqlDataReader SR = SQLCmd.ExecuteReader();
 
             List<FileInfoClass> FileHashList = new List<FileInfoClass>();

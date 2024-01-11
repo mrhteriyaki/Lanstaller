@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Lanstaller.Updater
 {
@@ -22,7 +23,7 @@ namespace Lanstaller.Updater
 
             serveraddr = args[0].ToString() + "StaticFiles/";
 
-            //Download Update.
+            //Shutdown any open Lanstaller.
             Process LSTKill = new Process();
             LSTKill.StartInfo.FileName = "C:\\Windows\\System32\\taskkill.exe";
             LSTKill.StartInfo.Arguments = "/f /im Lanstaller.exe";
@@ -31,12 +32,40 @@ namespace Lanstaller.Updater
 
             Thread.Sleep(200);
 
-            DF("Lanstaller.exe");
-            DF("Lanstaller Shared.dll");
-            DF("Newtonsoft.Json.dll");
-            DF("Pri.LongPath.dll");
-            DF("7z.exe");
-            DF("7z.dll");
+            //Files to download and replace.
+            List<string> FileList = new List<string>();
+            FileList.Add("Lanstaller.exe");
+            FileList.Add("Lanstaller Shared.dll");
+            FileList.Add("Newtonsoft.Json.dll");
+            FileList.Add("Pri.LongPath.dll");
+            FileList.Add("7z.exe");
+            FileList.Add("7z.dll");
+
+            foreach(string file in FileList)
+            {
+                File.Move(file, file + ".bak"); //Backup files.
+            }
+
+            foreach (string file in FileList)
+            {
+                try
+                {
+                    DF(file); //Download files.
+                }
+                catch(Exception ex)
+                {
+                    //Restore files - delete any already downloaded.
+                    foreach(string file2 in FileList)
+                    {
+                        if (File.Exists(file2))
+                        {
+                            File.Delete(file2);
+                        }
+                        File.Move(file2 + ".bak", file2); //restore backup.
+                    }
+                    break;
+                }
+            }
 
 
             //Launch.
