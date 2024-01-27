@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
@@ -19,6 +18,9 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using System.Net.Http;
 using static Lanstaller_Shared.SoftwareClass;
 using System.Runtime.InteropServices.ComTypes;
+using Pri.LongPath;
+using System.Reflection;
+using static Lanstaller.Classes.LocalDatabase;
 
 namespace Lanstaller
 {
@@ -26,13 +28,14 @@ namespace Lanstaller
 
     public partial class frmLanstaller : Form
     {
-        Double Version = 0.22; //Increment Version in tblSystem when changed.
+        static readonly Double Version = 0.22; //Increment Version in tblSystem when changed.
+        readonly static string LanstallerDataDir = "C:\\ProgramData\\Lanstaller\\";
+        LocalDatabase LocalDB;
 
         ConcurrentQueue<ClientSoftwareClass> InstallQueue = new ConcurrentQueue<ClientSoftwareClass>();
 
         List<int> InstallQueueIDs = new List<int>();
         private static object lock_InstallQueueIDs = new object();
-
 
         List<ClientSoftwareClass.SoftwareInfo> SList; //List of Software.
 
@@ -40,61 +43,92 @@ namespace Lanstaller
         Thread CThread; //Chat Thread
         Thread InsTrd; //installer thread.
 
-        bool shutdown = false;
-        bool InstallThreadRunning = false;
+        static bool install_option = true;
+        static bool shutdown = false;
+        static bool InstallThreadRunning = false;
         private static object lock_InstallThreadRunning = new object();
 
-        Size StartSize;
+        Size WindowStartSize;
+
+        List<ShortcutOperation> currentSoftwareShortcuts;
+
 
         public frmLanstaller()
         {
             InitializeComponent();
         }
 
-        bool CheckResources()
+        void CheckCoreFilesExist()
         {
-            if (!CheckFile("7z.exe")) return false;
-            if (!CheckFile("7z.dll")) return false;
-            if (!CheckFile("Lanstaller Shared.dll")) return false;
-            if (!CheckFile("Newtonsoft.Json.dll")) return false;
-            if (!CheckFile("Pri.LongPath.dll")) return false;
-            return true;
-        }
+            string[] core_files = {
+                "7z.exe",
+                "7z.dll",
+                "Lanstaller Shared.dll",
+                "Newtonsoft.Json.dll",
+                "Pri.LongPath.dll"
+            };
 
-        bool CheckFile(string cfpath)
-        {
-            //Check if file exists, return false if not.
-            if (!System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + cfpath))
+            foreach (string cfile in core_files)
             {
-                MessageBox.Show("Missing resource file: " + cfpath);
-                return false;
+                if (!System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + cfile))
+                {
+                    MessageBox.Show("Missing resource file: " + cfile);
+                    Application.Exit();
+                }
             }
-            return true;
         }
-
 
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
-            if (!CheckResources())
-            {
-                //Missing files, exit.
-                Application.Exit();
-                return;
-            }
+            CheckCoreFilesExist();
+            WindowStartSize = this.Size;
+            LoadConfigFile();
+            ClientUpdateCheck();
+            SetupThreads();
 
-            //Load Config File.
+            //Get list of installed programs - future use to skip redist.
+            //WindowsInstallerClass.CheckProgram();
+
+            LoadClientSettings();
+            InitialFormSetup();
+            LoadSoftwareList();
+        }
+
+        void InitialFormSetup()
+        {
+            lblSpaceRequired.Text = "";
+            gbxStatus.Visible = false;
+            lvSoftware.View = View.Details;
+            lvSoftware.HeaderStyle = ColumnHeaderStyle.None;
+            lvSoftware.FullRowSelect = true;
+            lvSoftware.Columns.Add("Name", 275);
+        }
+
+
+        void SetupThreads()
+        {
+            MThread = new Thread(StatusMonitorThread);
+            MThread.Name = "Status Monitor";
+            MThread.Start();
+
+            CThread = new Thread(ChatThread);
+            CThread.Name = "Chat Thread";
+            CThread.Start();
+        }
+
+        void LoadConfigFile()
+        {
             if (!File.Exists("config.ini"))
             {
                 //Generate Config File if missing.
                 frmConfigInput CI = new frmConfigInput();
                 CI.ShowDialog();
             }
-
-            //Check if config file exists.
-            if (!File.Exists("config.ini")) Application.Exit();
-
-
-            //Load Config.
+            if (!File.Exists("config.ini"))
+            {
+                MessageBox.Show("Config File Missing.");
+                Application.Exit();
+            }
             foreach (string line in System.IO.File.ReadAllLines("config.ini"))
             {
                 if (line.StartsWith("authkey="))
@@ -115,98 +149,69 @@ namespace Lanstaller
                     ChatClient.ChatServer = APIClient.APIServer;
                 }
             }
+        }
 
-            //Record original window size.
-            StartSize = this.Size;
-
-            //Init threads.
-            MThread = new Thread(StatusMonitorThread);
-            MThread.Name = "Status Monitor";
-            CThread = new Thread(ChatThread);
-            CThread.Name = "Chat Thread";
-
-
-            //Check Server Version against local client.
-            VersionCheck();
-
-            //Set initial status.
-            lblSpaceRequired.Text = "";
-            //Hide status box.
-            gbxStatus.Visible = false;
-
-            //Get list of installed programs.
-            WindowsInstallerClass.CheckProgram();
-
-
-            //Lanstaller Settings
-            LanstallerSettings.GetSettings(); //Refresh settings from Registry.
-            txtInstallDirectory.Text = LanstallerSettings.InstallDirectory;
-            txtUsername.Text = LanstallerSettings.Username;
-            txtWidth.Text = LanstallerSettings.ScreenWidth.ToString();
-            txtHeight.Text = LanstallerSettings.ScreenHeight.ToString();
-
-            //Load software list from Server.
-            lvSoftware.View = View.Details;
-            lvSoftware.HeaderStyle = ColumnHeaderStyle.None;
-            lvSoftware.FullRowSelect = true;
-            lvSoftware.Columns.Add("Name", 275);
-            LoadSoftwareList();
-
-            //Start installation progress bar thread.
-            MThread.Start();
-
-            //Start Chat thread.
-            CThread.Start(); //Disabled until code update.
+        void LoadClientSettings()
+        {
+            UserSettings.GetSettings(); //Refresh settings from Registry.
+            txtInstallDirectory.Text = UserSettings.InstallDirectory;
+            txtUsername.Text = UserSettings.Username;
+            txtWidth.Text = UserSettings.ScreenWidth.ToString();
+            txtHeight.Text = UserSettings.ScreenHeight.ToString();
         }
 
         void LoadSoftwareList()
         {
-            //Direct to database.
+            //For direct link to database.
             //SList = SoftwareClass.LoadSoftware();
 
-            lvSoftware.Items.Clear();
+            SList = APIClient.GetSoftwareListFromAPI();
+            Server FileServer = APIClient.GetFileServerFromAPI();
 
-            string tmpImages = Path.GetTempPath() + "Lanstaller\\Images";
-            if (!Directory.Exists(tmpImages))
+            string ImageDir = LanstallerDataDir + "Images";
+            if (!Directory.Exists(ImageDir))
             {
-                Directory.CreateDirectory(tmpImages);
+                Directory.CreateDirectory(ImageDir);
             }
 
-            //Get a file server path.
-            SoftwareClass.Server FileServer = APIClient.GetFileServerFromAPI();
+            //Load software already installed.
+            LocalDB = new LocalDatabase(LanstallerDataDir + "installed.json");
+            List<int> InstalledIDs = LocalDB.GetSoftwareIDs();
 
-            //Load Software list from web api.
-            SList = APIClient.GetSoftwareListFromAPI();
-
-            //Load Icons.
-            ImageList SmallImageList = new ImageList();
-            lvSoftware.SmallImageList = SmallImageList;
-            foreach (SoftwareClass.SoftwareInfo SWI in SList)
+            lvSoftware.SmallImageList = new ImageList();
+            foreach (SoftwareInfo SWI in SList)
             {
-                ListViewItem LVI;
+                ListViewItem LVI = new ListViewItem(SWI.Name);
+                lvSoftware.Items.Add(LVI);
+
                 if (!String.IsNullOrEmpty(SWI.image_small))
                 {
-                    LVI = new ListViewItem(SWI.Name, SmallImageList.Images.Count);
+                    LVI.ImageIndex = lvSoftware.SmallImageList.Images.Count;
                     string imgFilename = Path.GetFileName(SWI.image_small);
-                    string imgDst = tmpImages + "\\" + imgFilename;
+                    string imgDst = ImageDir + "\\" + imgFilename;
                     string imgSrc = FileServer.path + SWI.image_small;
-                    APIClient.DownloadFile(imgSrc, imgDst);
-                    SmallImageList.Images.Add(Image.FromFile(imgDst));
-
-                    //add caching here later if load speed is slow from images.
+                    if (!File.Exists(imgDst))
+                    {
+                        APIClient.DownloadFile(imgSrc, imgDst);
+                        //Will need cache invalidation in future for refresh / updates.
+                    }
+                    lvSoftware.SmallImageList.Images.Add(Image.FromFile(imgDst));
                 }
-                else
+
+                //Highlight installed items with White text.
+                LVI.ForeColor = Color.Gray;
+                foreach (int LSWID in InstalledIDs)
                 {
-                    LVI = new ListViewItem(SWI.Name);
+                    if (LSWID == SWI.id)
+                    {
+                        LVI.ForeColor = Color.White;
+                        break;
+                    }
                 }
-
-                lvSoftware.Items.Add(LVI);
             }
-
-
         }
 
-        void VersionCheck()
+        void ClientUpdateCheck()
         {
             try
             {
@@ -270,10 +275,8 @@ namespace Lanstaller
                 });
 
                 //Wait 100 ms before next update.
-                System.Threading.Thread.Sleep(100);
-
+                Thread.Sleep(100);
             }
-
         }
 
         long lastid = 0; //last message ID number.
@@ -326,71 +329,108 @@ namespace Lanstaller
             });
         }
 
+        private void lvSoftware_DoubleClick(object sender, EventArgs e)
+        {
+            SoftwareAction();
+        }
 
         private void btnInstall_Click(object sender, EventArgs e)
         {
-            InstallSelected();
+            SoftwareAction();
         }
 
-        void InstallSelected()
+        void SoftwareAction()
         {
-            foreach (ListViewItem sItm in lvSoftware.SelectedItems)
+            if (install_option)
             {
-                //Prepare install request.
-                ClientSoftwareClass InstallSW = new ClientSoftwareClass();
-                InstallSW.Identity = SList[sItm.Index];
-
-                //Check if already in queue.
-                lock (lock_InstallQueueIDs)
+                foreach (ListViewItem sItm in lvSoftware.SelectedItems)
                 {
-                    foreach (int qid in InstallQueueIDs)
-                    {
-                        if (InstallSW.Identity.id == qid)
-                        {
-                            MessageBox.Show("Installation already queued.");
-                            return; //skip installation.
-                        }
-
-                    }
-                    InstallQueueIDs.Add(InstallSW.Identity.id);
-                }
-
-                InstallSW.InstallDir = LanstallerSettings.InstallDirectory;
-                //Set current selections for installation.
-                InstallSW.installfiles = chkFiles.Checked;
-                InstallSW.installregistry = chkRegistry.Checked;
-                InstallSW.installshortcuts = chkShortcuts.Checked;
-                InstallSW.apply_windowssettings = chkWindowsSettings.Checked;
-                InstallSW.apply_preferences = chkPreferences.Checked;
-                InstallSW.install_redist = chkRedist.Checked;
-
-                //Get serial keys from user - may need to put on another thread to stop gui block.
-                if (InstallSW.installregistry) //Only request serials if registry checked.
-                {
-                    foreach (ClientSoftwareClass.SerialNumber SN in APIClient.GetSerialsListFromAPI(InstallSW.Identity.id))
-                    {
-                        InstallSW.SerialList.Add(SN);
-                    }
-                    ClientSoftwareClass.GenerateSerials(InstallSW.SerialList);
-                }
-
-
-                //Queue installation request.
-                InstallQueue.Enqueue(InstallSW);
-
-                //Start Installation thread if not running.
-                lock (lock_InstallThreadRunning)
-                {
-                    if (!InstallThreadRunning)
-                    {
-                        InstallThreadRunning = true;
-                        InsTrd = new Thread(InstallThread);
-                        InsTrd.Name = "Installer Thread";
-                        InsTrd.Start();
-                    }
+                    QueueInstall(sItm.Index);
                 }
             }
+            else
+            {
+                runSoftware();
+            }
+            
+        }
+        void runSoftware()
+        {
+            //need to Offer gui option to support multiple shortcuts.
 
+            if (currentSoftwareShortcuts.Count == 1)
+            {
+                runShortcut(0);    
+            }
+
+        }
+        void runShortcut(int index)
+        {
+
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.FileName = currentSoftwareShortcuts[index].filepath;
+            startInfo.WorkingDirectory = currentSoftwareShortcuts[index].runpath;
+            startInfo.Arguments = currentSoftwareShortcuts[index].arguments;
+            startInfo.UseShellExecute = true;
+            Process.Start(startInfo);
+
+        }
+
+
+
+        void QueueInstall(int SoftwareListIndex)
+        {
+            ClientSoftwareClass InstallSW = new ClientSoftwareClass();
+            InstallSW.Identity = SList[SoftwareListIndex];
+
+            //Check if already in queue.
+            lock (lock_InstallQueueIDs)
+            {
+                foreach (int qid in InstallQueueIDs)
+                {
+                    if (InstallSW.Identity.id == qid)
+                    {
+                        MessageBox.Show("Installation already queued.");
+                        return; //skip installation.
+                    }
+                }
+                InstallQueueIDs.Add(InstallSW.Identity.id);
+            }
+            lvSoftware.Items[SoftwareListIndex].Text = lvSoftware.Items[SoftwareListIndex].Text + " (Install Queued)";
+            lvSoftware.Items[SoftwareListIndex].ForeColor = Color.DarkGray;
+
+            InstallSW.InstallDir = UserSettings.InstallDirectory;
+            InstallSW.installfiles = chkFiles.Checked;
+            InstallSW.installregistry = chkRegistry.Checked;
+            InstallSW.installshortcuts = chkShortcuts.Checked;
+            InstallSW.apply_windowssettings = chkWindowsSettings.Checked;
+            InstallSW.apply_preferences = chkPreferences.Checked;
+            InstallSW.install_redist = chkRedist.Checked;
+
+            //Get serial keys from user - may need to put on another thread to stop gui block.
+            if (InstallSW.installregistry) //Only request serials if registry checked.
+            {
+                foreach (ClientSoftwareClass.SerialNumber SN in APIClient.GetSerialsListFromAPI(InstallSW.Identity.id))
+                {
+                    InstallSW.SerialList.Add(SN);
+                }
+                ClientSoftwareClass.GenerateSerials(InstallSW.SerialList);
+            }
+
+            //Queue installation request.
+            InstallQueue.Enqueue(InstallSW);
+
+            //Start Installation thread if not running.
+            lock (lock_InstallThreadRunning)
+            {
+                if (!InstallThreadRunning)
+                {
+                    InstallThreadRunning = true;
+                    InsTrd = new Thread(InstallThread);
+                    InsTrd.Name = "Installer Thread";
+                    InsTrd.Start();
+                }
+            }
         }
 
         void InstallThread()
@@ -406,21 +446,29 @@ namespace Lanstaller
                     //Enable progress bar.
                     this.BeginInvoke((MethodInvoker)(() => gbxStatus.Visible = true));
 
+                    int SListIndex = 0;
+                    foreach (SoftwareInfo SWI in SList)
+                    {
+                        if (SList[SListIndex].id == CSW.Identity.id)
+                        {
+                            this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CSW.Identity.Name + " (Installing)"));
+                            break;
+                        }
+                        SListIndex++;
+                    }
+
                     //Run Installation.
                     CSW.Install();
-
-                    //Disabled complete notification - swapping to queue system.
-                    /*
-                    frmComplete CF = new frmComplete();
-                    CF.TopMost = true;
-                    CF.FormBorderStyle = FormBorderStyle.None;
-                    CF.ShowDialog();
-                    */
 
                     lock (lock_InstallQueueIDs)
                     {
                         InstallQueueIDs.Remove(CSW.Identity.id);
                     }
+
+                    LocalDB.AddLocalInstall(CSW.Identity.id, CSW.GetShortcutOperations());
+                    this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CSW.Identity.Name));
+                    this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
+
                 }
             } //End of installer queue.
 
@@ -437,22 +485,22 @@ namespace Lanstaller
 
         private void txtInstallDirectory_TextChanged(object sender, EventArgs e)
         {
-            LanstallerSettings.SetInstallDirectory(txtInstallDirectory.Text);
+            UserSettings.SetInstallDirectory(txtInstallDirectory.Text);
         }
 
         private void txtWidth_TextChanged(object sender, EventArgs e)
         {
-            LanstallerSettings.SetWidth(int.Parse(txtWidth.Text));
+            UserSettings.SetWidth(int.Parse(txtWidth.Text));
         }
 
         private void txtHeight_TextChanged(object sender, EventArgs e)
         {
-            LanstallerSettings.SetHeight(int.Parse(txtHeight.Text));
+            UserSettings.SetHeight(int.Parse(txtHeight.Text));
         }
 
         private void txtUsername_TextChanged(object sender, EventArgs e)
         {
-            LanstallerSettings.SetUsername(txtUsername.Text);
+            UserSettings.SetUsername(txtUsername.Text);
         }
 
         private void frmLanstaller_Closing(object sender, FormClosingEventArgs e)
@@ -516,7 +564,7 @@ namespace Lanstaller
         [DllImportAttribute("user32.dll")]
         public static extern bool ReleaseCapture();
 
-        private void Caption_MouseDown(object sender, MouseEventArgs e)
+        private void Caption_MouseDown(object sender, MouseEventArgs e) //Used by MouseDown event on pictureboxes to move program window.
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -537,27 +585,27 @@ namespace Lanstaller
         {
             ControlPaint.DrawBorder(e.Graphics, this.ClientRectangle, Color.White, ButtonBorderStyle.Solid);
         }
-              
+
 
         private void tmrRefresh_Tick(object sender, EventArgs e)
         {
             //If game force shrinks window, reset to normal size.
 
-            if (this.Size.Width < StartSize.Width)
+            if (this.Size.Width < WindowStartSize.Width)
             {
-                int monwidth = System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Width;
-                if (monwidth > StartSize.Width)
+                int monwidth = SystemInformation.PrimaryMonitorSize.Width;
+                if (monwidth > WindowStartSize.Width)
                 {
-                    this.Width = StartSize.Width;
+                    this.Width = WindowStartSize.Width;
 
                 }
             }
-            if (this.Size.Height < StartSize.Height)
+            if (this.Size.Height < WindowStartSize.Height)
             {
-                int monheight = System.Windows.Forms.SystemInformation.PrimaryMonitorSize.Height;
-                if (monheight > StartSize.Height)
+                int monheight = SystemInformation.PrimaryMonitorSize.Height;
+                if (monheight > WindowStartSize.Height)
                 {
-                    this.Height = StartSize.Height;
+                    this.Height = WindowStartSize.Height;
                 }
             }
             this.Invalidate();
@@ -566,12 +614,10 @@ namespace Lanstaller
         private void lvSoftware_SelectedIndexChanged(object sender, EventArgs e)
         {
             UpdateInstallOptions();
+            CheckInstalled();
         }
 
-        private void lvSoftware_DoubleClick(object sender, EventArgs e)
-        {
-            InstallSelected();
-        }
+
 
 
         private void lvSoftware_MouseClick(object sender, MouseEventArgs e)
@@ -603,9 +649,26 @@ namespace Lanstaller
                     space_req_str = Math.Round(gbfilesize, 2).ToString() + "GB";
                 }
             }
-
             lblSpaceRequired.Text = "Space required: " + space_req_str;
         }
+
+
+        void CheckInstalled()
+        {
+            install_option = true;
+            btnInstall.Text = "Install";
+            if (lvSoftware.SelectedItems.Count == 1)
+            {
+                currentSoftwareShortcuts = LocalDB.GetShortcuts(SList[lvSoftware.SelectedItems[0].Index].id);
+                if (currentSoftwareShortcuts.Count > 0)
+                {          
+                    install_option = false;
+                    btnInstall.Text = "Run";
+                }
+            }
+        }
+        
+
 
         void UpdateInstallOptions()
         {
@@ -627,65 +690,74 @@ namespace Lanstaller
                 set_ops += SI.firewall_count;
                 dis_ops += SI.redist_count;
             }
-
+            active_chk = 0;
             if (fil_ops == 0)
             {
-                CVis(chkFiles, false);
+                CheckboxSet(chkFiles, false);
             }
             else
             {
-                CVis(chkFiles,true);
+                CheckboxSet(chkFiles, true);
             }
             if (reg_ops == 0)
             {
-                CVis(chkRegistry,false);
+                CheckboxSet(chkRegistry, false);
             }
             else
             {
-                CVis(chkRegistry,true);
+                CheckboxSet(chkRegistry, true);
             }
             if (sht_ops == 0)
             {
-                CVis(chkShortcuts,false);
+                CheckboxSet(chkShortcuts, false);
             }
             else
             {
-                CVis(chkShortcuts,true);
+                CheckboxSet(chkShortcuts, true);
             }
             if (usr_ops == 0)
             {
-                CVis(chkPreferences, false);
+                CheckboxSet(chkPreferences, false);
             }
             else
             {
-                CVis(chkPreferences,true);
+                CheckboxSet(chkPreferences, true);
             }
             if (set_ops == 0)
             {
-                CVis(chkWindowsSettings,false);
+                CheckboxSet(chkWindowsSettings, false);
             }
             else
             {
-                CVis(chkWindowsSettings,true);
+                CheckboxSet(chkWindowsSettings, true);
             }
             if (dis_ops == 0)
             {
-                CVis(chkRedist,false);
+                CheckboxSet(chkRedist, false);
             }
             else
             {
-                CVis(chkRedist,true);
+                CheckboxSet(chkRedist, true);
             }
+
+
+
+
+
         }
 
-        void CVis(Control _control,bool State)
+        int active_chk = 0;
+        const int chk_height = 0;
+        void CheckboxSet(Control _control, bool State)
         {
             _control.Enabled = State;
             _control.Visible = State;
+            if (State)
+            {
+                active_chk++;
+                _control.Location = new Point(_control.Location.X, (active_chk * 20));
+            }
         }
-
-
-
 
         private const int WM_NCHITTEST = 0x84;
         private const int HTCLIENT = 0x1;
@@ -758,5 +830,8 @@ namespace Lanstaller
         {
             this.WindowState = FormWindowState.Minimized;
         }
+
+
+
     }
 }

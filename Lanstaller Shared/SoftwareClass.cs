@@ -36,9 +36,7 @@ namespace Lanstaller_Shared
             public int firewall_count;
             public int preference_count;
             public int redist_count;
-
             public long install_size;
-
             public string image_small; //Icon Image for List.
         }
 
@@ -358,7 +356,6 @@ namespace Lanstaller_Shared
 
         public static Server GetFileServer(string servertype) //web or smb for type.
         {
-            //ServerList.Clear();
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
@@ -385,7 +382,6 @@ namespace Lanstaller_Shared
 
         public static string GetSoftwareName(int softwareid)
         {
-            //ServerList.Clear();
             string QueryString = "SELECT TOP(1) [name] FROM [tblSoftware] WHERE id = @sid";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
@@ -404,7 +400,6 @@ namespace Lanstaller_Shared
         public static List<FileCopyOperation> GetFiles(int SoftwareID)
         {
             List<FileCopyOperation> FileCopyList = new List<FileCopyOperation>();
-            //FileCopyList.Clear();
 
             string QueryString = "SELECT [id],[source],[destination],[filesize],[hash_md5] from tblFiles WHERE software_id = @softwareid ORDER BY filesize ASC";
 
@@ -623,13 +618,12 @@ namespace Lanstaller_Shared
         public static List<ShortcutOperation> GetShortcuts(int SoftwareID)
         {
             List<ShortcutOperation> ShortcutList = new List<ShortcutOperation>();
-            ShortcutList.Clear();
-
-            string QueryString = "SELECT [name],[location],[filepath],[runpath],[arguments],[icon] FROM [tblShortcut] WHERE software_id = @softwareid";
 
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
+            SQLCmd.CommandText = "SELECT [name],[location],[filepath],[runpath],[arguments],[icon] FROM [tblShortcut] WHERE software_id = @softwareid";
             SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
             while (SQLOutput.Read())
@@ -641,7 +635,6 @@ namespace Lanstaller_Shared
                 tScut.runpath = SQLOutput[3].ToString();
                 tScut.arguments = SQLOutput[4].ToString();
                 tScut.icon = SQLOutput[5].ToString();
-
                 ShortcutList.Add(tScut);
             }
             SQLConn.Close();
@@ -679,8 +672,6 @@ namespace Lanstaller_Shared
 
             //Software name used for Windows Firewall rule.
             string softwarename = GetSoftwareName(SoftwareID);
-
-            FirewallRuleList.Clear(); //Reset list.
 
             string QueryString = "select [filepath],[rulename],[proto_scope],[port_scope] from tblFirewallExceptions WHERE software_id = @softwareid";
             SqlConnection SQLConn = new SqlConnection(ConnectionString);

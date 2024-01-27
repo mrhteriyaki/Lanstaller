@@ -43,6 +43,12 @@ namespace Lanstaller
         public bool apply_preferences;
         public bool install_redist;
 
+        List<FileCopyOperation> FileCopyOperations;
+        List<RegistryOperation> RegistryOperations;
+        List<ShortcutOperation> ShortcutOperations;
+        List<FirewallRule> FirewallRules;
+        List<PreferenceOperation> PreferenceOperations;
+        List<Redistributable> Redistributables;
 
         public void Install()
         {
@@ -51,39 +57,37 @@ namespace Lanstaller
             if (installregistry)
             {
                 SetStatus("Applying Registry - " + Identity.Name);
-                List<RegistryOperation> RegistryList;
 
                 //DB
                 //RegistryList = GetRegistry(Identity.id);
-                
+
                 //Web
-                RegistryList = GetRegistryListFromAPI(Identity.id);
-                GenerateRegistry(RegistryList, SerialList);
+                RegistryOperations = GetRegistryListFromAPI(Identity.id);
+                GenerateRegistry(RegistryOperations, SerialList);
             }
 
 
             if (installfiles)
             {
                 SetStatus("Indexing - " + Identity.Name);
-                List<FileCopyOperation> FCL;
                 List<string> DirectoryList = new List<string>();
 
                 //DB
                 //FCL = GetFiles(Identity.id);
 
                 //Web
-                FCL = GetFilesListFromAPI(Identity.id);
-                
+                FileCopyOperations = GetFilesListFromAPI(Identity.id);
+
                 //Get Directories, split up all sub directory paths and add to generation list.
                 foreach (string Dir in GetDirectoriesFromAPI(Identity.id))
                 {
                     GetSubFolders(ReplaceVariable(Dir), DirectoryList);
                 }
 
-                foreach (FileCopyOperation FCO in FCL)
+                //Remove filename from path.
+                foreach (FileCopyOperation FCO in FileCopyOperations)
                 {
                     FCO.destination = ReplaceVariable(FCO.destination);
-                    //Remove filename from path.
                     string filedirectory = FCO.destination.Substring(0, FCO.destination.LastIndexOf("\\"));
                     GetSubFolders(filedirectory, DirectoryList);
                 }
@@ -92,72 +96,72 @@ namespace Lanstaller
                 InstallSize = Identity.install_size;
 
                 SetStatus("Copying Files - " + Identity.Name);
-                CopyFiles(FCL, DirectoryList);
+                CopyFiles(FileCopyOperations, DirectoryList);
             }
 
             if (installshortcuts)
             {
                 SetStatus("Generating Shortcuts - " + Identity.Name);
-                List<ShortcutOperation> SCO;
 
                 //DB
                 //SCO = GetShortcuts(Identity.id);
 
                 //WEB
-                SCO = GetShortcutListFromAPI(Identity.id);
-
-                GenerateShortcuts(SCO);
+                ShortcutOperations = GetShortcutListFromAPI(Identity.id);
+                foreach (ShortcutOperation SCO in ShortcutOperations)
+                {
+                    SCO.location = ReplaceVariable(SCO.location);
+                    SCO.filepath = ReplaceVariable(SCO.filepath);
+                    SCO.runpath = ReplaceVariable(SCO.runpath);
+                    SCO.arguments = ReplaceVariable(SCO.arguments);
+                    SCO.icon = ReplaceVariable(SCO.icon);
+                }
+                GenerateShortcuts(ShortcutOperations);
             }
 
             SetStatus(Identity.Name + Environment.NewLine + "Updating Windows Settings" + Environment.NewLine + "(Firewall Rules and Compatibility)");
             //Windows Settings (Firewall rules, Compatibility)
             if (apply_windowssettings)
             {
-                //Firewall
-                List<FirewallRule> FWL;
-                
+
                 //DB
                 //FWL = GetFirewallRules(Identity.id);
 
                 //WEB
-                FWL = GetFirewallRulesListFromAPI(Identity.id);
-                GenerateFirewallRules(FWL);
+                FirewallRules = GetFirewallRulesListFromAPI(Identity.id);
+                GenerateFirewallRules(FirewallRules);
 
                 //Compatibility.
                 List<Compatibility> CPL = GetCompatibilitiesFromAPI(Identity.id);
-                foreach(Compatibility CP in CPL)
+                foreach (Compatibility CP in CPL)
                 {
-                    GenerateCompatibility(CP.filename,CP.compat_type);
+                    GenerateCompatibility(CP.filename, CP.compat_type);
                 }
-                
+
             }
 
             SetStatus("Applying Preferences - " + Identity.Name);
             if (apply_preferences)
             {
-                List<PreferenceOperation> POList;
-                
+
                 //DB
                 //POList = GetPreferenceFiles(Identity.id);
-                
-                //WEB
-                POList = GetPreferencesListFromAPI(Identity.id);
 
-                GeneratePreferenceFiles(POList);
+                //WEB
+                PreferenceOperations = GetPreferencesListFromAPI(Identity.id);
+
+                GeneratePreferenceFiles(PreferenceOperations);
             }
 
             SetStatus("Installing Redistributables - " + Identity.Name);
             if (install_redist)
             {
-                List<Redistributable> RL;
-
                 //DB
                 //RL = GetRedistributables(Identity.id);
 
                 //WEB
-                RL = GetRedistributablesListFromAPI(Identity.id);
-
-                GenerateRedistributables(RL);
+                Redistributables = GetRedistributablesListFromAPI(Identity.id);
+                GenerateRedistributables(Redistributables);
             }
 
             SetStatus("Install Complete:" + Environment.NewLine + Identity.Name);
@@ -169,7 +173,7 @@ namespace Lanstaller
         {
             lock (_statuslock)
             {
-                status =  message.Replace("&", "&&");
+                status = message.Replace("&", "&&");
 
             }
         }
@@ -284,7 +288,7 @@ namespace Lanstaller
                 //Check if rule exists.
                 FWNetSHProc.StartInfo.Arguments = "advfirewall firewall show rule name=\"" + rulename + "\" verbose";
                 FWNetSHProc.Start();
-                
+
                 //Get existing firewall rules.
                 List<FirewallRule> existingFWList = new List<FirewallRule>();
                 while (!FWNetSHProc.StandardOutput.EndOfStream)
@@ -344,7 +348,7 @@ namespace Lanstaller
                 string procpath = ReplaceVariable(fwr.exepath);
                 bool rule_required = true;
                 //Check if any existing rule matches properties of requested.
-                foreach(FirewallRule EFW in existingFWList)
+                foreach (FirewallRule EFW in existingFWList)
                 {
                     if (EFW.enabled && EFW.action && EFW.direction) //skip disabled, blocked and outbound rules.
                     {
@@ -358,8 +362,8 @@ namespace Lanstaller
                         }
                     }
                 }
-                
-                
+
+
                 //Generates firewall rule using netsh, eg:
                 //netsh advfirewall firewall add rule name="My Application" dir=in action=allow program="C:\games\The Call of Duty\CoDMP.exe" enable=yes
                 if (rule_required)
@@ -368,7 +372,8 @@ namespace Lanstaller
                     if (fwr.protocol_value == 6) //IP Protocol value for TCP
                     {
                         protocol_str = " protocol=tcp";
-                    }else if (fwr.protocol_value == 17) //IP Protocol value for UDP
+                    }
+                    else if (fwr.protocol_value == 17) //IP Protocol value for UDP
                     {
                         protocol_str = " protocol=udp";
                     }
@@ -381,11 +386,11 @@ namespace Lanstaller
                     FWNetSHProc.StartInfo.Arguments = "advfirewall firewall add rule name=\"" + rulename + "\" dir=in action=allow" + protocol_str + port_str + " program=\"" + procpath + "\" enable=yes";
                     FWNetSHProc.Start();
                 }
-                
+
             }
         }
 
-       
+
 
         public void GenerateRedistributables(List<Redistributable> RedistributableList) //Incomplete.
         {
@@ -400,7 +405,7 @@ namespace Lanstaller
                     }
                 }
 
-                string temppath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp" ;              
+                string temppath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp";
                 string filename = Redist.path.Substring(Redist.path.Replace("\\", "/").LastIndexOf("/"));
                 string destpath = temppath + filename;
 
@@ -416,14 +421,14 @@ namespace Lanstaller
                 if (Redist.compressed == "0" || Redist.compressed == "") //Direct file, run.
                 {
                     RDProc.StartInfo.FileName = destpath;
-                    RDProc.StartInfo.Arguments = Redist.args;                 
+                    RDProc.StartInfo.Arguments = Redist.args;
                 }
                 else if (Redist.compressed == "1")
                 {
                     string extractpath = temppath + "\\" + Guid.NewGuid().ToString() + "\\";
                     Directory.CreateDirectory(extractpath);
-                   
-                   
+
+
                     //Extract.
                     Process SevenZipProc = new Process();
                     SevenZipProc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "7z.exe";
@@ -434,12 +439,12 @@ namespace Lanstaller
                         SevenZipProc.Start();
                         SevenZipProc.WaitForExit();
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         MessageBox.Show("Failed to extract redistributable: " + ex.ToString());
                         return;
                     }
-                    
+
                     try
                     {
                         //Run
@@ -489,16 +494,16 @@ namespace Lanstaller
                     {
 
                         if (SN.regKey.StartsWith("HKEY_LOCAL_MACHINE"))
-                        { 
+                        {
                             RegistryKey RK = Registry.LocalMachine.OpenSubKey(SN.regKey.Substring(19));
                             if (RK != null)
                             {
-                                string serialkey = SerialNumber.UnformatSerial(SN.regVal,SN.format);
+                                string serialkey = SerialNumber.UnformatSerial(SN.regVal, SN.format);
                                 SF.txtSerial.Text = RK.GetValue(SN.regVal, serialkey).ToString();
                             }
                         }
 
-                       
+
                     }
                     catch (Exception ex)
                     {
@@ -508,11 +513,11 @@ namespace Lanstaller
 
                 }
                 SF.ShowDialog();
-                SN.serialnumber = SerialNumber.FormatSerial(SF.txtSerial.Text,SN.format);
+                SN.serialnumber = SerialNumber.FormatSerial(SF.txtSerial.Text, SN.format);
             }
         }
 
-        
+
 
         //Copy files from list provided, directory list for folder generation (Including empty dirs)
         void CopyFiles(List<FileCopyOperation> FileCopyList, List<string> DirectoryList)
@@ -531,7 +536,7 @@ namespace Lanstaller
                 if (Pri.LongPath.Directory.Exists(dir) == true)
                 {
                     //Prompt to remove any existing game folder.
-                    if (dir.StartsWith(LanstallerSettings.InstallDirectory + "\\") && dir != LanstallerSettings.InstallDirectory + "\\")
+                    if (dir.StartsWith(UserSettings.InstallDirectory + "\\") && dir != UserSettings.InstallDirectory + "\\")
                     {
                         if (MessageBox.Show("Delete existing folder?\n" + dir, "Delete?", MessageBoxButtons.YesNo) == DialogResult.Yes)
                         {
@@ -554,7 +559,7 @@ namespace Lanstaller
             }
 
             Server FileServer = GetFileServerFromAPI();
-            
+
             //Trim / from url (getfiles will prepend / to source on copy operation).
             if (FileServer.path.EndsWith("/"))
             {
@@ -584,7 +589,7 @@ namespace Lanstaller
                 //Calculate Gigabyte count of transfered files + current progress.
                 //double mbfilesize = (double)FCO.size / 1048576;
                 double gbsize = (double)bytecounter / 1073741824;
-                
+
 
                 //Check file exists, verify hash.
                 if (System.IO.File.Exists(FCO.destination))
@@ -593,15 +598,15 @@ namespace Lanstaller
                     {
                         MessageBox.Show("Error - file hash not available from server - alert Lanlord.");
                     }
-                    SetStatus("Installing: \n" + Identity.Name + 
-                            "\nVerifying File:" + copycount2 + " / " + FileCopyList.Count + 
+                    SetStatus("Installing: \n" + Identity.Name +
+                            "\nVerifying File:" + copycount2 + " / " + FileCopyList.Count +
                             "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
                             "\n" + sizestring);
 
                     string check_hash = CalculateMD5(FCO.destination);
                     //MessageBox.Show(check_hash);
                     //MessageBox.Show("CH:" + check_hash + "\nFH:" + FCO.fileinfo.hash);
-                   
+
                     if (!String.IsNullOrEmpty(FCO.fileinfo.hash)) //Check hash value has been scanned into server.
                     {
                         if (FCO.fileinfo.hash.Equals(check_hash)) //Compare server hash value to local.
@@ -614,7 +619,7 @@ namespace Lanstaller
                         }
                     }
                 }
-               
+
 
                 //Copy File.
                 try
@@ -632,18 +637,18 @@ namespace Lanstaller
                         //Need to test retry / verification process.
 
 
-                        while(!DLP.completed) //Do until download is completed.
+                        while (!DLP.completed) //Do until download is completed.
                         {
                             gbsize = ((double)bytecounter + DLP.downloadedbytes) / 1073741824;
                             SetProgress(bytecounter + DLP.downloadedbytes);
 
-                            SetStatus("Installing: \n" + Identity.Name + 
+                            SetStatus("Installing: \n" + Identity.Name +
                             "\nCopying File:" + copycount2 + " / " + FileCopyList.Count +
                             "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
                             "\n" + sizestring);
                         }
 
-                       
+
                     }
                     else if (FileServer.protocol == "smb")
                     {
@@ -675,7 +680,7 @@ namespace Lanstaller
             }
 
         }
-    
+
 
 
 
@@ -728,25 +733,24 @@ namespace Lanstaller
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error setting registry key " + REGOP.subkey + ":" + REGOP.value + "\n" + ex.ToString());
-                    
+
                 }
-                
+
             }
         }
 
-        void GenerateShortcuts(List<ShortcutOperation>ShortcutList)
+        void GenerateShortcuts(List<ShortcutOperation> ShortcutList)
         {
             foreach (ShortcutOperation SCO in ShortcutList)
             {
                 WshShell shell = new WshShell();
-                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(ReplaceVariable(SCO.location) + "\\" + SCO.name + ".lnk");
-
-                shortcut.TargetPath = ReplaceVariable(SCO.filepath);
-                shortcut.WorkingDirectory = ReplaceVariable(SCO.runpath);
-                shortcut.Arguments = ReplaceVariable(SCO.arguments);
+                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(SCO.location + "\\" + SCO.name + ".lnk");
+                shortcut.TargetPath = SCO.filepath;
+                shortcut.WorkingDirectory = SCO.runpath;
+                shortcut.Arguments = SCO.arguments;
                 if (!String.IsNullOrEmpty(SCO.icon))
                 {
-                    shortcut.IconLocation = ReplaceVariable(SCO.icon);
+                    shortcut.IconLocation = SCO.icon;
                 }
                 shortcut.Save();
             }
@@ -754,23 +758,28 @@ namespace Lanstaller
 
         }
 
-      
+        public List<ShortcutOperation> GetShortcutOperations()
+        {
+            return ShortcutOperations;
+        }
+
+
         public static string ReplaceVariable(string dataline)
         {
             //VARIABLES for FilePath, Shortcut Path, Registry Data.
 
             //%INSTALLPATH% = Installation Directory.
-            string updateline = dataline.Replace("%INSTALLPATH%", LanstallerSettings.InstallDirectory);
+            string updateline = dataline.Replace("%INSTALLPATH%", UserSettings.InstallDirectory);
 
             //%USERPROFILE% = User profile directory.
             updateline = updateline.Replace("%USERPROFILE%", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
 
             //Resolution.
-            updateline = updateline.Replace("%WIDTH%", LanstallerSettings.ScreenWidth.ToString());
-            updateline = updateline.Replace("%HEIGHT%", LanstallerSettings.ScreenHeight.ToString());
+            updateline = updateline.Replace("%WIDTH%", UserSettings.ScreenWidth.ToString());
+            updateline = updateline.Replace("%HEIGHT%", UserSettings.ScreenHeight.ToString());
 
             //Username
-            updateline = updateline.Replace("%USERNAME%", LanstallerSettings.Username);
+            updateline = updateline.Replace("%USERNAME%", UserSettings.Username);
 
             return updateline;
 
@@ -797,7 +806,6 @@ namespace Lanstaller
                         newdata = newdata.Replace(replacestring, SN.serialnumber); //update serial number.
                     }
                 }
-
             }
             return newdata;
         }
@@ -813,14 +821,11 @@ namespace Lanstaller
                 return;
             }
 
-
-
             //Read existing file.
             StreamReader SR = new StreamReader(filename, true);
             Encoding EncodingType = SR.CurrentEncoding; //Record encoding type.
             string configfiledata = SR.ReadToEnd();
             SR.Close();
-
 
             if (EncodingType == Encoding.UTF8)
             {

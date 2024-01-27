@@ -786,13 +786,13 @@ namespace Lanstaller_Management_Console
             }
 
 
-            if(MessageBox.Show("Also verify existing hashes?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if(MessageBox.Show("Verify only the unhashed files?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                SoftwareClass.RescanFileHashes(true,scanid);
+                SoftwareClass.RescanFileHashes(false, scanid);
             }
             else
             {
-                SoftwareClass.RescanFileHashes(false, scanid);
+                SoftwareClass.RescanFileHashes(true, scanid);
             }
 
             FilesPanel.lblCopyActionInfo.Invoke((MethodInvoker)delegate {

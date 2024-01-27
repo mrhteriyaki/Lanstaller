@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 namespace Lanstaller
 {
-    class LanstallerSettings
+    class UserSettings
     {
         static string SettingsKey = "Software\\Lanstaller";
         public static readonly string defaultinstalldir = "C:\\Games";
