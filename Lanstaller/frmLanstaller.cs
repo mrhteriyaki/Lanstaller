@@ -184,6 +184,7 @@ namespace Lanstaller
                 ListViewItem LVI = new ListViewItem(SWI.Name);
                 lvSoftware.Items.Add(LVI);
 
+                //Add icon image to listview
                 if (!String.IsNullOrEmpty(SWI.image_small))
                 {
                     LVI.ImageIndex = lvSoftware.SmallImageList.Images.Count;

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
+using System.Windows.Forms;
 
 namespace Lanstaller.Classes
 {
@@ -43,8 +44,31 @@ namespace Lanstaller.Classes
                 {
                     _records = JsonConvert.DeserializeObject<List<LocalInstallRecord>>(dbfiledata);
                 }
-                
             }
+
+            //Remove any deleted software.
+            List<int> removal_list = new List<int>();
+            foreach(LocalInstallRecord record in _records)
+            {
+                bool software_removed = true;
+                foreach(SoftwareClass.ShortcutOperation shortcut in record.Shortcuts)
+                {
+                    if (File.Exists(shortcut.filepath))
+                    {
+                        software_removed = false;
+                    }
+                }
+                if (software_removed)
+                {
+                    removal_list.Add(record.SoftwareID);
+                }
+            }
+
+            foreach(int softwareid in removal_list)
+            {
+                RemoveLocalInstall(softwareid);
+            }
+            
         }
 
         public List<int> GetSoftwareIDs()
@@ -93,6 +117,7 @@ namespace Lanstaller.Classes
                     WriteListDB(_records);
                     break;
                 }
+                index++;
             }
         }
 
