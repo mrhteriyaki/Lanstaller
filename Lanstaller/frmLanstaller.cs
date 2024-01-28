@@ -353,25 +353,28 @@ namespace Lanstaller
             {
                 runSoftware();
             }
-            
         }
         void runSoftware()
         {
-            //need to Offer gui option to support multiple shortcuts.
-
             if (currentSoftwareShortcuts.Count == 1)
             {
-                runShortcut(0);    
+                runShortcut(currentSoftwareShortcuts[0]);
+            }
+            else
+            {
+                frmRunSelection runOptionsWindow = new frmRunSelection();
+                runOptionsWindow.SetOptions(currentSoftwareShortcuts);
+                runOptionsWindow.Show();
             }
 
         }
-        void runShortcut(int index)
+        public static void runShortcut(ShortcutOperation Shortcut)
         {
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = currentSoftwareShortcuts[index].filepath;
-            startInfo.WorkingDirectory = currentSoftwareShortcuts[index].runpath;
-            startInfo.Arguments = currentSoftwareShortcuts[index].arguments;
+            startInfo.FileName = Shortcut.filepath;
+            startInfo.WorkingDirectory = Shortcut.runpath;
+            startInfo.Arguments = Shortcut.arguments;
             startInfo.UseShellExecute = true;
             Process.Start(startInfo);
 
@@ -469,6 +472,8 @@ namespace Lanstaller
                     LocalDB.AddLocalInstall(CSW.Identity.id, CSW.GetShortcutOperations());
                     this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CSW.Identity.Name));
                     this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
+                    this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
+                    
 
                 }
             } //End of installer queue.
@@ -664,7 +669,7 @@ namespace Lanstaller
                 if (currentSoftwareShortcuts.Count > 0)
                 {          
                     install_option = false;
-                    btnInstall.Text = "Run";
+                    btnInstall.Text = "Start";
                 }
             }
         }

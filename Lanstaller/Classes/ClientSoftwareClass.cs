@@ -99,23 +99,23 @@ namespace Lanstaller
                 CopyFiles(FileCopyOperations, DirectoryList);
             }
 
+
+            ShortcutOperations = GetShortcutListFromAPI(Identity.id);
+            foreach (ShortcutOperation SCO in ShortcutOperations)
+            {
+                SCO.location = ReplaceVariable(SCO.location);
+                SCO.filepath = ReplaceVariable(SCO.filepath);
+                SCO.runpath = ReplaceVariable(SCO.runpath);
+                SCO.arguments = ReplaceVariable(SCO.arguments);
+                SCO.icon = ReplaceVariable(SCO.icon);
+            }
             if (installshortcuts)
             {
                 SetStatus("Generating Shortcuts - " + Identity.Name);
-
                 //DB
                 //SCO = GetShortcuts(Identity.id);
 
-                //WEB
-                ShortcutOperations = GetShortcutListFromAPI(Identity.id);
-                foreach (ShortcutOperation SCO in ShortcutOperations)
-                {
-                    SCO.location = ReplaceVariable(SCO.location);
-                    SCO.filepath = ReplaceVariable(SCO.filepath);
-                    SCO.runpath = ReplaceVariable(SCO.runpath);
-                    SCO.arguments = ReplaceVariable(SCO.arguments);
-                    SCO.icon = ReplaceVariable(SCO.icon);
-                }
+                //WEB  
                 GenerateShortcuts(ShortcutOperations);
             }
 
@@ -352,7 +352,7 @@ namespace Lanstaller
                 {
                     if (EFW.enabled && EFW.action && EFW.direction) //skip disabled, blocked and outbound rules.
                     {
-                        if (procpath.ToLower().Equals(procpath.ToLower())) //Process path matched.
+                        if (EFW.exepath.ToLower().Equals(procpath.ToLower())) //Process path matched.
                         {
                             if (EFW.protocol_value == fwr.protocol_value && EFW.port_number == fwr.port_number) //Port and IP Protocol matched.
                             {
