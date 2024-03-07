@@ -57,6 +57,9 @@ namespace Lanstaller.Classes
                     {
                         software_removed = false;
                     }
+                    //Need to add check for Disk Removal.
+
+
                 }
                 if (software_removed)
                 {
