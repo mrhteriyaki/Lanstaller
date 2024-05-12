@@ -468,13 +468,17 @@ namespace Lanstaller
                     {
                         InstallQueueIDs.Remove(CSW.Identity.id);
                     }
-
-                    LocalDB.AddLocalInstall(CSW.Identity.id, CSW.GetShortcutOperations());
+                    if (CSW.GetErrored())
+                    {
+                        MessageBox.Show("Some or all files failed to download and pass verification.");
+                    }
+                    else
+                    {
+                        LocalDB.AddLocalInstall(CSW.Identity.id, CSW.GetShortcutOperations());
+                        this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
+                        this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
+                    }
                     this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CSW.Identity.Name));
-                    this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
-                    this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
-                    
-
                 }
             } //End of installer queue.
 
@@ -667,13 +671,13 @@ namespace Lanstaller
             {
                 currentSoftwareShortcuts = LocalDB.GetShortcuts(SList[lvSoftware.SelectedItems[0].Index].id);
                 if (currentSoftwareShortcuts.Count > 0)
-                {          
+                {
                     install_option = false;
                     btnInstall.Text = "Start";
                 }
             }
         }
-        
+
 
 
         void UpdateInstallOptions()

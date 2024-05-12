@@ -42,6 +42,7 @@ namespace Lanstaller
         public bool apply_windowssettings;
         public bool apply_preferences;
         public bool install_redist;
+        bool error_occured = false;
 
         List<FileCopyOperation> FileCopyOperations;
         List<RegistryOperation> RegistryOperations;
@@ -532,26 +533,6 @@ namespace Lanstaller
             //Generate any required Directories for Files.
             foreach (string dir in DirectoryList)
             {
-                /*
-                if (Pri.LongPath.Directory.Exists(dir) == true)
-                {
-                    //Prompt to remove any existing game folder.
-                    if (dir.StartsWith(UserSettings.InstallDirectory + "\\") && dir != UserSettings.InstallDirectory + "\\")
-                    {
-                        if (MessageBox.Show("Delete existing folder?\n" + dir, "Delete?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                        {
-                            while(Pri.LongPath.Directory.Exists(dir) == true)
-                            {
-                                Pri.LongPath.Directory.Delete(dir, true);
-                                if (Pri.LongPath.Directory.Exists(dir))
-                                {
-                                    MessageBox.Show("Removal failed, try again?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                                }
-                            }                           
-                        }
-                    }
-                }
-                */
                 if (Pri.LongPath.Directory.Exists(dir) == false)
                 {
                     Pri.LongPath.Directory.CreateDirectory(dir);
@@ -627,17 +608,11 @@ namespace Lanstaller
                     if (FileServer.protocol == "web")
                     {
                         //Web mode.
-
-                        //OLD Download.
-                        //DownloadFile(FileServer.path + FCO.fileinfo.source, FCO.destination);
-
                         //Download File - ASYNC
-                        DownloadWithProgress DLP = new DownloadWithProgress(FileServer.path + FCO.fileinfo.source, FCO.destination);
-                        DLP.Download();
-                        //Need to test retry / verification process.
+                        DownloadWithProgress DLP = new DownloadWithProgress(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.hash);
+                        DLP.Download();                     
 
-
-                        while (!DLP.completed) //Do until download is completed.
+                        while (DLP.GetStatus() == 0) //Do until download is completed.
                         {
                             gbsize = ((double)bytecounter + DLP.downloadedbytes) / 1073741824;
                             SetProgress(bytecounter + DLP.downloadedbytes);
@@ -647,6 +622,10 @@ namespace Lanstaller
                             "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
                             "\n" + sizestring);
                         }
+                        if (error_occured == false && DLP.GetStatus() == 2)
+                        {
+                            error_occured = true; //Download failed
+                        }
 
 
                     }
@@ -654,7 +633,6 @@ namespace Lanstaller
                     {
                         //SMB mode.
                         Pri.LongPath.File.Copy(FileServer.path + "\\" + FCO.fileinfo.source, FCO.destination, true);
-                        //System.IO.File.Copy(ServerAddress + "\\" + FCO.fileinfo.source, FCO.destination, true);
                     }
 
                     //Update copy index once complete, failure will cause copy retry.
@@ -865,6 +843,10 @@ namespace Lanstaller
 
         }
 
+        public bool GetErrored()
+        {
+            return error_occured;
+        }
 
 
 

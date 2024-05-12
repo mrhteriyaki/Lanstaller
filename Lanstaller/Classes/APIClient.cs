@@ -80,9 +80,10 @@ namespace Lanstaller.Classes
             public long downloadedbytes = 0;
             string _source;
             string _destination;
-            public bool completed = false;
+            string _hash;
+            int _state = 0; //0 = Not Started, 1 = Downloaded, 2 = Failed.
 
-            public DownloadWithProgress(string Source, string Destination) { _source = Source; _destination = Destination; }
+            public DownloadWithProgress(string Source, string Destination, string MD5Hash) { _source = Source; _destination = Destination; _hash = MD5Hash; }
             public void Download()
             {
                 WC.DownloadProgressChanged += new DownloadProgressChangedEventHandler(client_DownloadProgressChanged);
@@ -97,7 +98,23 @@ namespace Lanstaller.Classes
             }
             void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
             {
-                completed = true;
+                //Check file downloaded correctly.
+                if (Pri.LongPath.File.Exists(_destination))
+                {
+                    string check_hash = CalculateMD5(_destination);
+                    if (_hash.Equals(check_hash))
+                    {
+                        _state = 1;
+                        return;
+                    }
+                    Pri.LongPath.File.Delete(_destination); // Delete file if partially downloaded.
+                }
+                _state = 2; //Failed Download.
+            }
+
+            public int GetStatus()
+            {
+                return _state;
             }
 
         }
