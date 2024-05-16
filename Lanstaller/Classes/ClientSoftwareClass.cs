@@ -21,6 +21,7 @@ using Microsoft.VisualBasic;
 using System.Threading;
 using System.Security.Policy;
 using System.Reflection;
+using static System.Windows.Forms.AxHost;
 
 namespace Lanstaller
 {
@@ -48,8 +49,8 @@ namespace Lanstaller
 
         List<SerialNumber> SerialList = new List<SerialNumber>();
 
+        Queue<FileCopyOperation> VerifyCopyOperations = new Queue<FileCopyOperation>();
         List<FileCopyOperation> FileCopyOperations;
-        List<FileCopyOperation> VerifyCopyOperations;
         List<RegistryOperation> RegistryOperations;
         List<ShortcutOperation> ShortcutOperations;
         List<FirewallRule> FirewallRules;
@@ -77,7 +78,6 @@ namespace Lanstaller
             if (installfiles)
             {
                 SetStatus("Indexing - " + Identity.Name);
-                
 
                 //DB
                 //FCL = GetFiles(Identity.id);
@@ -528,6 +528,43 @@ namespace Lanstaller
         }
 
 
+        void VerifyFilesThread(int FileCount)
+        {
+            int CheckCounter = 0;
+            FileCopyOperation FVO;
+            while (CheckCounter < FileCount)
+            {
+                lock (_verifyLock)
+                {
+                    if (VerifyCopyOperations.Count == 0)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        FVO = VerifyCopyOperations.Dequeue();
+                    }
+                }
+                CheckCounter++;
+                if (FVO.verified == true)
+                {
+                    continue; //skip already verified.
+                }
+
+                if (Pri.LongPath.File.Exists(FVO.destination))
+                {
+                    string check_hash = CalculateMD5(FVO.destination);
+                    if (FVO.fileinfo.hash.Equals(check_hash))
+                    {
+                        FVO.verified = true;
+                        continue;
+                    }
+                    Pri.LongPath.File.Delete(FVO.destination); // Delete file if partially downloaded.
+                }
+            }
+
+        }
+
 
         //Copy files from list provided, directory list for folder generation (Including empty dirs)
         void CopyFiles()
@@ -549,91 +586,121 @@ namespace Lanstaller
 
             Server FileServer = GetFileServerFromAPI();
 
-            int CopyIndex = 0;
-            long bytecounter = 0;
-            VerifyCopyOperations.Clear();
+            bool ValidationPending = true;
 
-            while (CopyIndex < FileCopyOperations.Count)
+            while (ValidationPending)
             {
-                FileCopyOperation FCO = FileCopyOperations[CopyIndex];
-                string sizestring = SizeToString(FCO.fileinfo.size);
-
-                //Calculate Gigabyte count of transfered files + current progress.
-                //double mbfilesize = (double)FCO.size / 1048576;
-                double gbsize = (double)bytecounter / 1073741824;
+                int CopyIndex = 0;
+                long bytecounter = 0;
+                VerifyCopyOperations.Clear();
 
 
-                //Check file exists, verify hash.
-                if (System.IO.File.Exists(FCO.destination))
+                Thread VerifyCopyThread = new Thread(() => VerifyFilesThread(FileCopyOperations.Count));
+                VerifyCopyThread.Start();
+
+                while (CopyIndex < FileCopyOperations.Count)
                 {
-                    if (string.IsNullOrEmpty(FCO.fileinfo.hash))
+                    FileCopyOperation FCO = FileCopyOperations[CopyIndex];
+                    string sizestring = SizeToString(FCO.fileinfo.size);
+
+                    //Calculate Gigabyte count of transfered files + current progress.
+                    //double mbfilesize = (double)FCO.size / 1048576;
+                    double gbsize = (double)bytecounter / 1073741824;
+
+
+                    //Check file exists, verify hash.
+                    if (System.IO.File.Exists(FCO.destination))
                     {
-                        if (MessageBox.Show("Error - file hash not available from server, continue anyway?", "Hash Error",MessageBoxButtons.YesNo) == DialogResult.No)
+                        if (string.IsNullOrEmpty(FCO.fileinfo.hash))
                         {
-                            return;
+                            if (MessageBox.Show("Error - file hash not available from server, continue anyway?", "Hash Error", MessageBoxButtons.YesNo) == DialogResult.No)
+                            {
+                                return;
+                            }
                         }
-                    }
-                    SetStatus(Identity.Name, CopyIndex, FileCopyOperations.Count, gbsize, totalgbytes, sizestring);
-
-                    if (!String.IsNullOrEmpty(FCO.fileinfo.hash)) //Check hash value has been scanned into server.
-                    {
-                        string check_hash = CalculateMD5(FCO.destination);
-                        if (FCO.fileinfo.hash.Equals(check_hash)) //Compare server hash value to local.
+                        else
                         {
-                            bytecounter += FCO.fileinfo.size;
-                            SetProgress(bytecounter);
-                            CopyIndex++; //increment file counter.
-                            continue; //Skip file copy, go to next.
-                        }
-                    }
-                }
-
-
-                //Copy File.
-                try
-                {
-                    if (FileServer.GetProtocol() == 1)
-                    {
-                        DownloadWithProgress DLP = new DownloadWithProgress(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.hash);
-                        DLP.Download();
-                        while (DLP.isDownloading()) //Do until download is completed.
-                        {
-                            gbsize = ((double)bytecounter + DLP.downloadedbytes) / 1073741824;
-                            SetProgress(bytecounter + DLP.downloadedbytes);
                             SetStatus(Identity.Name, CopyIndex, FileCopyOperations.Count, gbsize, totalgbytes, sizestring);
+
+                            if (FCO.verified || FCO.fileinfo.hash.Equals(CalculateMD5(FCO.destination))) //Compare server hash value to local, also skip if verified previously.
+                            {
+                                FCO.verified = true;
+                                lock (_verifyLock)
+                                {
+                                    VerifyCopyOperations.Enqueue(FCO);
+                                }
+                                bytecounter += FCO.fileinfo.size;
+                                SetProgress(bytecounter);
+                                CopyIndex++; //increment file counter.
+                                continue; //Skip file copy, go to next.
+                            }
                         }
                     }
-                    else if (FileServer.GetProtocol() == 2)
+
+                    //Copy File.
+                    try
                     {
-                        Pri.LongPath.File.Copy(FileServer.path + "\\" + FCO.fileinfo.source, FCO.destination, true);
+                        if (FileServer.protocol == 1) //Web
+                        {
+                            DownloadWithProgress DLP = new DownloadWithProgress(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.hash);
+                            DLP.Download();
+                            while (DLP.isDownloading()) //Do until download is completed.
+                            {
+                                gbsize = ((double)bytecounter + DLP.downloadedbytes) / 1073741824;
+                                SetProgress(bytecounter + DLP.downloadedbytes);
+                                SetStatus(Identity.Name, CopyIndex, FileCopyOperations.Count, gbsize, totalgbytes, sizestring);
+                            }
+                        }
+                        else if (FileServer.protocol == 2) //Smb
+                        {
+                            Pri.LongPath.File.Copy(FileServer.path + "\\" + FCO.fileinfo.source, FCO.destination, true);
+                        }
+                        //Add to verification list.
+                        lock (_verifyLock)
+                        {
+                            VerifyCopyOperations.Enqueue(FCO);
+                        }
+                        CopyIndex++;
                     }
-                    //Add to verification list.
-                    lock (_verifyLock)
+                    catch (ThreadAbortException ex)
                     {
-                        VerifyCopyOperations.Add(FCO);
+                        SetStatus("File copy stopped - thread Abort Exception");
+                        continue;
                     }
-                    CopyIndex++;
-                }
-                catch (ThreadAbortException ex)
-                {
-                    SetStatus("File copy stopped - thread Abort Exception");
-                    Thread.Sleep(500); //Pause to prevent DOS on server and retry.
-                    continue;
-                }
-                catch (Exception ex)
-                {
-                    //MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "TO:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
-                    SetStatus("Download error:" + ex.ToString());
-                    Thread.Sleep(500);
-                    continue;
+                    catch (Exception ex)
+                    {
+                        //MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "TO:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
+                        SetStatus("Download error:" + ex.ToString());
+                        Thread.Sleep(500);
+                        continue;
+                    }
+
+                    bytecounter += FCO.fileinfo.size;
+                    SetProgress(bytecounter);
                 }
 
-                bytecounter += FCO.fileinfo.size;
-                SetProgress(bytecounter);
+                //Complete validation of downloaded files.
+                //restart previous loop if failures exist.
+                SetStatus("Waiting for file verification to complete");
+                VerifyCopyThread.Join();
+                ValidationPending = false;
+                foreach (FileCopyOperation FCO2 in FileCopyOperations)
+                {
+                    if (FCO2.verified == false)
+                    {
+                        MessageBox.Show(FCO2.destination);
+                        ValidationPending = true;
+                        if (MessageBox.Show("Some files failed to validate after download, retry?", "Validation Error", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                        {
+                            break; //loop again.
+                        }
+                        else
+                        {
+                            return; //Exit copy.
+                        }
+                    }
+                }
             }
-
-            //Complete validation of downloaded files.
-            //restart previous loop if failures exist.
 
         }
 
@@ -839,7 +906,7 @@ namespace Lanstaller
 
     }
 
-        
+
 
 
 

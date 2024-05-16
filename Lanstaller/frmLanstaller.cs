@@ -757,7 +757,6 @@ namespace Lanstaller
         }
 
         int active_chk = 0;
-        const int chk_height = 0;
         void CheckboxSet(Control _control, bool State)
         {
             _control.Enabled = State;

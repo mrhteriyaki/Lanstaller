@@ -54,6 +54,7 @@ namespace Lanstaller_Shared
         {
             public FileInfoClass fileinfo = new FileInfoClass();
             public string destination;
+            public bool verified = false;
         }
 
 
@@ -167,29 +168,8 @@ namespace Lanstaller_Shared
 
         public class Server
         {
-            public string path;
-            public string protocol;
-            public int _protocol = 0;
-
-            //Web or SMB Download
-            public void SetProtocol(string protocol)
-            {
-                if (protocol.Equals("web"))
-                {
-                    _protocol = 1;
-                }
-                else if (protocol.Equals("smb"))
-                {
-                    _protocol = 2;
-                }
-
-            }
-
-            public int GetProtocol()
-            { 
-                return _protocol; 
-            }
-
+            public string path;           
+            public int protocol = 0; //1 = Web, 2 = SMB
         }
 
 
@@ -395,7 +375,7 @@ namespace Lanstaller_Shared
             while (SQLOutput.Read())
             {
                 tmpServ.path = SQLOutput[0].ToString();
-                tmpServ.SetProtocol(SQLOutput[1].ToString());
+                tmpServ.protocol = (int)SQLOutput[1];
             }
             SQLConn.Close();
             return tmpServ;
