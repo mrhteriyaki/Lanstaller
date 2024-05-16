@@ -40,7 +40,7 @@ namespace Lanstaller_Shared
             public string image_small; //Icon Image for List.
         }
 
-       
+
         public class FileInfoClass
         {
             public int id;
@@ -88,7 +88,7 @@ namespace Lanstaller_Shared
             {
                 //Converts serial into formatted version for registry.
                 //Eg add hypen to *****-*****-*****
-                
+
                 if (String.IsNullOrEmpty(format)) return serial_value; //return serial if no format provided.
 
                 //Check if serial length long enough for unformat.
@@ -96,7 +96,7 @@ namespace Lanstaller_Shared
                 {
                     if (serial_value.Length < format.Length) return serial_value;
                 }
-                
+
                 char[] keyChars = serial_value.ToCharArray();
                 char[] formatChars = format.ToCharArray();
 
@@ -115,7 +115,7 @@ namespace Lanstaller_Shared
                     else if (formatChars[fc_i] == '-') //Hyphen
                     {
                         if (!UnformatMode) output_value += '-';
-                        if (UnformatMode) kc_i++; 
+                        if (UnformatMode) kc_i++;
                     }
 
                 }
@@ -169,6 +169,27 @@ namespace Lanstaller_Shared
         {
             public string path;
             public string protocol;
+            public int _protocol = 0;
+
+            //Web or SMB Download
+            public void SetProtocol(string protocol)
+            {
+                if (protocol.Equals("web"))
+                {
+                    _protocol = 1;
+                }
+                else if (protocol.Equals("smb"))
+                {
+                    _protocol = 2;
+                }
+
+            }
+
+            public int GetProtocol()
+            { 
+                return _protocol; 
+            }
+
         }
 
 
@@ -277,7 +298,7 @@ namespace Lanstaller_Shared
             foreach (SoftwareInfo SW in tmpList)
             {
                 LoadSoftwareCounts(SW);
-                SW.install_size = GetInstallSize(SW.id); 
+                SW.install_size = GetInstallSize(SW.id);
             }
 
             return tmpList;
@@ -374,7 +395,7 @@ namespace Lanstaller_Shared
             while (SQLOutput.Read())
             {
                 tmpServ.path = SQLOutput[0].ToString();
-                tmpServ.protocol = SQLOutput[1].ToString();
+                tmpServ.SetProtocol(SQLOutput[1].ToString());
             }
             SQLConn.Close();
             return tmpServ;
@@ -865,7 +886,7 @@ namespace Lanstaller_Shared
             SQLConn.Close();
         }
 
-       
+
         public static void AddRegistry(int softwareid, int hkey, string subkey, string value, int regtype, string data)
         {
             string QueryString = "INSERT into tblRegistry ([hkey],[subkey],[value],[type],[data],[software_id]) VALUES (@hkey,@subkey,@value,@type,@data,@softwareid)";
@@ -948,12 +969,12 @@ namespace Lanstaller_Shared
                 else
                 {
                     QueryString += " AND [hash_md5] is null";
-                }              
+                }
             }
             else
             {
                 //Full Rescan, clear existing hashes for progress check.
-                QueryString += "; UPDATE tblFiles SET [hash_md5] = NULL WHERE software_id = @swid"; 
+                QueryString += "; UPDATE tblFiles SET [hash_md5] = NULL WHERE software_id = @swid";
             }
 
 

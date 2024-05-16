@@ -414,11 +414,11 @@ namespace Lanstaller
             //Get serial keys from user - may need to put on another thread to stop gui block.
             if (InstallSW.installregistry) //Only request serials if registry checked.
             {
-                foreach (ClientSoftwareClass.SerialNumber SN in APIClient.GetSerialsListFromAPI(InstallSW.Identity.id))
+                foreach (SerialNumber SN in APIClient.GetSerialsListFromAPI(InstallSW.Identity.id))
                 {
-                    InstallSW.SerialList.Add(SN);
+                    InstallSW.AddSerial(SN);
                 }
-                ClientSoftwareClass.GenerateSerials(InstallSW.SerialList);
+                InstallSW.GenerateSerials();
             }
 
             //Queue installation request.

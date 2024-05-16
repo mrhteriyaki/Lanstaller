@@ -81,7 +81,7 @@ namespace Lanstaller.Classes
             string _source;
             string _destination;
             string _hash;
-            int _state = 0; //0 = Not Started, 1 = Downloaded, 2 = Failed.
+            bool _isDownloading;
 
             public DownloadWithProgress(string Source, string Destination, string MD5Hash) { _source = Source; _destination = Destination; _hash = MD5Hash; }
             public void Download()
@@ -94,27 +94,15 @@ namespace Lanstaller.Classes
             {
                 downloadedbytes = e.BytesReceived;
                 //double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());   
-
             }
             void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
             {
-                //Check file downloaded correctly.
-                if (Pri.LongPath.File.Exists(_destination))
-                {
-                    string check_hash = CalculateMD5(_destination);
-                    if (_hash.Equals(check_hash))
-                    {
-                        _state = 1;
-                        return;
-                    }
-                    Pri.LongPath.File.Delete(_destination); // Delete file if partially downloaded.
-                }
-                _state = 2; //Failed Download.
+                _isDownloading = true;
             }
 
-            public int GetStatus()
+            public bool isDownloading()
             {
-                return _state;
+                return _isDownloading;
             }
 
         }
@@ -134,6 +122,12 @@ namespace Lanstaller.Classes
         {
             //return (Server)JsonConvert.DeserializeObject(WC.DownloadString(APIServer + "InstallationList/Server"));
             Server FS = JObject.Parse(GetString(APIServer + "InstallationList/Server")).ToObject<Server>();
+
+            //Trim / from url (getfiles will prepend / to source on copy operation).
+            if (FS.path.EndsWith("/"))
+            {
+                FS.path = FS.path.Substring(0, FS.path.Length - 1);
+            }
             return FS;
 
         }

@@ -18,6 +18,9 @@ using static Lanstaller.Classes.APIClient;
 using System.Drawing;
 using System.Diagnostics.Eventing.Reader;
 using Microsoft.VisualBasic;
+using System.Threading;
+using System.Security.Policy;
+using System.Reflection;
 
 namespace Lanstaller
 {
@@ -32,8 +35,7 @@ namespace Lanstaller
         //Locks.
         static readonly object _statuslock = new object();
         static readonly object _progresslock = new object();
-
-        public List<SerialNumber> SerialList = new List<SerialNumber>();
+        static readonly object _verifyLock = new object();
 
         public string InstallDir;
         public bool installfiles;
@@ -44,12 +46,16 @@ namespace Lanstaller
         public bool install_redist;
         bool error_occured = false;
 
+        List<SerialNumber> SerialList = new List<SerialNumber>();
+
         List<FileCopyOperation> FileCopyOperations;
+        List<FileCopyOperation> VerifyCopyOperations;
         List<RegistryOperation> RegistryOperations;
         List<ShortcutOperation> ShortcutOperations;
         List<FirewallRule> FirewallRules;
         List<PreferenceOperation> PreferenceOperations;
         List<Redistributable> Redistributables;
+        List<string> DirectoryList = new List<string>();
 
         public void Install()
         {
@@ -64,14 +70,14 @@ namespace Lanstaller
 
                 //Web
                 RegistryOperations = GetRegistryListFromAPI(Identity.id);
-                GenerateRegistry(RegistryOperations, SerialList);
+                GenerateRegistry();
             }
 
 
             if (installfiles)
             {
                 SetStatus("Indexing - " + Identity.Name);
-                List<string> DirectoryList = new List<string>();
+                
 
                 //DB
                 //FCL = GetFiles(Identity.id);
@@ -82,7 +88,7 @@ namespace Lanstaller
                 //Get Directories, split up all sub directory paths and add to generation list.
                 foreach (string Dir in GetDirectoriesFromAPI(Identity.id))
                 {
-                    GetSubFolders(ReplaceVariable(Dir), DirectoryList);
+                    GetSubFolders(ReplaceVariable(Dir));
                 }
 
                 //Remove filename from path.
@@ -90,14 +96,14 @@ namespace Lanstaller
                 {
                     FCO.destination = ReplaceVariable(FCO.destination);
                     string filedirectory = FCO.destination.Substring(0, FCO.destination.LastIndexOf("\\"));
-                    GetSubFolders(filedirectory, DirectoryList);
+                    GetSubFolders(filedirectory);
                 }
 
                 InstalledSize = 0; //reset install size.
                 InstallSize = Identity.install_size;
 
                 SetStatus("Copying Files - " + Identity.Name);
-                CopyFiles(FileCopyOperations, DirectoryList);
+                CopyFiles();
             }
 
 
@@ -117,7 +123,7 @@ namespace Lanstaller
                 //SCO = GetShortcuts(Identity.id);
 
                 //WEB  
-                GenerateShortcuts(ShortcutOperations);
+                GenerateShortcuts();
             }
 
             SetStatus(Identity.Name + Environment.NewLine + "Updating Windows Settings" + Environment.NewLine + "(Firewall Rules and Compatibility)");
@@ -130,7 +136,7 @@ namespace Lanstaller
 
                 //WEB
                 FirewallRules = GetFirewallRulesListFromAPI(Identity.id);
-                GenerateFirewallRules(FirewallRules);
+                GenerateFirewallRules();
 
                 //Compatibility.
                 List<Compatibility> CPL = GetCompatibilitiesFromAPI(Identity.id);
@@ -151,7 +157,7 @@ namespace Lanstaller
                 //WEB
                 PreferenceOperations = GetPreferencesListFromAPI(Identity.id);
 
-                GeneratePreferenceFiles(PreferenceOperations);
+                GeneratePreferenceFiles();
             }
 
             SetStatus("Installing Redistributables - " + Identity.Name);
@@ -162,11 +168,10 @@ namespace Lanstaller
 
                 //WEB
                 Redistributables = GetRedistributablesListFromAPI(Identity.id);
-                GenerateRedistributables(Redistributables);
+                GenerateRedistributables();
             }
 
             SetStatus("Install Complete:" + Environment.NewLine + Identity.Name);
-
         }
 
 
@@ -175,8 +180,14 @@ namespace Lanstaller
             lock (_statuslock)
             {
                 status = message.Replace("&", "&&");
-
             }
+        }
+        static void SetStatus(string Name, int CopyIndex, int EndCount, double Size, double TotalSize, string SizeString)
+        {
+            SetStatus("Installing: \n" + Name +
+                "\nFile:" + (CopyIndex + 1) + " / " + EndCount +
+                "\nProgress (GB): " + Math.Round(Size, 2) + " / " + Math.Round(TotalSize, 2) +
+                "\n" + SizeString);
         }
 
         public static string GetStatus()
@@ -210,7 +221,7 @@ namespace Lanstaller
         }
 
         //Gets all sub folders for given directory, adds to list.
-        void GetSubFolders(string directory, List<string> DirectoryList)
+        void GetSubFolders(string directory)
         {
             //Check if already in list, if so skip.
             foreach (string dir in DirectoryList)
@@ -255,9 +266,9 @@ namespace Lanstaller
         }
 
 
-        void GeneratePreferenceFiles(List<PreferenceOperation> PreferenceOperationList)
+        void GeneratePreferenceFiles()
         {
-            foreach (PreferenceOperation PO in PreferenceOperationList)
+            foreach (PreferenceOperation PO in PreferenceOperations)
             {
                 ReplacePreferenceFile(PO.filename, PO.target, PO.replace);
             }
@@ -265,7 +276,7 @@ namespace Lanstaller
 
 
 
-        void GenerateFirewallRules(List<FirewallRule> FirewallRuleList)
+        void GenerateFirewallRules()
         {
             //Add Firewall rules to Windows.
             string netsh_path = "c:\\windows\\system32\\netsh.exe";
@@ -281,7 +292,7 @@ namespace Lanstaller
             FWNetSHProc.StartInfo.RedirectStandardOutput = true;
             FWNetSHProc.StartInfo.CreateNoWindow = true;
 
-            foreach (FirewallRule fwr in FirewallRuleList)
+            foreach (FirewallRule fwr in FirewallRules)
             {
                 string rulename = fwr.rulename;
                 if (string.IsNullOrEmpty(rulename)) rulename = fwr.softwarename;
@@ -393,9 +404,9 @@ namespace Lanstaller
 
 
 
-        public void GenerateRedistributables(List<Redistributable> RedistributableList) //Incomplete.
+        public void GenerateRedistributables() //Incomplete.
         {
-            foreach (Redistributable Redist in RedistributableList)
+            foreach (Redistributable Redist in Redistributables)
             {
                 if (Redist.filecheck != "")
                 {
@@ -472,10 +483,8 @@ namespace Lanstaller
             //Check filecheck, if blank, check name against windows installations.
         }
 
-        public static void GenerateSerials(List<SerialNumber> SerialList)
+        public void GenerateSerials() //Updates SerialList with user input.
         {
-            //Updates SerialList with user input.
-
             foreach (SerialNumber SN in SerialList)
             {
                 //Prompt user to enter serial numbers.
@@ -521,15 +530,14 @@ namespace Lanstaller
 
 
         //Copy files from list provided, directory list for folder generation (Including empty dirs)
-        void CopyFiles(List<FileCopyOperation> FileCopyList, List<string> DirectoryList)
+        void CopyFiles()
         {
+            SetStatus("Status: Installing " + Identity.Name + Environment.NewLine + " - Generating Directories");
 
             //Calculate total copy size.
             long totalbytes = Identity.install_size;
             double totalgbytes = (double)totalbytes / 1073741824;
 
-
-            SetStatus("Status: Installing " + Identity.Name + Environment.NewLine + " - Generating Directories");
             //Generate any required Directories for Files.
             foreach (string dir in DirectoryList)
             {
@@ -541,31 +549,14 @@ namespace Lanstaller
 
             Server FileServer = GetFileServerFromAPI();
 
-            //Trim / from url (getfiles will prepend / to source on copy operation).
-            if (FileServer.path.EndsWith("/"))
-            {
-                FileServer.path = FileServer.path.Substring(0, FileServer.path.Length - 1);
-            }
-
-            //Copy Files.
-            int copycount = 0;
+            int CopyIndex = 0;
             long bytecounter = 0;
-            while (copycount < FileCopyList.Count)
+            VerifyCopyOperations.Clear();
+
+            while (CopyIndex < FileCopyOperations.Count)
             {
-                //Info for status update.
-                FileCopyOperation FCO = FileCopyList[copycount];
-                int copycount2 = (copycount + 1);
-                string sizestring = "";
-                if (FCO.fileinfo.size > 1073741824) //Larger than 1GB.
-                {
-                    double currentgbsize = (double)FCO.fileinfo.size / 1073741824;
-                    sizestring = "Current File Size: " + Math.Round(currentgbsize, 2).ToString() + "GB";
-                }
-                else if (FCO.fileinfo.size > 1048576) //larger than 1MB
-                {
-                    double currentmbsize = (double)FCO.fileinfo.size / 1048576;
-                    sizestring = "Current File Size: " + Math.Round(currentmbsize, 0).ToString() + "MB";
-                }
+                FileCopyOperation FCO = FileCopyOperations[CopyIndex];
+                string sizestring = SizeToString(FCO.fileinfo.size);
 
                 //Calculate Gigabyte count of transfered files + current progress.
                 //double mbfilesize = (double)FCO.size / 1048576;
@@ -577,25 +568,21 @@ namespace Lanstaller
                 {
                     if (string.IsNullOrEmpty(FCO.fileinfo.hash))
                     {
-                        MessageBox.Show("Error - file hash not available from server - alert Lanlord.");
+                        if (MessageBox.Show("Error - file hash not available from server, continue anyway?", "Hash Error",MessageBoxButtons.YesNo) == DialogResult.No)
+                        {
+                            return;
+                        }
                     }
-                    SetStatus("Installing: \n" + Identity.Name +
-                            "\nVerifying File:" + copycount2 + " / " + FileCopyList.Count +
-                            "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
-                            "\n" + sizestring);
-
-                    string check_hash = CalculateMD5(FCO.destination);
-                    //MessageBox.Show(check_hash);
-                    //MessageBox.Show("CH:" + check_hash + "\nFH:" + FCO.fileinfo.hash);
+                    SetStatus(Identity.Name, CopyIndex, FileCopyOperations.Count, gbsize, totalgbytes, sizestring);
 
                     if (!String.IsNullOrEmpty(FCO.fileinfo.hash)) //Check hash value has been scanned into server.
                     {
+                        string check_hash = CalculateMD5(FCO.destination);
                         if (FCO.fileinfo.hash.Equals(check_hash)) //Compare server hash value to local.
                         {
-                            //File exists and matches correct hash.
                             bytecounter += FCO.fileinfo.size;
                             SetProgress(bytecounter);
-                            copycount++; //increment file counter.
+                            CopyIndex++; //increment file counter.
                             continue; //Skip file copy, go to next.
                         }
                     }
@@ -605,61 +592,64 @@ namespace Lanstaller
                 //Copy File.
                 try
                 {
-                    if (FileServer.protocol == "web")
+                    if (FileServer.GetProtocol() == 1)
                     {
-                        //Web mode.
-                        //Download File - ASYNC
                         DownloadWithProgress DLP = new DownloadWithProgress(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.hash);
-                        DLP.Download();                     
-
-                        while (DLP.GetStatus() == 0) //Do until download is completed.
+                        DLP.Download();
+                        while (DLP.isDownloading()) //Do until download is completed.
                         {
                             gbsize = ((double)bytecounter + DLP.downloadedbytes) / 1073741824;
                             SetProgress(bytecounter + DLP.downloadedbytes);
-
-                            SetStatus("Installing: \n" + Identity.Name +
-                            "\nCopying File:" + copycount2 + " / " + FileCopyList.Count +
-                            "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(totalgbytes, 2) +
-                            "\n" + sizestring);
+                            SetStatus(Identity.Name, CopyIndex, FileCopyOperations.Count, gbsize, totalgbytes, sizestring);
                         }
-                        if (error_occured == false && DLP.GetStatus() == 2)
-                        {
-                            error_occured = true; //Download failed
-                        }
-
-
                     }
-                    else if (FileServer.protocol == "smb")
+                    else if (FileServer.GetProtocol() == 2)
                     {
-                        //SMB mode.
                         Pri.LongPath.File.Copy(FileServer.path + "\\" + FCO.fileinfo.source, FCO.destination, true);
                     }
-
-                    //Update copy index once complete, failure will cause copy retry.
-                    copycount++;
+                    //Add to verification list.
+                    lock (_verifyLock)
+                    {
+                        VerifyCopyOperations.Add(FCO);
+                    }
+                    CopyIndex++;
                 }
-                catch (System.Threading.ThreadAbortException ex)
+                catch (ThreadAbortException ex)
                 {
-                    //MessageBox.Show(ex.ToString());
                     SetStatus("File copy stopped - thread Abort Exception");
-                    return;
+                    Thread.Sleep(500); //Pause to prevent DOS on server and retry.
+                    continue;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "TO:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
-                    SetStatus("Error:" + ex.ToString());
-                    return; //Exit - terminate.
+                    //MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "TO:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
+                    SetStatus("Download error:" + ex.ToString());
+                    Thread.Sleep(500);
+                    continue;
                 }
-
 
                 bytecounter += FCO.fileinfo.size;
                 SetProgress(bytecounter);
-
             }
+
+            //Complete validation of downloaded files.
+            //restart previous loop if failures exist.
 
         }
 
-
+        static string SizeToString(long Size)
+        {
+            if (Size > 1073741824) //Larger than 1GB.
+            {
+                double currentgbsize = (double)Size / 1073741824;
+                return "Current File Size: " + Math.Round(currentgbsize, 2).ToString() + "GB";
+            }
+            else //if (Size > 1048576) //larger than 1MB
+            {
+                double currentmbsize = (double)Size / 1048576;
+                return "Current File Size: " + Math.Round(currentmbsize, 0).ToString() + "MB";
+            }
+        }
 
 
         public static void GenerateCompatibility(string filename, int compat_type)
@@ -674,9 +664,9 @@ namespace Lanstaller
         }
 
 
-        void GenerateRegistry(List<RegistryOperation> RegistryList, List<SerialNumber> SerialList)
+        void GenerateRegistry()
         {
-            foreach (RegistryOperation REGOP in RegistryList)
+            foreach (RegistryOperation REGOP in RegistryOperations)
             {
                 RegistryKey HKEY = null;
 
@@ -713,13 +703,12 @@ namespace Lanstaller
                     MessageBox.Show("Error setting registry key " + REGOP.subkey + ":" + REGOP.value + "\n" + ex.ToString());
 
                 }
-
             }
         }
 
-        void GenerateShortcuts(List<ShortcutOperation> ShortcutList)
+        void GenerateShortcuts()
         {
-            foreach (ShortcutOperation SCO in ShortcutList)
+            foreach (ShortcutOperation SCO in ShortcutOperations)
             {
                 WshShell shell = new WshShell();
                 IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(SCO.location + "\\" + SCO.name + ".lnk");
@@ -732,8 +721,6 @@ namespace Lanstaller
                 }
                 shortcut.Save();
             }
-
-
         }
 
         public List<ShortcutOperation> GetShortcutOperations()
@@ -821,8 +808,6 @@ namespace Lanstaller
 
             }
 
-
-
             //Process config file data.
             replace = ReplaceVariable(replace); //Update replacement variables with user preferences.
             configfiledata = configfiledata.Replace(target, replace); //Apply replacement to target in file data.
@@ -837,7 +822,6 @@ namespace Lanstaller
             SW.Write(configfiledata); //Write new data.
             SW.Close();
 
-
             //Delete Backup of Existing File.
             Pri.LongPath.File.Delete(filename + ".bak");
 
@@ -848,11 +832,14 @@ namespace Lanstaller
             return error_occured;
         }
 
-
+        public void AddSerial(SerialNumber Serial)
+        {
+            SerialList.Add(Serial);
+        }
 
     }
 
-
+        
 
 
 
