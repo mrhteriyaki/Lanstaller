@@ -355,18 +355,18 @@ namespace Lanstaller_Shared
         }
 
 
-        public static Server GetFileServer(string servertype) //web or smb for type.
+        public static Server GetFileServer(int Protocol) //web or smb for type.
         {
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 
-            SQLCmd.CommandText = "SELECT TOP (1) [address],[type] FROM [tblServers] ORDER BY [Priority] ASC";
+            SQLCmd.CommandText = "SELECT TOP (1) [address],[protocol] FROM [tblServers] ORDER BY [Priority] ASC";
             //server type specified (web / smb)
-            if (servertype != "")
+            if (Protocol != 0)
             {
-                SQLCmd.CommandText = "SELECT TOP (1) [address],[type] FROM [tblServers] WHERE [type] = @servertype ORDER BY [Priority] ASC";
-                SQLCmd.Parameters.AddWithValue("@servertype", servertype);
+                SQLCmd.CommandText = "SELECT TOP (1) [address],[protocol] FROM [tblServers] WHERE [type] = @servertype ORDER BY [Priority] ASC";
+                SQLCmd.Parameters.AddWithValue("@servertype", Protocol);
             }
 
             SQLConn.Open();
@@ -704,7 +704,7 @@ namespace Lanstaller_Shared
         {
             List<Redistributable> RedistributableList = new List<Redistributable>();
 
-            string server_path = GetFileServer("web").path;
+            string server_path = GetFileServer(1).path;
 
             //Get Required Redist ID for install.
             string QueryString = "SELECT tblRedistUsage.[redist_id],tblRedist.id,tblRedist.[name],tblRedist.[path],tblRedist.args,tblRedist.filecheck,tblRedist.[version],tblRedist.compressed,tblRedist.compressed_path FROM tblRedistUsage INNER JOIN tblRedist ON tblRedistUsage.redist_id=tblRedist.id WHERE tblRedistUsage.software_id = @softwareid ORDER BY tblRedistUsage.[install_order] ASC";
@@ -929,7 +929,7 @@ namespace Lanstaller_Shared
 
         public static void RescanFileHashes(bool fullrescan, int software_id)
         {
-            Server SA = GetFileServer("smb");
+            Server SA = GetFileServer(1);
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;

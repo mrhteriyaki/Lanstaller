@@ -16,7 +16,7 @@ namespace Lanstaller_Management_Console
         //Rescan file size and update database (use of Pri.Longpath only on windows / .net framework).
         public static void RescanFileSize(int software_id)
         {
-            string SA = SoftwareClass.GetFileServer("smb").path;
+            string SA = SoftwareClass.GetFileServer(2).path; //smb path.
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
