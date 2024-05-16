@@ -166,7 +166,17 @@ namespace Lanstaller
             //SList = SoftwareClass.LoadSoftware();
 
             SList = APIClient.GetSoftwareListFromAPI();
-            Server FileServer = APIClient.GetFileServerFromAPI();
+            Server FileServer;
+            try
+            {
+                FileServer = APIClient.GetFileServerFromAPI();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Unable to get server information, Error: " + ex.Message);
+                return;
+            }
+
 
             string ImageDir = LanstallerDataDir + "Images";
             if (!Directory.Exists(ImageDir))

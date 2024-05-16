@@ -365,7 +365,7 @@ namespace Lanstaller_Shared
             //server type specified (web / smb)
             if (Protocol != 0)
             {
-                SQLCmd.CommandText = "SELECT TOP (1) [address],[protocol] FROM [tblServers] WHERE [type] = @servertype ORDER BY [Priority] ASC";
+                SQLCmd.CommandText = "SELECT TOP (1) [address],[protocol] FROM [tblServers] WHERE [protocol] = @servertype ORDER BY [Priority] ASC";
                 SQLCmd.Parameters.AddWithValue("@servertype", Protocol);
             }
 
