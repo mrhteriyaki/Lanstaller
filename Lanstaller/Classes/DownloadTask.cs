@@ -1,0 +1,98 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using static Lanstaller_Shared.SoftwareClass;
+using System.Windows.Forms;
+using Lanstaller_Shared.Models;
+
+namespace Lanstaller.Classes
+{
+    public class DownloadTask
+    {
+        public long downloadedbytes = 0;
+        FileCopyOperation _FCO;
+        Server _FileServer;
+        static string _authkey;
+
+        public static void SetAuth(string authkey)
+        {
+            _authkey = authkey;
+        }
+
+        public DownloadTask(Server FileServer, FileCopyOperation FCO)
+        {
+            _FCO = FCO;
+            _FileServer = FileServer;
+        }
+
+
+        public async Task DownloadAsync()
+        {
+            string SourceUri = _FileServer.path + _FCO.fileinfo.source;
+
+            HttpClient hClient = new HttpClient();
+            hClient.DefaultRequestHeaders.Add("authorization", _authkey);
+
+            
+            try
+            {
+                // Send a GET request to the specified URL
+                HttpResponseMessage response = await hClient.GetAsync(SourceUri, HttpCompletionOption.ResponseHeadersRead);
+                response.EnsureSuccessStatusCode();
+
+                // Get the total file size from the response headers, if available
+                //long? totalBytes = response.Content.Headers.ContentLength;
+
+                // Read the content and write it to the destination file
+                //131072 = 128k
+                //524288 - 512K Buffer.
+                //4194304 = 4MB
+                //16777216 = 16MB
+                Stream contentStream = await response.Content.ReadAsStreamAsync();
+                Stream fileStream = new FileStream(_FCO.destination, FileMode.Create, FileAccess.Write, FileShare.None, 131072, true);
+                
+                byte[] buffer = new byte[131072];
+                int bytesRead;
+
+                while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    fileStream.Write(buffer, 0, bytesRead);
+                    downloadedbytes += bytesRead;
+                    /* Report progress
+                    if (totalBytes.HasValue)
+                    {
+                        //Console.WriteLine($"Downloaded {totalRead} of {totalBytes} bytes ({(totalRead * 100 / totalBytes.Value):0.00}%). {FCO.destination}");
+                    }
+                    else
+                    {
+                        //Console.WriteLine($"Downloaded {totalRead} bytes. {FCO.destination}");
+                    }
+                    */
+                }
+                fileStream.Close();
+
+                //Console.WriteLine("File downloaded successfully. " + FCO.destination);
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"Request error: {e.Message}");
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine($"File error: {e.Message}");
+            }
+            hClient.Dispose();
+        }
+
+
+        public long GetDownloadedBytes()
+        {
+            return downloadedbytes;
+        }
+
+    }
+}

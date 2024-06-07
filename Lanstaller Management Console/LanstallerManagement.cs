@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lanstaller_Shared;
+using Lanstaller_Shared.Models;
 
 namespace Lanstaller_Management_Console
 {
@@ -25,10 +26,10 @@ namespace Lanstaller_Management_Console
             SQLCmd.Parameters.AddWithValue("@swid", software_id);
             SQLConn.Open();
             SqlDataReader SR = SQLCmd.ExecuteReader();
-            List<SoftwareClass.FileCopyOperation> FileList = new List<SoftwareClass.FileCopyOperation>();
+            List<FileCopyOperation> FileList = new List<FileCopyOperation>();
             while (SR.Read())
             {
-                SoftwareClass.FileCopyOperation tmpFCO = new SoftwareClass.FileCopyOperation();
+                FileCopyOperation tmpFCO = new FileCopyOperation();
                 tmpFCO.fileinfo.id = (int)SR[0];
                 tmpFCO.fileinfo.source = SR[1].ToString();
                 Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(SA + "\\" + SR[1].ToString());
@@ -36,9 +37,8 @@ namespace Lanstaller_Management_Console
                 FileList.Add(tmpFCO);
             }
             SR.Close();
-
             SQLCmd.CommandText = "UPDATE tblFiles SET filesize = @filesize WHERE id = @fileid";
-            foreach (SoftwareClass.FileCopyOperation FCO in FileList)
+            foreach (FileCopyOperation FCO in FileList)
             {
                 SQLCmd.Parameters.AddWithValue("filesize", FCO.fileinfo.size);
                 SQLCmd.Parameters.AddWithValue("fileid", FCO.fileinfo.id);

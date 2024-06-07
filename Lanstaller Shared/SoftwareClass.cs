@@ -14,6 +14,8 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Web;
 using System.Data.SqlTypes;
+using System.Threading;
+using Lanstaller_Shared.Models;
 
 
 //Shared library of functions for client and API (Server).
@@ -26,182 +28,7 @@ namespace Lanstaller_Shared
         public static string ConnectionString;
         public SoftwareInfo Identity = new SoftwareInfo();
 
-        public class SoftwareInfo
-        {
-            public int id;
-            public string Name;
-            public int file_count;
-            public int registry_count;
-            public int shortcut_count;
-            public int firewall_count;
-            public int preference_count;
-            public int redist_count;
-            public long install_size;
-            public string image_small; //Icon Image for List.
-        }
-
-
-        public class FileInfoClass
-        {
-            public int id;
-            public long size;
-            public string hash;
-            public string source;
-
-        }
-
-        public class FileCopyOperation
-        {
-            public FileInfoClass fileinfo = new FileInfoClass();
-            public string destination;
-            public bool verified = false;
-        }
-
-
-        public class ShortcutOperation
-        {
-            public string name;
-            public string location;
-            public string filepath;
-            public string runpath;
-            public string icon;
-            public string arguments;
-        }
-
-        public class SerialNumber
-        {
-            public int serialid;
-            public string name;
-            public int instancenumber;
-            public string serialnumber;
-            public string regKey;
-            public string regVal;
-            public int softwareid;
-            public string format;
-
-            //Filter symbols from serial key input boxes (management and client)
-            public static string FilterSerial(string serial_value)
-            {
-                return serial_value.Replace("-", "").Replace(" ", "");
-            }
-
-            public static string FormatSerial(string serial_value, string format, bool UnformatMode = false)
-            {
-                //Converts serial into formatted version for registry.
-                //Eg add hypen to *****-*****-*****
-
-                if (String.IsNullOrEmpty(format)) return serial_value; //return serial if no format provided.
-
-                //Check if serial length long enough for unformat.
-                if (UnformatMode)
-                {
-                    if (serial_value.Length < format.Length) return serial_value;
-                }
-
-                char[] keyChars = serial_value.ToCharArray();
-                char[] formatChars = format.ToCharArray();
-
-                string output_value = String.Empty;
-                int kc_i = 0;
-                for (int fc_i = 0; fc_i < formatChars.Length; fc_i++)
-                {
-                    if (formatChars[fc_i] == '*') //Regular Character
-                    {
-                        if (kc_i < keyChars.Length) //Check if input too short for requested format.
-                        {
-                            output_value += keyChars[kc_i];
-                        }
-                        kc_i++;
-                    }
-                    else if (formatChars[fc_i] == '-') //Hyphen
-                    {
-                        if (!UnformatMode) output_value += '-';
-                        if (UnformatMode) kc_i++;
-                    }
-
-                }
-                return output_value;
-            }
-
-            public static string UnformatSerial(string serial_value, string format)
-            {
-                return FormatSerial(serial_value, format, true);
-            }
-
-        }
-
-        public class FirewallRule
-        {
-            public string softwarename;
-            public string exepath;
-            public string rulename;
-            public int protocol_value = 0;
-            public int port_number = 0;
-
-            //Only netsh usage, possible expanded future use.
-            public bool enabled;
-            public bool direction; //true = in.
-            public string localip;
-            public string remoteip;
-            public int remoteport = 0;
-            public bool action; //true = allow.
-        }
-
-        public class PreferenceOperation
-        {
-            public string filename;
-            public string target;
-            public string replace;
-        }
-
-        public class Redistributable
-        {
-            public int id;
-            public string name;
-            public string path;
-            public string filecheck;
-            public string args;
-            public string version;
-            public string compressed;
-            public string compressed_path;
-        }
-
-        public class Server
-        {
-            public string path;           
-            public int protocol = 0; //1 = Web, 2 = SMB
-        }
-
-
-
-        public class RegistryOperation
-        {
-            public int hkey;
-            //1 = Local Machine.
-            //2 = Current User.
-            //3 = Users.
-
-            public int regtype;
-            //string = 1
-            //binary = 3
-            //dword = 4
-            //expanded string = 2
-            //multi string = 7
-            //qword = 11
-
-            public string subkey;
-            public string value;
-            public string data;
-
-        }
-
-        public class Compatibility
-        {
-            public string filename;
-            public int compat_type;
-        }
-
-
+        
         public static string GetSystemData(string setting)
         {
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
@@ -309,49 +136,18 @@ namespace Lanstaller_Shared
             SQLConn.Open();
 
             //Delete Files.
-            SQLCmd.CommandText = "DELETE FROM tblFiles WHERE software_id = @softid";
+            SQLCmd.CommandText = "DELETE FROM tblFiles WHERE software_id = @softid" +
+            "DELETE FROM tblRegistry WHERE software_id = @softid;" +
+            "DELETE FROM tblCompatibility WHERE software_id = @softid;" +
+            "DELETE FROM tblFirewallExceptions WHERE software_id = @softid;" +
+            "DELETE FROM tblPreferenceFiles WHERE software_id = @softid;" +
+            "DELETE FROM tblSerialsAvailable WHERE serial_id = (SELECT id FROM tblSerials WHERE software_id = @softid);" +
+            "DELETE FROM tblSerials WHERE software_id = @softid;" +
+            "DELETE FROM tblShortcut WHERE software_id = @softid;" +
+            "DELETE FROM tblRedistUsage WHERE software_id = @softid;" +
+            "DELETE FROM tblSoftware WHERE id = @softid;";
             SQLCmd.ExecuteNonQuery();
-
-            //Delete Registry
-            SQLCmd.CommandText = "DELETE FROM tblRegistry WHERE software_id = @softid";
-            SQLCmd.ExecuteNonQuery();
-
-            //Delete Compatibility
-            SQLCmd.CommandText = "DELETE FROM tblCompatibility WHERE software_id = @softid";
-            SQLCmd.ExecuteNonQuery();
-
-            //Delete Firewall rules.
-            SQLCmd.CommandText = "DELETE FROM tblFirewallExceptions WHERE software_id = @softid";
-            SQLCmd.ExecuteNonQuery();
-
-            //Delete Preference files
-            SQLCmd.CommandText = "DELETE FROM tblPreferenceFiles WHERE software_id = @softid";
-            SQLCmd.ExecuteNonQuery();
-
-            //Delete available serials.
-            SQLCmd.CommandText = "DELETE FROM tblSerialsAvailable WHERE serial_id = (SELECT id FROM tblSerials WHERE software_id = @softid)";
-            SQLCmd.ExecuteNonQuery();
-
-            //Delete serials
-            SQLCmd.CommandText = "DELETE FROM tblSerials WHERE software_id = @softid";
-            SQLCmd.ExecuteNonQuery();
-
-
-            //Delete shortcuts
-            SQLCmd.CommandText = "DELETE FROM tblShortcut WHERE software_id = @softid";
-            SQLCmd.ExecuteNonQuery();
-
-            //delete Redist Usage
-            SQLCmd.CommandText = "DELETE FROM tblRedistUsage WHERE software_id = @softid";
-            SQLCmd.ExecuteNonQuery();
-
-            //Delete software index.
-            SQLCmd.CommandText = "DELETE FROM tblSoftware WHERE id = @softid";
-            SQLCmd.ExecuteNonQuery();
-
             SQLConn.Close();
-
-
         }
 
 
@@ -548,71 +344,7 @@ namespace Lanstaller_Shared
 
         }
 
-        public class UserSerial
-        {
-            public int id;
-            public string serial;
-            public string used_timestamp;
-
-
-            //Get available serial numbers.
-            public static List<UserSerial> GetUserSerials(int SerialID)
-            {
-                string QueryString = "select [id],[serial_value],[serial_used] from [tblSerialsAvailable] WHERE serial_id = @serialid AND [serial_used] IS NULL";
-
-                List<UserSerial> SerialList = new List<UserSerial>();
-                SqlConnection SQLConn = new SqlConnection(ConnectionString);
-                SQLConn.Open();
-                SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
-                SQLCmd.Parameters.AddWithValue("@serialid", SerialID);
-                SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
-                while (SQLOutput.Read())
-                {
-                    UserSerial tmpUserSerial = new UserSerial();
-                    tmpUserSerial.id = (int)SQLOutput[0];
-                    tmpUserSerial.serial = SQLOutput[1].ToString();
-                    tmpUserSerial.used_timestamp = SQLOutput[2].ToString();
-                    SerialList.Add(tmpUserSerial);
-                }
-                SQLConn.Close();
-                return SerialList;
-            }
-
-            //Mark available serial as used.
-            public static void SetAvailableSerial(int PoolSerialID)
-            {
-                SqlConnection SQLConn = new SqlConnection(ConnectionString);
-                SQLConn.Open();
-                SqlCommand SQLCmd = new SqlCommand("UPDATE [tblSerialsAvailable] SET serial_used = GETDATE() WHERE id = @sid", SQLConn);
-                SQLCmd.Parameters.AddWithValue("@sid", PoolSerialID);
-                SQLCmd.ExecuteNonQuery();
-                SQLConn.Close();
-            }
-
-
-            //Add serial to pool.
-            public static void AddAvailableSerial(int SerialID, string Serial)
-            {
-                SqlConnection SQLConn = new SqlConnection(ConnectionString);
-                SQLConn.Open();
-                SqlCommand SQLCmd = new SqlCommand("INSERT INTO [tblSerialsAvailable] ([serial_id],[serial_value]) VALUES (@sid,@sval)", SQLConn);
-                SQLCmd.Parameters.AddWithValue("@sid", SerialID);
-                SQLCmd.Parameters.AddWithValue("@sval", Serial);
-                SQLCmd.ExecuteNonQuery();
-                SQLConn.Close();
-            }
-
-            //Remove serial from pool.
-            public static void DeleteAvailableSerial(int UserSerialID)
-            {
-                SqlConnection SQLConn = new SqlConnection(ConnectionString);
-                SQLConn.Open();
-                SqlCommand SQLCmd = new SqlCommand("DELETE FROM [tblSerialsAvailable] WHERE id = @usersid", SQLConn);
-                SQLCmd.Parameters.AddWithValue("@usersid", UserSerialID);
-                SQLCmd.ExecuteNonQuery();
-                SQLConn.Close();
-            }
-        }
+      
 
 
 
@@ -996,20 +728,29 @@ namespace Lanstaller_Shared
                 SQLCmd.ExecuteNonQuery();
                 SQLConn.Close();
             }
-
-
         }
 
         public static string CalculateMD5(string filename)
         {
-            using (var md5 = MD5.Create())
+            bool filelockerror = true; //loop on file lock errors.
+            while (filelockerror)
             {
-                using (var stream = File.OpenRead(filename))
+                try
                 {
-                    var hash = md5.ComputeHash(stream);
+                    MD5 md5 = MD5.Create();
+                    FileStream stream = File.OpenRead(filename);
+                    byte[] hash = md5.ComputeHash(stream);
+                    stream.Close();
+                    filelockerror = false;
                     return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("File hash failed: " + ex.Message);
+                }
             }
+            return string.Empty;
+
         }
 
     }

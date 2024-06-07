@@ -1,4 +1,5 @@
 ﻿using Lanstaller_Shared;
+using Lanstaller_Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,11 +25,11 @@ namespace Lanstaller
         }
 
 
-        public void SetOptions(List<SoftwareClass.ShortcutOperation> LaunchOptions)
+        public void SetOptions(List<ShortcutOperation> LaunchOptions)
         {
             int locationX = 10;
             int locationY = 20;
-            foreach(SoftwareClass.ShortcutOperation op in LaunchOptions)
+            foreach(ShortcutOperation op in LaunchOptions)
             {
                 Button newButton = new Button();
                 newButton.ForeColor = Color.White;
@@ -51,7 +52,7 @@ namespace Lanstaller
         private void newButton_Click(object sender, EventArgs e)
         {
             Button sending_button = (Button)sender;
-            SoftwareClass.ShortcutOperation shortcutOperation = (SoftwareClass.ShortcutOperation)sending_button.Tag;
+            ShortcutOperation shortcutOperation = (ShortcutOperation)sending_button.Tag;
             frmLanstaller.runShortcut(shortcutOperation);
             this.Close();
         }

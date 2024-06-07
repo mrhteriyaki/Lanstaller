@@ -13,46 +13,48 @@ using System.IO;
 using System.Web;
 using System.Windows.Forms;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
 using System.ComponentModel;
 using System.Threading;
 using Lanstaller_Shared;
+using System.Collections.Concurrent;
+using Lanstaller_Shared.Models;
 
 namespace Lanstaller.Classes
 {
     public class APIClient
     {
-        //Client side functions to access Lanstaller API.
+        //Consolidate multiple download requests into single api client.
+        //Many Webclient objects will cause excessive port usage stuck in time_wait open state.
+        //Seperate objects for multi-threading or exception will occur 'WebClient does not support concurrent I/O Operations'
 
-        static WebClient WC = new System.Net.WebClient(); //Static webclient to reduce time_wait open ports.
-        public static string APIServer = "";
         static string _authkey = "";
+        public static string APIServer = "";
+        WebClient WC;
 
+        public APIClient()
+        {
+            WC = new WebClient();
+            WC.Headers.Add("authorization", _authkey);
+        }
 
-        public static void Setup(string authkey)
+        public static void SetAuth(string authkey)
         {
             _authkey = authkey;
-            SetHeaders( WC);
+            DownloadTask.SetAuth(authkey);
         }
-
-        public static void SetHeaders(WebClient newWebClient)
-        {
-            newWebClient.Headers.Clear();
-            newWebClient.Headers.Add("authorization", _authkey);
-        }
-
-        //Use local Webclient variable for DownloadString - Error occured on high load 'WebClient does not support concurrent I/O Operations' indicating issue with rapid connections with shared static object.
-        public static string GetString(string requestUri)
-        {
-            WebClient _WC = new System.Net.WebClient();
-            SetHeaders( _WC);
-            return _WC.DownloadString(requestUri);
-        }
-
 
 
         public static void DownloadFile(string Source, string Destination)
+        {
+            APIClient AC = new APIClient();
+            AC.Download(Source, Destination);
+            AC.WC.Dispose();
+        }
+
+
+
+        public void Download(string Source, string Destination)
         {
             //File download function.
             try
@@ -61,6 +63,7 @@ namespace Lanstaller.Classes
             }
             catch (WebException ex)
             {
+                Console.WriteLine("Download failed: " + Source + " Error:" + ex.Message);
                 DialogResult DR = MessageBox.Show("File Download Error\n" + Source + "\nRetry or Cancel (Skip this file)?\n" + ex.ToString(), "Download Error", MessageBoxButtons.RetryCancel);
                 if (DR == DialogResult.Retry)
                 {
@@ -75,53 +78,21 @@ namespace Lanstaller.Classes
             }
         }
 
-        public class DownloadWithProgress
+        string GetString(string Uri)
         {
-            public long downloadedbytes = 0;
-            string _source;
-            string _destination;
-            string _hash;
-            bool _isDownloading;
-
-            public DownloadWithProgress(string Source, string Destination, string MD5Hash) { _source = Source; _destination = Destination; _hash = MD5Hash; }
-            public void Download()
-            {
-                WC.DownloadProgressChanged += new DownloadProgressChangedEventHandler(client_DownloadProgressChanged);
-                WC.DownloadFileCompleted += new AsyncCompletedEventHandler(client_DownloadFileCompleted);
-                WC.DownloadFileAsync(new Uri(_source),_destination);
-            }
-            void client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-            {
-                downloadedbytes = e.BytesReceived;
-                //double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());   
-            }
-            void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
-            {
-                _isDownloading = true;
-            }
-
-            public bool isDownloading()
-            {
-                return _isDownloading;
-            }
-
-        }
-                
-
-        static string GetString(string ListName, int SoftwareID)
-        {
-            return GetString(APIServer + "InstallationList/" + ListName + "?id=" + SoftwareID.ToString());
+            return WC.DownloadString(Uri);
         }
 
+       
         public static string GetSystemInfo(string setting)
         {
-            return GetString(APIServer + "System/" + setting);
+            APIClient AC = new APIClient();
+            return AC.GetString(APIServer + "System/" + setting);
         }
 
         public static Server GetFileServerFromAPI()
         {
-            //return (Server)JsonConvert.DeserializeObject(WC.DownloadString(APIServer + "InstallationList/Server"));
-            Server FS = JObject.Parse(GetString(APIServer + "InstallationList/Server")).ToObject<Server>();
+            Server FS = JObject.Parse((new APIClient()).GetString(APIServer + "InstallationList/Server")).ToObject<Server>();
 
             //Trim / from url (getfiles will prepend / to source on copy operation).
             if (FS.path.EndsWith("/"))
@@ -137,9 +108,10 @@ namespace Lanstaller.Classes
             string url = APIServer + "InstallationList/" + ListName + "?id=" + SoftwareID.ToString();
             try
             {
-                string Reply = GetString(url);
+                string Reply = (new APIClient()).GetString(url);
                 return JArray.Parse(Reply);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Failed to download install list details from URL:" + url + ex.Message + "\nInstall will terminate.");
             }
@@ -151,7 +123,7 @@ namespace Lanstaller.Classes
         public static List<SoftwareInfo> GetSoftwareListFromAPI()
         {
             List<SoftwareInfo> SWL = new List<SoftwareInfo>();
-            JArray SoftwareArray = JArray.Parse(GetString(APIServer + "InstallationList/Software"));
+            JArray SoftwareArray = JArray.Parse((new APIClient()).GetString(APIServer + "InstallationList/Software"));
             foreach (var SW in SoftwareArray)
             {
                 SWL.Add(SW.ToObject<SoftwareInfo>());
@@ -272,13 +244,13 @@ namespace Lanstaller.Classes
         }
 
 
-        public static List<SoftwareClass.UserSerial> GetAvailableSerialsFromAPI(int SerialID)
+        public static List<UserSerial> GetAvailableSerialsFromAPI(int SerialID)
         {
-            List<SoftwareClass.UserSerial> SerialList = new List<SoftwareClass.UserSerial>();
+            List<UserSerial> SerialList = new List<UserSerial>();
             JArray Array = GetListFromAPI("AvailableSerials", SerialID);
             foreach (var itm in Array)
             {
-                SerialList.Add(itm.ToObject<SoftwareClass.UserSerial>());
+                SerialList.Add(itm.ToObject<UserSerial>());
             }
             return SerialList;
 
@@ -288,7 +260,7 @@ namespace Lanstaller.Classes
         {
             if (UserSerialID > 0)
             {
-                GetString(APIServer + "Serials?id=" + UserSerialID.ToString());
+                (new APIClient()).GetString(APIServer + "Serials?id=" + UserSerialID.ToString());
             }
         }
 

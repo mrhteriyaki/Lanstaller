@@ -77,7 +77,7 @@ namespace Lanstaller
             this.btnInstall.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnInstall.ForeColor = System.Drawing.Color.White;
-            this.btnInstall.Location = new System.Drawing.Point(316, 388);
+            this.btnInstall.Location = new System.Drawing.Point(351, 391);
             this.btnInstall.Name = "btnInstall";
             this.btnInstall.Size = new System.Drawing.Size(180, 60);
             this.btnInstall.TabIndex = 2;
@@ -89,7 +89,7 @@ namespace Lanstaller
             // 
             this.txtInstallDirectory.BackColor = System.Drawing.Color.Black;
             this.txtInstallDirectory.ForeColor = System.Drawing.Color.White;
-            this.txtInstallDirectory.Location = new System.Drawing.Point(304, 110);
+            this.txtInstallDirectory.Location = new System.Drawing.Point(339, 110);
             this.txtInstallDirectory.Name = "txtInstallDirectory";
             this.txtInstallDirectory.Size = new System.Drawing.Size(203, 20);
             this.txtInstallDirectory.TabIndex = 5;
@@ -99,7 +99,7 @@ namespace Lanstaller
             // 
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(302, 94);
+            this.label1.Location = new System.Drawing.Point(336, 94);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 6;
@@ -114,7 +114,7 @@ namespace Lanstaller
             this.gbxActions.Controls.Add(this.chkRegistry);
             this.gbxActions.Controls.Add(this.chkFiles);
             this.gbxActions.ForeColor = System.Drawing.Color.White;
-            this.gbxActions.Location = new System.Drawing.Point(304, 149);
+            this.gbxActions.Location = new System.Drawing.Point(339, 149);
             this.gbxActions.Name = "gbxActions";
             this.gbxActions.Size = new System.Drawing.Size(203, 146);
             this.gbxActions.TabIndex = 8;
@@ -208,7 +208,7 @@ namespace Lanstaller
             this.gbxPref.Controls.Add(this.label2);
             this.gbxPref.Controls.Add(this.txtUsername);
             this.gbxPref.ForeColor = System.Drawing.Color.White;
-            this.gbxPref.Location = new System.Drawing.Point(304, 301);
+            this.gbxPref.Location = new System.Drawing.Point(339, 301);
             this.gbxPref.Name = "gbxPref";
             this.gbxPref.Size = new System.Drawing.Size(203, 74);
             this.gbxPref.TabIndex = 9;
@@ -282,7 +282,7 @@ namespace Lanstaller
             this.gbxStatus.ForeColor = System.Drawing.Color.White;
             this.gbxStatus.Location = new System.Drawing.Point(305, 457);
             this.gbxStatus.Name = "gbxStatus";
-            this.gbxStatus.Size = new System.Drawing.Size(203, 122);
+            this.gbxStatus.Size = new System.Drawing.Size(260, 122);
             this.gbxStatus.TabIndex = 10;
             this.gbxStatus.TabStop = false;
             this.gbxStatus.Text = "Status";
@@ -292,7 +292,7 @@ namespace Lanstaller
             this.pbInstall.Enabled = false;
             this.pbInstall.Location = new System.Drawing.Point(6, 94);
             this.pbInstall.Name = "pbInstall";
-            this.pbInstall.Size = new System.Drawing.Size(192, 22);
+            this.pbInstall.Size = new System.Drawing.Size(248, 22);
             this.pbInstall.TabIndex = 1;
             // 
             // lblStatus
@@ -311,12 +311,12 @@ namespace Lanstaller
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtChatMessages.BackColor = System.Drawing.Color.Black;
             this.txtChatMessages.ForeColor = System.Drawing.Color.White;
-            this.txtChatMessages.Location = new System.Drawing.Point(514, 96);
+            this.txtChatMessages.Location = new System.Drawing.Point(574, 96);
             this.txtChatMessages.Multiline = true;
             this.txtChatMessages.Name = "txtChatMessages";
             this.txtChatMessages.ReadOnly = true;
             this.txtChatMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtChatMessages.Size = new System.Drawing.Size(297, 457);
+            this.txtChatMessages.Size = new System.Drawing.Size(366, 457);
             this.txtChatMessages.TabIndex = 11;
             // 
             // txtChatSendMessage
@@ -325,9 +325,9 @@ namespace Lanstaller
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtChatSendMessage.BackColor = System.Drawing.Color.Black;
             this.txtChatSendMessage.ForeColor = System.Drawing.Color.White;
-            this.txtChatSendMessage.Location = new System.Drawing.Point(552, 559);
+            this.txtChatSendMessage.Location = new System.Drawing.Point(609, 559);
             this.txtChatSendMessage.Name = "txtChatSendMessage";
-            this.txtChatSendMessage.Size = new System.Drawing.Size(250, 20);
+            this.txtChatSendMessage.Size = new System.Drawing.Size(322, 20);
             this.txtChatSendMessage.TabIndex = 12;
             this.txtChatSendMessage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtChatSendMessage_KeyUp);
             // 
@@ -335,7 +335,7 @@ namespace Lanstaller
             // 
             this.lblSpaceRequired.AutoSize = true;
             this.lblSpaceRequired.ForeColor = System.Drawing.Color.White;
-            this.lblSpaceRequired.Location = new System.Drawing.Point(302, 133);
+            this.lblSpaceRequired.Location = new System.Drawing.Point(336, 133);
             this.lblSpaceRequired.Name = "lblSpaceRequired";
             this.lblSpaceRequired.Size = new System.Drawing.Size(87, 13);
             this.lblSpaceRequired.TabIndex = 16;
@@ -348,7 +348,7 @@ namespace Lanstaller
             this.pbTitleExpanded.InitialImage = null;
             this.pbTitleExpanded.Location = new System.Drawing.Point(0, 0);
             this.pbTitleExpanded.Name = "pbTitleExpanded";
-            this.pbTitleExpanded.Size = new System.Drawing.Size(835, 90);
+            this.pbTitleExpanded.Size = new System.Drawing.Size(967, 90);
             this.pbTitleExpanded.TabIndex = 17;
             this.pbTitleExpanded.TabStop = false;
             this.pbTitleExpanded.Click += new System.EventHandler(this.pbTitleExpanded_Click);
@@ -360,7 +360,7 @@ namespace Lanstaller
             this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnExit.ForeColor = System.Drawing.Color.White;
-            this.btnExit.Location = new System.Drawing.Point(793, 0);
+            this.btnExit.Location = new System.Drawing.Point(922, 0);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(30, 29);
             this.btnExit.TabIndex = 18;
@@ -373,7 +373,7 @@ namespace Lanstaller
             this.pbTitle.BackgroundImage = global::Lanstaller.Properties.Resources.LanstallerThin;
             this.pbTitle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.pbTitle.InitialImage = null;
-            this.pbTitle.Location = new System.Drawing.Point(8, 7);
+            this.pbTitle.Location = new System.Drawing.Point(90, 5);
             this.pbTitle.Name = "pbTitle";
             this.pbTitle.Size = new System.Drawing.Size(748, 83);
             this.pbTitle.TabIndex = 7;
@@ -386,7 +386,7 @@ namespace Lanstaller
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
             this.label4.ForeColor = System.Drawing.Color.White;
-            this.label4.Location = new System.Drawing.Point(514, 562);
+            this.label4.Location = new System.Drawing.Point(571, 562);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(32, 13);
             this.label4.TabIndex = 7;
@@ -422,7 +422,7 @@ namespace Lanstaller
             this.pbBottomright.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbBottomright.BackgroundImage")));
             this.pbBottomright.ErrorImage = null;
             this.pbBottomright.InitialImage = null;
-            this.pbBottomright.Location = new System.Drawing.Point(806, 566);
+            this.pbBottomright.Location = new System.Drawing.Point(935, 566);
             this.pbBottomright.Name = "pbBottomright";
             this.pbBottomright.Size = new System.Drawing.Size(15, 15);
             this.pbBottomright.TabIndex = 22;
@@ -437,7 +437,7 @@ namespace Lanstaller
             this.btnMin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMin.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnMin.ForeColor = System.Drawing.Color.White;
-            this.btnMin.Location = new System.Drawing.Point(762, 0);
+            this.btnMin.Location = new System.Drawing.Point(891, 0);
             this.btnMin.Name = "btnMin";
             this.btnMin.Size = new System.Drawing.Size(30, 29);
             this.btnMin.TabIndex = 23;
@@ -450,7 +450,7 @@ namespace Lanstaller
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(823, 583);
+            this.ClientSize = new System.Drawing.Size(952, 583);
             this.Controls.Add(this.btnMin);
             this.Controls.Add(this.pbBottomright);
             this.Controls.Add(this.lvSoftware);

@@ -35,6 +35,7 @@ namespace Lanstaller
             this.btnPaste = new System.Windows.Forms.Button();
             this.cmbxServerSerials = new System.Windows.Forms.ComboBox();
             this.lblServerSerials = new System.Windows.Forms.Label();
+            this.btnClose = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtSerial
@@ -42,10 +43,9 @@ namespace Lanstaller
             this.txtSerial.BackColor = System.Drawing.Color.White;
             this.txtSerial.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtSerial.ForeColor = System.Drawing.Color.Black;
-            this.txtSerial.Location = new System.Drawing.Point(20, 42);
-            this.txtSerial.Margin = new System.Windows.Forms.Padding(4);
+            this.txtSerial.Location = new System.Drawing.Point(12, 34);
             this.txtSerial.Name = "txtSerial";
-            this.txtSerial.Size = new System.Drawing.Size(800, 46);
+            this.txtSerial.Size = new System.Drawing.Size(604, 38);
             this.txtSerial.TabIndex = 0;
             this.txtSerial.TextChanged += new System.EventHandler(this.txtSerial_TextChanged);
             // 
@@ -53,10 +53,9 @@ namespace Lanstaller
             // 
             this.lblTitle.AutoSize = true;
             this.lblTitle.ForeColor = System.Drawing.Color.White;
-            this.lblTitle.Location = new System.Drawing.Point(16, 17);
-            this.lblTitle.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblTitle.Location = new System.Drawing.Point(9, 9);
             this.lblTitle.Name = "lblTitle";
-            this.lblTitle.Size = new System.Drawing.Size(96, 16);
+            this.lblTitle.Size = new System.Drawing.Size(76, 13);
             this.lblTitle.TabIndex = 1;
             this.lblTitle.Text = "Serial Number:";
             // 
@@ -64,10 +63,9 @@ namespace Lanstaller
             // 
             this.btnOK.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnOK.ForeColor = System.Drawing.Color.White;
-            this.btnOK.Location = new System.Drawing.Point(688, 96);
-            this.btnOK.Margin = new System.Windows.Forms.Padding(4);
+            this.btnOK.Location = new System.Drawing.Point(516, 78);
             this.btnOK.Name = "btnOK";
-            this.btnOK.Size = new System.Drawing.Size(133, 37);
+            this.btnOK.Size = new System.Drawing.Size(100, 30);
             this.btnOK.TabIndex = 2;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
@@ -78,10 +76,9 @@ namespace Lanstaller
             this.btnPaste.BackColor = System.Drawing.Color.Black;
             this.btnPaste.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnPaste.ForeColor = System.Drawing.Color.White;
-            this.btnPaste.Location = new System.Drawing.Point(547, 96);
-            this.btnPaste.Margin = new System.Windows.Forms.Padding(4);
+            this.btnPaste.Location = new System.Drawing.Point(410, 78);
             this.btnPaste.Name = "btnPaste";
-            this.btnPaste.Size = new System.Drawing.Size(133, 37);
+            this.btnPaste.Size = new System.Drawing.Size(100, 30);
             this.btnPaste.TabIndex = 3;
             this.btnPaste.Text = "Paste";
             this.btnPaste.UseVisualStyleBackColor = false;
@@ -90,9 +87,10 @@ namespace Lanstaller
             // cmbxServerSerials
             // 
             this.cmbxServerSerials.FormattingEnabled = true;
-            this.cmbxServerSerials.Location = new System.Drawing.Point(120, 100);
+            this.cmbxServerSerials.Location = new System.Drawing.Point(166, 82);
+            this.cmbxServerSerials.Margin = new System.Windows.Forms.Padding(2);
             this.cmbxServerSerials.Name = "cmbxServerSerials";
-            this.cmbxServerSerials.Size = new System.Drawing.Size(316, 24);
+            this.cmbxServerSerials.Size = new System.Drawing.Size(238, 21);
             this.cmbxServerSerials.TabIndex = 4;
             this.cmbxServerSerials.SelectedIndexChanged += new System.EventHandler(this.cmbxServerSerials_SelectedIndexChanged);
             // 
@@ -100,19 +98,32 @@ namespace Lanstaller
             // 
             this.lblServerSerials.AutoSize = true;
             this.lblServerSerials.ForeColor = System.Drawing.Color.White;
-            this.lblServerSerials.Location = new System.Drawing.Point(17, 103);
-            this.lblServerSerials.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblServerSerials.Location = new System.Drawing.Point(89, 85);
             this.lblServerSerials.Name = "lblServerSerials";
-            this.lblServerSerials.Size = new System.Drawing.Size(95, 16);
+            this.lblServerSerials.Size = new System.Drawing.Size(75, 13);
             this.lblServerSerials.TabIndex = 5;
             this.lblServerSerials.Text = "Server Serials:";
             // 
+            // btnClose
+            // 
+            this.btnClose.BackColor = System.Drawing.Color.Black;
+            this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnClose.ForeColor = System.Drawing.Color.White;
+            this.btnClose.Location = new System.Drawing.Point(12, 78);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(72, 30);
+            this.btnClose.TabIndex = 6;
+            this.btnClose.Text = "Cancel";
+            this.btnClose.UseVisualStyleBackColor = false;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
             // frmSerial
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(837, 148);
+            this.ClientSize = new System.Drawing.Size(628, 120);
+            this.Controls.Add(this.btnClose);
             this.Controls.Add(this.lblServerSerials);
             this.Controls.Add(this.cmbxServerSerials);
             this.Controls.Add(this.btnPaste);
@@ -120,7 +131,6 @@ namespace Lanstaller
             this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.txtSerial);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "frmSerial";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SerialForm";
@@ -137,5 +147,6 @@ namespace Lanstaller
         public System.Windows.Forms.Label lblTitle;
         public System.Windows.Forms.Label lblServerSerials;
         private System.Windows.Forms.ComboBox cmbxServerSerials;
+        public System.Windows.Forms.Button btnClose;
     }
 }

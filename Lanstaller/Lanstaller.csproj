@@ -66,7 +66,6 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -87,6 +86,7 @@
     <Compile Include="Classes\APIClient.cs" />
     <Compile Include="Classes\ChatClient.cs" />
     <Compile Include="Classes\Cryptographic.cs" />
+    <Compile Include="Classes\DownloadTask.cs" />
     <Compile Include="Classes\LocalDatabase.cs" />
     <Compile Include="frmLanstaller.cs">
       <SubType>Form</SubType>

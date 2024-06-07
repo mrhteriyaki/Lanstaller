@@ -11,6 +11,8 @@ using System.Windows.Forms;
 
 //using Lanstaller;
 using Lanstaller_Shared;
+using Lanstaller_Shared.Models;
+
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
 
@@ -20,10 +22,10 @@ namespace Lanstaller_Management_Console
 {
     public partial class frmLanstallerManager : Form
     {
-        List<SoftwareClass.SoftwareInfo> SoftwareList = new List<SoftwareClass.SoftwareInfo>();
-        SoftwareClass.SoftwareInfo CurrentSelectedSoftware;
+        List<SoftwareInfo> SoftwareList = new List<SoftwareInfo>();
+        SoftwareInfo CurrentSelectedSoftware;
         
-        List<SoftwareClass.Redistributable> RedistList = new List<SoftwareClass.Redistributable>();
+        List<Redistributable> RedistList = new List<Redistributable>();
 
         //static string status = "Status: Ready";
 
@@ -203,7 +205,7 @@ namespace Lanstaller_Management_Console
             SqlDataReader SR = SQLCmd.ExecuteReader();
             while (SR.Read())
             {
-                SoftwareClass.Redistributable RED = new SoftwareClass.Redistributable();
+                Redistributable RED = new Redistributable();
                 RED.id = (int)SR[0];
                 RED.name = SR[1].ToString();
                 RedistList.Add(RED);
@@ -220,7 +222,7 @@ namespace Lanstaller_Management_Console
 
             //for updating listview from local SoftwareList counts.
             lvSoftware.Items.Clear();
-            foreach (SoftwareClass.SoftwareInfo SW in SoftwareList)
+            foreach (SoftwareInfo SW in SoftwareList)
             {
                 ListViewItem lvi = new ListViewItem(SW.Name);
                 lvi.SubItems.Add(SW.file_count.ToString());
@@ -247,7 +249,7 @@ namespace Lanstaller_Management_Console
 
             RefreshSoftware();
             int index = 0;
-            foreach (SoftwareClass.SoftwareInfo SW in SoftwareList)
+            foreach (SoftwareInfo SW in SoftwareList)
             {
                 if (SW.id == newid)
                 {
@@ -697,7 +699,7 @@ namespace Lanstaller_Management_Console
         private void RefreshSerialPoolList()
         {
             SerialPanel.lvUserSerials.Items.Clear();
-            foreach (SoftwareClass.UserSerial SN in SoftwareClass.UserSerial.GetUserSerials(serialid_pool_selected))
+            foreach (UserSerial SN in UserSerial.GetUserSerials(serialid_pool_selected))
             {
                 //MessageBox.Show(SN.name);
                 ListViewItem LVI = new ListViewItem(SN.serial);
@@ -713,9 +715,9 @@ namespace Lanstaller_Management_Console
         {
             if (String.IsNullOrEmpty(SerialPanel.txtUserSerial.Text)) return; //Skip empty input.
             //add serial to pool.
-            string serial_value = SoftwareClass.SerialNumber.FilterSerial(SerialPanel.txtUserSerial.Text);
+            string serial_value = SerialNumber.FilterSerial(SerialPanel.txtUserSerial.Text);
             
-            SoftwareClass.UserSerial.AddAvailableSerial(serialid_pool_selected, serial_value);
+            UserSerial.AddAvailableSerial(serialid_pool_selected, serial_value);
             SerialPanel.txtUserSerial.Text = serial_value;
             RefreshSerialPoolList();
             SerialPanel.txtUserSerial.Text = string.Empty;
@@ -726,7 +728,7 @@ namespace Lanstaller_Management_Console
             if (SerialPanel.lvUserSerials.SelectedItems.Count == 0) return;
             //Delete serial from pool.
             int userserialid = (int)SerialPanel.lvUserSerials.SelectedItems[0].Tag;
-            SoftwareClass.UserSerial.DeleteAvailableSerial(userserialid);
+            UserSerial.DeleteAvailableSerial(userserialid);
             RefreshSerialPoolList();
         }
 
@@ -854,12 +856,12 @@ namespace Lanstaller_Management_Console
 
             //load serial panel details.
             SerialPanel.cmbxSerialPoolInstance.Items.Clear();
-            foreach (SoftwareClass.SerialNumber SN in SoftwareClass.GetSerials(CurrentSelectedSoftware.id))
+            foreach (SerialNumber SN in SoftwareClass.GetSerials(CurrentSelectedSoftware.id))
             {
                 SerialPanel.cmbxSerialPoolInstance.Items.Add(SN.name);
             }
 
-            foreach(SoftwareClass.Redistributable RS in SoftwareClass.GetRedistributables(CurrentSelectedSoftware.id))
+            foreach(Redistributable RS in SoftwareClass.GetRedistributables(CurrentSelectedSoftware.id))
             {
                 WindowsSettingsPanel.cmbxRedist.Items.Add(RS.name);
             }

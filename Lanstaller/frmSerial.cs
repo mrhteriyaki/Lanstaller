@@ -12,6 +12,7 @@ using System.Threading;
 using Lanstaller.Classes;
 using Lanstaller_Shared;
 using static Lanstaller_Shared.SoftwareClass;
+using Lanstaller_Shared.Models;
 
 namespace Lanstaller
 {
@@ -20,6 +21,7 @@ namespace Lanstaller
     {
         public int serialid;
         List<UserSerial> serial_pool = new List<UserSerial>();
+        public bool aborted = true;
 
         public frmSerial()
         {
@@ -29,7 +31,7 @@ namespace Lanstaller
        
         private void txtSerial_TextChanged(object sender, EventArgs e)
         {
-            txtSerial.Text = SoftwareClass.SerialNumber.FilterSerial(txtSerial.Text);
+            txtSerial.Text = SerialNumber.FilterSerial(txtSerial.Text);
         }
 
      
@@ -37,14 +39,13 @@ namespace Lanstaller
         {
             if (cmbxServerSerials.SelectedIndex != -1)
             {
-                //MessageBox.Show(cmbxServerSerials.SelectedIndex.ToString());
                 //Send back Server Serial of confirmation for use.
                 APIClient.SetAvailableSerialsFromAPI(serial_pool[cmbxServerSerials.SelectedIndex].id);
             }
 
-
             if (!String.IsNullOrWhiteSpace(txtSerial.Text))
             {
+                aborted = false;
                 this.Close();
             }
         }
@@ -110,6 +111,11 @@ namespace Lanstaller
             {
                 txtSerial.Text = cmbxServerSerials.Text;
             }
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

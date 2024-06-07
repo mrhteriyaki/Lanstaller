@@ -21,6 +21,8 @@ using System.Runtime.InteropServices.ComTypes;
 using Pri.LongPath;
 using System.Reflection;
 using static Lanstaller.Classes.LocalDatabase;
+using System.Linq;
+using Lanstaller_Shared.Models;
 
 namespace Lanstaller
 {
@@ -32,12 +34,11 @@ namespace Lanstaller
         readonly static string LanstallerDataDir = "C:\\ProgramData\\Lanstaller\\";
         LocalDatabase LocalDB;
 
-        ConcurrentQueue<ClientSoftwareClass> InstallQueue = new ConcurrentQueue<ClientSoftwareClass>();
+        private static object lock_InstallQueue = new object();
+        Queue<ClientSoftwareClass> InstallQueue = new Queue<ClientSoftwareClass>();
+        ClientSoftwareClass CurrentCSW = new ClientSoftwareClass();
 
-        List<int> InstallQueueIDs = new List<int>();
-        private static object lock_InstallQueueIDs = new object();
-
-        List<ClientSoftwareClass.SoftwareInfo> SList; //List of Software.
+        List<SoftwareInfo> SList; //List of Software.
 
         Thread MThread; //Status Monitor Thread
         Thread CThread; //Chat Thread
@@ -51,7 +52,6 @@ namespace Lanstaller
         Size WindowStartSize;
 
         List<ShortcutOperation> currentSoftwareShortcuts;
-
 
         public frmLanstaller()
         {
@@ -91,7 +91,15 @@ namespace Lanstaller
 
             LoadClientSettings();
             InitialFormSetup();
-            LoadSoftwareList();
+            try
+            {
+                LoadSoftwareList();
+            }
+            catch
+            {
+                MessageBox.Show("Failed to connect to server");
+                Application.Exit();
+            }
         }
 
         void InitialFormSetup()
@@ -134,7 +142,7 @@ namespace Lanstaller
                 if (line.StartsWith("authkey="))
                 {
                     string auth = line.Split('=')[1];
-                    APIClient.Setup(auth);
+                    APIClient.SetAuth(auth);
                     ChatClient.SetAuth(auth);
 
                 }
@@ -277,12 +285,12 @@ namespace Lanstaller
 
                 lblStatus.Invoke((MethodInvoker)delegate
                  {
-                     lblStatus.Text = ClientSoftwareClass.GetStatus();
+                     lblStatus.Text = CurrentCSW.GetStatus();
                  });
 
                 pbInstall.Invoke((MethodInvoker)delegate
                 {
-                    pbInstall.Value = ClientSoftwareClass.GetProgressPercentage();
+                    pbInstall.Value = CurrentCSW.GetProgressPercentage();
                 });
 
                 //Wait 100 ms before next update.
@@ -361,36 +369,40 @@ namespace Lanstaller
             }
             else
             {
-                runSoftware();
+                if (currentSoftwareShortcuts.Count == 1)
+                {
+                    runShortcut(currentSoftwareShortcuts[0]);
+                }
+                else
+                {
+                    frmRunSelection runOptionsWindow = new frmRunSelection();
+                    runOptionsWindow.SetOptions(currentSoftwareShortcuts);
+                    runOptionsWindow.Show();
+                }
             }
         }
-        void runSoftware()
-        {
-            if (currentSoftwareShortcuts.Count == 1)
-            {
-                runShortcut(currentSoftwareShortcuts[0]);
-            }
-            else
-            {
-                frmRunSelection runOptionsWindow = new frmRunSelection();
-                runOptionsWindow.SetOptions(currentSoftwareShortcuts);
-                runOptionsWindow.Show();
-            }
 
-        }
         public static void runShortcut(ShortcutOperation Shortcut)
         {
-
+            if (!File.Exists(Shortcut.filepath))
+            {
+                MessageBox.Show("Missing EXE to launch");
+                return;
+            }
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.FileName = Shortcut.filepath;
             startInfo.WorkingDirectory = Shortcut.runpath;
             startInfo.Arguments = Shortcut.arguments;
             startInfo.UseShellExecute = true;
-            Process.Start(startInfo);
-
+            try
+            {
+                Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to launch: " + ex.ToString());
+            }
         }
-
-
 
         void QueueInstall(int SoftwareListIndex)
         {
@@ -398,18 +410,22 @@ namespace Lanstaller
             InstallSW.Identity = SList[SoftwareListIndex];
 
             //Check if already in queue.
-            lock (lock_InstallQueueIDs)
+            if (CurrentCSW.Identity.id == InstallSW.Identity.id)
             {
-                foreach (int qid in InstallQueueIDs)
-                {
-                    if (InstallSW.Identity.id == qid)
-                    {
-                        MessageBox.Show("Installation already queued.");
-                        return; //skip installation.
-                    }
-                }
-                InstallQueueIDs.Add(InstallSW.Identity.id);
+                MessageBox.Show("Installation already running.");
+                return;
             }
+
+            lock (lock_InstallQueue)
+            {
+                if (InstallQueue.Any(inst => inst.Identity.id == InstallSW.Identity.id))
+                {
+                    MessageBox.Show("Installation already queued.");
+                    return;
+                }
+            }
+
+
             lvSoftware.Items[SoftwareListIndex].Text = lvSoftware.Items[SoftwareListIndex].Text + " (Install Queued)";
             lvSoftware.Items[SoftwareListIndex].ForeColor = Color.DarkGray;
 
@@ -428,11 +444,17 @@ namespace Lanstaller
                 {
                     InstallSW.AddSerial(SN);
                 }
-                InstallSW.GenerateSerials();
+                if (!InstallSW.GenerateSerials()) //Prompt for serials, if cancelled, abort install.
+                {
+                    return;
+                }
             }
 
             //Queue installation request.
-            InstallQueue.Enqueue(InstallSW);
+            lock (lock_InstallQueue)
+            {
+                InstallQueue.Enqueue(InstallSW);
+            }
 
             //Start Installation thread if not running.
             lock (lock_InstallThreadRunning)
@@ -451,46 +473,50 @@ namespace Lanstaller
         {
             while (InstallQueue.Count > 0)
             {
-                ClientSoftwareClass CSW;
-                if (InstallQueue.TryDequeue(out CSW))
+                lock (lock_InstallQueue)
                 {
-                    //Check Install Directory Valid.
-                    if (Directory.Exists(CSW.InstallDir) == false) Directory.CreateDirectory(CSW.InstallDir); //Generate installation path.
-
-                    //Enable progress bar.
-                    this.BeginInvoke((MethodInvoker)(() => gbxStatus.Visible = true));
-
-                    int SListIndex = 0;
-                    foreach (SoftwareInfo SWI in SList)
-                    {
-                        if (SList[SListIndex].id == CSW.Identity.id)
-                        {
-                            this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CSW.Identity.Name + " (Installing)"));
-                            break;
-                        }
-                        SListIndex++;
-                    }
-
-                    //Run Installation.
-                    CSW.Install();
-
-                    lock (lock_InstallQueueIDs)
-                    {
-                        InstallQueueIDs.Remove(CSW.Identity.id);
-                    }
-                    if (CSW.GetErrored())
-                    {
-                        MessageBox.Show("Some or all files failed to download and pass verification.");
-                    }
-                    else
-                    {
-                        LocalDB.AddLocalInstall(CSW.Identity.id, CSW.GetShortcutOperations());
-                        this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
-                        this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
-                    }
-                    this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CSW.Identity.Name));
+                    CurrentCSW = InstallQueue.Dequeue();
                 }
+
+                //Check Install Directory Valid.
+                if (Directory.Exists(CurrentCSW.InstallDir) == false)
+                {
+                    Directory.CreateDirectory(CurrentCSW.InstallDir); //Generate installation path.
+                }
+
+                this.BeginInvoke((MethodInvoker)(() => gbxStatus.Visible = true));
+
+                int SListIndex = 0;
+                foreach (SoftwareInfo SWI in SList)
+                {
+                    if (SList[SListIndex].id == CurrentCSW.Identity.id)
+                    {
+                        this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.Identity.Name + " (Installing)"));
+                        break;
+                    }
+                    SListIndex++;
+                }
+
+                CurrentCSW.Install();
+
+                if (CurrentCSW.GetErrored())
+                {
+                    MessageBox.Show("Some or all files failed to download and pass verification.");
+                }
+                else
+                {
+                    //if (ShortcutAndFileExist(CurrentCSW.Identity.id))
+
+                    LocalDB.AddLocalInstall(CurrentCSW.Identity.id, CurrentCSW.GetShortcutOperations());
+                    this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
+
+                    this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
+                }
+                this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.Identity.Name));
+
             } //End of installer queue.
+
+            CurrentCSW = new ClientSoftwareClass(); //Clear current CSW object.
 
             //Disable progress bar while no installs running.
             this.BeginInvoke((MethodInvoker)(() => gbxStatus.Visible = false));
@@ -676,16 +702,23 @@ namespace Lanstaller
         void CheckInstalled()
         {
             install_option = true;
-            btnInstall.Text = "Install";
             if (lvSoftware.SelectedItems.Count == 1)
             {
                 currentSoftwareShortcuts = LocalDB.GetShortcuts(SList[lvSoftware.SelectedItems[0].Index].id);
                 if (currentSoftwareShortcuts.Count > 0)
                 {
-                    install_option = false;
-                    btnInstall.Text = "Start";
+                    foreach (ShortcutOperation SC in currentSoftwareShortcuts)
+                    {
+                        if (File.Exists(SC.filepath))
+                        {
+                            install_option = false;
+                            btnInstall.Text = "Start";
+                            return;
+                        }
+                    }
                 }
             }
+            btnInstall.Text = "Install";
         }
 
 

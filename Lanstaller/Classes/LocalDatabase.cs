@@ -8,6 +8,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using System.Windows.Forms;
+using Lanstaller_Shared.Models;
 
 namespace Lanstaller.Classes
 {
@@ -25,9 +26,9 @@ namespace Lanstaller.Classes
         public class LocalInstallRecord
         {
             public int SoftwareID;
-            public List<SoftwareClass.ShortcutOperation> Shortcuts;
+            public List<ShortcutOperation> Shortcuts;
 
-            public LocalInstallRecord(int softwareID, List<SoftwareClass.ShortcutOperation> shortcuts)
+            public LocalInstallRecord(int softwareID, List<ShortcutOperation> shortcuts)
             {
                 SoftwareID = softwareID;
                 Shortcuts = shortcuts;
@@ -51,7 +52,7 @@ namespace Lanstaller.Classes
             foreach(LocalInstallRecord record in _records)
             {
                 bool software_removed = true;
-                foreach(SoftwareClass.ShortcutOperation shortcut in record.Shortcuts)
+                foreach(ShortcutOperation shortcut in record.Shortcuts)
                 {
                     if (File.Exists(shortcut.filepath))
                     {
@@ -84,7 +85,7 @@ namespace Lanstaller.Classes
             return ids;
         }
 
-        public List<SoftwareClass.ShortcutOperation> GetShortcuts(int softwareID)
+        public List<ShortcutOperation> GetShortcuts(int softwareID)
         {
             foreach (LocalInstallRecord record in _records)
             {
@@ -93,10 +94,10 @@ namespace Lanstaller.Classes
                     return record.Shortcuts;
                 }
             }
-            return new List<SoftwareClass.ShortcutOperation>();
+            return new List<ShortcutOperation>();
         }
 
-        public void AddLocalInstall(int SoftwareID, List<SoftwareClass.ShortcutOperation> shortcutOperations)
+        public void AddLocalInstall(int SoftwareID, List<ShortcutOperation> shortcutOperations)
         {
             _records.Add(new LocalInstallRecord(SoftwareID, shortcutOperations));
             WriteListDB(_records);
