@@ -28,7 +28,7 @@ namespace Lanstaller_Shared
         public static string ConnectionString;
         public SoftwareInfo Identity = new SoftwareInfo();
 
-        
+
         public static string GetSystemData(string setting)
         {
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
@@ -151,47 +151,43 @@ namespace Lanstaller_Shared
         }
 
 
-        public static Server GetFileServer(int Protocol) //web or smb for type.
+        public static List<Server> GetFileServer() //web or smb for type.
         {
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 
-            SQLCmd.CommandText = "SELECT TOP (1) [address],[protocol] FROM [tblServers] ORDER BY [Priority] ASC";
-            //server type specified (web / smb)
-            if (Protocol != 0)
-            {
-                SQLCmd.CommandText = "SELECT TOP (1) [address],[protocol] FROM [tblServers] WHERE [protocol] = @servertype ORDER BY [Priority] ASC";
-                SQLCmd.Parameters.AddWithValue("@servertype", Protocol);
-            }
+            SQLCmd.CommandText = "SELECT [address],[protocol],[priority] FROM [tblServers] ORDER BY [Priority] ASC";
 
             SQLConn.Open();
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
-            Server tmpServ = new Server();
+            List<Server> tmpList = new List<Server>();
             while (SQLOutput.Read())
             {
-                tmpServ.path = SQLOutput[0].ToString();
-                tmpServ.protocol = (int)SQLOutput[1];
+                tmpList.Add(new Server()
+                {
+                    path = SQLOutput[0].ToString(),
+                    protocol = (int)SQLOutput[1],
+                    priority = (int)SQLOutput[2]
+                });
             }
             SQLConn.Close();
-            return tmpServ;
+            return tmpList;
         }
 
         public static string GetSoftwareName(int softwareid)
         {
-            string QueryString = "SELECT TOP(1) [name] FROM [tblSoftware] WHERE id = @sid";
-
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SQLConn.Open();
-            SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
+            SqlCommand SQLCmd = new SqlCommand()
+            {
+                CommandText = "SELECT TOP(1) [name] FROM [tblSoftware] WHERE id = @sid",
+                Connection = SQLConn
+            };
             SQLCmd.Parameters.AddWithValue("@sid", softwareid);
-            string softwarename = "";
-            softwarename = SQLCmd.ExecuteScalar().ToString();
-
+            string softwarename = SQLCmd.ExecuteScalar().ToString();
             SQLConn.Close();
-
             return softwarename;
-
         }
 
         public static List<FileCopyOperation> GetFiles(int SoftwareID)
@@ -211,8 +207,7 @@ namespace Lanstaller_Shared
                 FileCopyOperation tFCO = new FileCopyOperation();
                 tFCO.fileinfo.id = (int)SQLOutput[0];
 
-                string strsource = SQLOutput[1].ToString();
-                strsource = strsource.Replace("\\", "/");
+                string strsource = SQLOutput[1].ToString().Replace("\\", "/");
 
                 if (strsource.Contains("/"))
                 {
@@ -222,7 +217,6 @@ namespace Lanstaller_Shared
                     {
                         encodedsource.Append("/" + Uri.EscapeDataString(pth));
                         //encodedsource.Append("/" + HttpUtility.UrlEncode(pth));
-
                     }
                     tFCO.fileinfo.source = encodedsource.ToString();
                 }
@@ -344,7 +338,7 @@ namespace Lanstaller_Shared
 
         }
 
-      
+
 
 
 
@@ -436,7 +430,7 @@ namespace Lanstaller_Shared
         {
             List<Redistributable> RedistributableList = new List<Redistributable>();
 
-            string server_path = GetFileServer(1).path;
+            string server_path = GetFileServer()[0].path;
 
             //Get Required Redist ID for install.
             string QueryString = "SELECT tblRedistUsage.[redist_id],tblRedist.id,tblRedist.[name],tblRedist.[path],tblRedist.args,tblRedist.filecheck,tblRedist.[version],tblRedist.compressed,tblRedist.compressed_path FROM tblRedistUsage INNER JOIN tblRedist ON tblRedistUsage.redist_id=tblRedist.id WHERE tblRedistUsage.software_id = @softwareid ORDER BY tblRedistUsage.[install_order] ASC";
@@ -661,7 +655,7 @@ namespace Lanstaller_Shared
 
         public static void RescanFileHashes(bool fullrescan, int software_id)
         {
-            Server SA = GetFileServer(1);
+            Server SA = GetFileServer()[0];
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;

@@ -8,5 +8,6 @@ namespace Lanstaller_Shared.Models
     {
         public string path;
         public int protocol = 0; //1 = Web, 2 = SMB
+        public int priority = 0;
     }
 }

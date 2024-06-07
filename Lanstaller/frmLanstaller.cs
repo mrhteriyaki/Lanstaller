@@ -177,7 +177,7 @@ namespace Lanstaller
             Server FileServer;
             try
             {
-                FileServer = APIClient.GetFileServerFromAPI();
+                FileServer = APIClient.GetFileServerFromAPI()[0];
             }
             catch (Exception ex)
             {
@@ -486,19 +486,13 @@ namespace Lanstaller
 
                 this.BeginInvoke((MethodInvoker)(() => gbxStatus.Visible = true));
 
-                int SListIndex = 0;
-                foreach (SoftwareInfo SWI in SList)
-                {
-                    if (SList[SListIndex].id == CurrentCSW.Identity.id)
-                    {
-                        this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.Identity.Name + " (Installing)"));
-                        break;
-                    }
-                    SListIndex++;
-                }
+                int SListIndex = SList.FindIndex(swi => swi.id == CurrentCSW.Identity.id);
+
+                this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.Identity.Name + " (Installing)"));
 
                 CurrentCSW.Install();
 
+                this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.Identity.Name));
                 if (CurrentCSW.GetErrored())
                 {
                     MessageBox.Show("Some or all files failed to download and pass verification.");
@@ -506,13 +500,11 @@ namespace Lanstaller
                 else
                 {
                     //if (ShortcutAndFileExist(CurrentCSW.Identity.id))
-
                     LocalDB.AddLocalInstall(CurrentCSW.Identity.id, CurrentCSW.GetShortcutOperations());
                     this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
-
                     this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
                 }
-                this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.Identity.Name));
+                
 
             } //End of installer queue.
 

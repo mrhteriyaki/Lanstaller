@@ -607,7 +607,7 @@ namespace Lanstaller
                 }
             }
 
-            Server FileServer = GetFileServerFromAPI();
+            Server FileServer = GetFileServerFromAPI()[0];
 
             bool FilesNotValidated = true; //File copy validation - loop on hash failure.
             int FailLoopCount = 0;
@@ -752,7 +752,9 @@ namespace Lanstaller
             }
             else if (FileServer.protocol == 2) //Smb
             {
-                Pri.LongPath.File.Copy(FileServer.path + "\\" + FCO.fileinfo.source, FCO.destination, true);
+                Pri.LongPath.File.Copy(FileServer.path + "\\" + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
+                SetStatus(Identity.Name, FileCopyIndex, FileCopyOperations.Count, SizeMessage);
+                SetProgress(InstallBytesStart + FCO.fileinfo.size);
             }
 
             //Add to verification list.

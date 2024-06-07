@@ -90,17 +90,20 @@ namespace Lanstaller.Classes
             return AC.GetString(APIServer + "System/" + setting);
         }
 
-        public static Server GetFileServerFromAPI()
+        public static List<Server> GetFileServerFromAPI()
         {
-            Server FS = JObject.Parse((new APIClient()).GetString(APIServer + "InstallationList/Server")).ToObject<Server>();
-
-            //Trim / from url (getfiles will prepend / to source on copy operation).
-            if (FS.path.EndsWith("/"))
+            List<Server> Servers = new List<Server>();
+            JArray ServerArray = JArray.Parse((new APIClient()).GetString(APIServer + "InstallationList/Server"));
+            foreach(var SrvJA in  ServerArray) 
             {
-                FS.path = FS.path.Substring(0, FS.path.Length - 1);
+                Server FS = SrvJA.ToObject<Server>();
+                if (FS.path.EndsWith("/")) //Trim / from url (getfiles will prepend / to source on copy operation).
+                {
+                    FS.path = FS.path.Substring(0, FS.path.Length - 1);
+                }
+                Servers.Add(FS);
             }
-            return FS;
-
+            return Servers;
         }
 
         static JArray GetListFromAPI(string ListName, int SoftwareID)
