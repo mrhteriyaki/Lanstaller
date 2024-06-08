@@ -8,31 +8,36 @@ using System.Threading.Tasks;
 using static Lanstaller_Shared.SoftwareClass;
 using System.Windows.Forms;
 using Lanstaller_Shared.Models;
+using System.Security.Principal;
 
 namespace Lanstaller.Classes
 {
     public class DownloadTask
     {
-        public long downloadedbytes = 0;
-        FileCopyOperation _FCO;
         Server _FileServer;
         static string _authkey;
+
+        public long downloadedbytes = 0;
+        string _Source;
+        string _Destination;
+        
 
         public static void SetAuth(string authkey)
         {
             _authkey = authkey;
         }
 
-        public DownloadTask(Server FileServer, FileCopyOperation FCO)
+        public DownloadTask(Server FileServer, string Source, string Destination)
         {
-            _FCO = FCO;
+            _Source = Source;
+            _Destination = Destination;
             _FileServer = FileServer;
         }
 
 
         public async Task DownloadAsync()
         {
-            string SourceUri = _FileServer.path + _FCO.fileinfo.source;
+            string SourceUri = _FileServer.path + _Source;
 
             HttpClient hClient = new HttpClient();
             hClient.DefaultRequestHeaders.Add("authorization", _authkey);
@@ -49,11 +54,11 @@ namespace Lanstaller.Classes
 
                 // Read the content and write it to the destination file
                 //131072 = 128k
-                //524288 - 512K Buffer.
+                //524288 - 512K.
                 //4194304 = 4MB
                 //16777216 = 16MB
                 Stream contentStream = await response.Content.ReadAsStreamAsync();
-                Stream fileStream = new FileStream(_FCO.destination, FileMode.Create, FileAccess.Write, FileShare.None, 131072, true);
+                Stream fileStream = new FileStream(_Destination, FileMode.Create, FileAccess.Write, FileShare.None, 131072, true);
                 
                 byte[] buffer = new byte[131072];
                 int bytesRead;

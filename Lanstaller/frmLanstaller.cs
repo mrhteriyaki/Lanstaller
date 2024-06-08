@@ -195,8 +195,8 @@ namespace Lanstaller
             //Load software already installed.
             LocalDB = new LocalDatabase(LanstallerDataDir + "installed.json");
             List<int> InstalledIDs = LocalDB.GetSoftwareIDs();
-
             lvSoftware.SmallImageList = new ImageList();
+            Server FS = APIClient.GetFileServerFromAPI()[0];
             foreach (SoftwareInfo SWI in SList)
             {
                 ListViewItem LVI = new ListViewItem(SWI.Name);
@@ -211,7 +211,7 @@ namespace Lanstaller
                     string imgSrc = FileServer.path + SWI.image_small;
                     if (!File.Exists(imgDst))
                     {
-                        APIClient.DownloadFile(imgSrc, imgDst);
+                         ClientSoftwareClass.TransferFile(FS,imgSrc, imgDst);
                         //Will need cache invalidation in future for refresh / updates.
                     }
                     lvSoftware.SmallImageList.Images.Add(Image.FromFile(imgDst));
@@ -248,8 +248,9 @@ namespace Lanstaller
                             File.Delete(updaterpath);
                         }
                         //Download file.
-                        APIClient.DownloadFile(APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe", updaterpath);
-
+                        Server FS = APIClient.GetFileServerFromAPI()[0];
+                        ClientSoftwareClass.TransferFile(FS,APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe", updaterpath);
+                        
                         //Run with wscript.
                         Process UProc = new Process();
                         UProc.StartInfo.FileName = updaterpath;

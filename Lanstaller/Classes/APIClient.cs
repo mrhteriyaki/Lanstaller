@@ -45,39 +45,6 @@ namespace Lanstaller.Classes
         }
 
 
-        public static void DownloadFile(string Source, string Destination)
-        {
-            APIClient AC = new APIClient();
-            AC.Download(Source, Destination);
-            AC.WC.Dispose();
-        }
-
-
-
-        public void Download(string Source, string Destination)
-        {
-            //File download function.
-            try
-            {
-                WC.DownloadFile(Source, Destination);
-            }
-            catch (WebException ex)
-            {
-                Console.WriteLine("Download failed: " + Source + " Error:" + ex.Message);
-                DialogResult DR = MessageBox.Show("File Download Error\n" + Source + "\nRetry or Cancel (Skip this file)?\n" + ex.ToString(), "Download Error", MessageBoxButtons.RetryCancel);
-                if (DR == DialogResult.Retry)
-                {
-                    DownloadFile(Source, Destination);
-                    return;
-                }
-                else if (DR == DialogResult.Cancel)
-                {
-                    //Skip - Return ok.
-                    return;
-                }
-            }
-        }
-
         string GetString(string Uri)
         {
             return WC.DownloadString(Uri);
@@ -94,12 +61,16 @@ namespace Lanstaller.Classes
         {
             List<Server> Servers = new List<Server>();
             JArray ServerArray = JArray.Parse((new APIClient()).GetString(APIServer + "InstallationList/Server"));
-            foreach(var SrvJA in  ServerArray) 
+            foreach(JToken SrvJA in ServerArray) 
             {
                 Server FS = SrvJA.ToObject<Server>();
-                if (FS.path.EndsWith("/")) //Trim / from url (getfiles will prepend / to source on copy operation).
+                if (FS.protocol == 1 && !(FS.path.EndsWith("/"))) //Trim / from url (getfiles will prepend / to source on copy operation).
                 {
-                    FS.path = FS.path.Substring(0, FS.path.Length - 1);
+                    FS.path = FS.path + "/";
+                }
+                else if (FS.protocol == 2 && !(FS.path.EndsWith("\\")))
+                {
+                    FS.path = FS.path + "\\";
                 }
                 Servers.Add(FS);
             }

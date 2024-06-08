@@ -20,6 +20,7 @@ using Lanstaller.Classes;
 using System.Collections.Concurrent;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 using Lanstaller_Shared.Models;
+using System.Security.Principal;
 
 namespace Lanstaller
 {
@@ -58,7 +59,6 @@ namespace Lanstaller
         List<SerialNumber> SerialList;
         List<FirewallRule> FirewallRules;
         List<PreferenceOperation> PreferenceOperations;
-        List<Redistributable> Redistributables;
         List<string> DirectoryList = new List<string>();
 
         APIClient InstallAPIClient;
@@ -174,12 +174,7 @@ namespace Lanstaller
             SetStatus("Installing Redistributables - " + Identity.Name);
             if (install_redist)
             {
-                //DB
-                //RL = GetRedistributables(Identity.id);
-
-                //WEB
-                Redistributables = GetRedistributablesListFromAPI(Identity.id);
-                GenerateRedistributables();
+                GenerateRedistributables(Identity.id);
             }
 
             SetStatus("Install Complete:" + Environment.NewLine + Identity.Name);
@@ -412,15 +407,15 @@ namespace Lanstaller
                     FWNetSHProc.StartInfo.Arguments = "advfirewall firewall add rule name=\"" + rulename + "\" dir=in action=allow" + protocol_str + port_str + " program=\"" + procpath + "\" enable=yes";
                     FWNetSHProc.Start();
                 }
-
             }
         }
 
 
 
-        public void GenerateRedistributables() //Incomplete.
+        public void GenerateRedistributables(int sid) //Incomplete.
         {
-            foreach (Redistributable Redist in Redistributables)
+            
+            foreach (Redistributable Redist in GetRedistributablesListFromAPI(sid))
             {
                 if (Redist.filecheck != "")
                 {
@@ -435,7 +430,7 @@ namespace Lanstaller
                 string filename = Redist.path.Substring(Redist.path.Replace("\\", "/").LastIndexOf("/"));
                 string destpath = temppath + filename;
 
-                DownloadFile(Redist.path, destpath);
+                TransferFile(GetFileServerFromAPI()[0],Redist.path, destpath);
 
                 if (!System.IO.File.Exists(destpath))
                 {
@@ -712,6 +707,21 @@ namespace Lanstaller
 
         }
 
+
+        public static void TransferFile(Server FileServer, string Source, string Destination)
+        {
+            if (FileServer.protocol == 1)
+            {
+                DownloadTask DT = new DownloadTask(FileServer, Source, Destination);
+                Task Dtask = DT.DownloadAsync();
+                Dtask.Wait();
+            }
+            else if (FileServer.protocol == 2) //SMB
+            {
+                Pri.LongPath.File.Copy(FileServer.path + Uri.UnescapeDataString(Source), Destination, true);
+            }
+        }
+
         void TransferFile(Server FileServer, int FileCopyIndex)
         {
             FileCopyOperation FCO = FileCopyOperations[FileCopyIndex];
@@ -725,7 +735,7 @@ namespace Lanstaller
                     smallDownloadtasks.Add(Task.Run(async () =>
                     {
                         await semaphore.WaitAsync();
-                        DownloadTask DT = new DownloadTask(FileServer, FCO);
+                        DownloadTask DT = new DownloadTask(FileServer, FCO.fileinfo.source,FCO.destination);
                         Task Dtask = DT.DownloadAsync();
                         while (!Dtask.IsCompleted)
                         {
@@ -740,7 +750,7 @@ namespace Lanstaller
                 {
                     Task.WhenAll(smallDownloadtasks).Wait(); //Don't run multi with large file.
 
-                    DownloadTask DT = new DownloadTask(FileServer, FCO);
+                    DownloadTask DT = new DownloadTask(FileServer, FCO.fileinfo.source, FCO.destination);
                     Task Dtask = DT.DownloadAsync();
                     while (!Dtask.IsCompleted)
                     {
@@ -752,7 +762,7 @@ namespace Lanstaller
             }
             else if (FileServer.protocol == 2) //Smb
             {
-                Pri.LongPath.File.Copy(FileServer.path + "\\" + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
+                Pri.LongPath.File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
                 SetStatus(Identity.Name, FileCopyIndex, FileCopyOperations.Count, SizeMessage);
                 SetProgress(InstallBytesStart + FCO.fileinfo.size);
             }

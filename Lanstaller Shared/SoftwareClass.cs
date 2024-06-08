@@ -430,8 +430,6 @@ namespace Lanstaller_Shared
         {
             List<Redistributable> RedistributableList = new List<Redistributable>();
 
-            string server_path = GetFileServer()[0].path;
-
             //Get Required Redist ID for install.
             string QueryString = "SELECT tblRedistUsage.[redist_id],tblRedist.id,tblRedist.[name],tblRedist.[path],tblRedist.args,tblRedist.filecheck,tblRedist.[version],tblRedist.compressed,tblRedist.compressed_path FROM tblRedistUsage INNER JOIN tblRedist ON tblRedistUsage.redist_id=tblRedist.id WHERE tblRedistUsage.software_id = @softwareid ORDER BY tblRedistUsage.[install_order] ASC";
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
@@ -443,7 +441,7 @@ namespace Lanstaller_Shared
             {
                 Redistributable tmpRedist = new Redistributable();
                 tmpRedist.name = SQLOutput["name"].ToString();
-                tmpRedist.path = server_path + SQLOutput["path"].ToString();
+                tmpRedist.path = SQLOutput["path"].ToString();
                 tmpRedist.args = SQLOutput["args"].ToString();
                 tmpRedist.filecheck = SQLOutput["filecheck"].ToString();
                 tmpRedist.version = SQLOutput["version"].ToString();
