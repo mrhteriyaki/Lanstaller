@@ -39,6 +39,7 @@ namespace Lanstaller_Management_Console
             this.btnSecurity = new System.Windows.Forms.Button();
             this.tmrProgress = new System.Windows.Forms.Timer(this.components);
             this.lvSoftware = new System.Windows.Forms.ListView();
+            this.btnSetImage = new System.Windows.Forms.Button();
             this.gbxInfo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -131,11 +132,22 @@ namespace Lanstaller_Management_Console
             this.lvSoftware.View = System.Windows.Forms.View.Details;
             this.lvSoftware.SelectedIndexChanged += new System.EventHandler(this.lvSoftware_SelectedIndexChanged);
             // 
+            // btnSetImage
+            // 
+            this.btnSetImage.Location = new System.Drawing.Point(271, 39);
+            this.btnSetImage.Name = "btnSetImage";
+            this.btnSetImage.Size = new System.Drawing.Size(90, 23);
+            this.btnSetImage.TabIndex = 28;
+            this.btnSetImage.Text = "Set Icon Image";
+            this.btnSetImage.UseVisualStyleBackColor = true;
+            this.btnSetImage.Click += new System.EventHandler(this.btnSetImage_Click);
+            // 
             // frmLanstallerManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1349, 703);
+            this.Controls.Add(this.btnSetImage);
             this.Controls.Add(this.lvSoftware);
             this.Controls.Add(this.btnSecurity);
             this.Controls.Add(this.btnRemove);
@@ -162,6 +174,7 @@ namespace Lanstaller_Management_Console
         private System.Windows.Forms.Button btnSecurity;
         private System.Windows.Forms.Timer tmrProgress;
         private System.Windows.Forms.ListView lvSoftware;
+        private System.Windows.Forms.Button btnSetImage;
     }
 }
 

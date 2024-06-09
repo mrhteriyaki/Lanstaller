@@ -118,7 +118,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 62);
+            this.label4.Location = new System.Drawing.Point(6, 21);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(206, 13);
             this.label4.TabIndex = 11;
@@ -135,7 +135,7 @@
             // 
             // txtServerShare
             // 
-            this.txtServerShare.Location = new System.Drawing.Point(9, 78);
+            this.txtServerShare.Location = new System.Drawing.Point(9, 37);
             this.txtServerShare.Name = "txtServerShare";
             this.txtServerShare.Size = new System.Drawing.Size(737, 20);
             this.txtServerShare.TabIndex = 10;
@@ -149,15 +149,16 @@
             // 
             // txtScanfolder
             // 
-            this.txtScanfolder.Location = new System.Drawing.Point(9, 37);
+            this.txtScanfolder.Location = new System.Drawing.Point(9, 79);
             this.txtScanfolder.Name = "txtScanfolder";
             this.txtScanfolder.Size = new System.Drawing.Size(737, 20);
             this.txtScanfolder.TabIndex = 3;
+            this.txtScanfolder.TextChanged += new System.EventHandler(this.txtScanfolder_TextChanged);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 21);
+            this.label2.Location = new System.Drawing.Point(6, 63);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(202, 13);
             this.label2.TabIndex = 4;

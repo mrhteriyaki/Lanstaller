@@ -23,6 +23,7 @@ using System.Reflection;
 using static Lanstaller.Classes.LocalDatabase;
 using System.Linq;
 using Lanstaller_Shared.Models;
+using System.Threading.Tasks;
 
 namespace Lanstaller
 {
@@ -91,15 +92,19 @@ namespace Lanstaller
 
             LoadClientSettings();
             InitialFormSetup();
+
             try
             {
                 LoadSoftwareList();
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Failed to connect to server");
+                MessageBox.Show("Failed to connect to server. Error: " + ex.Message);
                 Application.Exit();
             }
+
+
+
         }
 
         void InitialFormSetup()
@@ -168,7 +173,7 @@ namespace Lanstaller
             txtHeight.Text = UserSettings.ScreenHeight.ToString();
         }
 
-        void LoadSoftwareList()
+        async void LoadSoftwareList()
         {
             //For direct link to database.
             //SList = SoftwareClass.LoadSoftware();
@@ -208,10 +213,11 @@ namespace Lanstaller
                     LVI.ImageIndex = lvSoftware.SmallImageList.Images.Count;
                     string imgFilename = Path.GetFileName(SWI.image_small);
                     string imgDst = ImageDir + "\\" + imgFilename;
-                    string imgSrc = FileServer.path + SWI.image_small;
                     if (!File.Exists(imgDst))
                     {
-                         ClientSoftwareClass.TransferFile(FS,imgSrc, imgDst);
+                        Task task = Task.Run(() => ClientSoftwareClass.TransferFile(FS, Uri.EscapeUriString(SWI.image_small), imgDst));
+                        await task;
+                        task.Wait();
                         //Will need cache invalidation in future for refresh / updates.
                     }
                     lvSoftware.SmallImageList.Images.Add(Image.FromFile(imgDst));
@@ -249,8 +255,8 @@ namespace Lanstaller
                         }
                         //Download file.
                         Server FS = APIClient.GetFileServerFromAPI()[0];
-                        ClientSoftwareClass.TransferFile(FS,APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe", updaterpath);
-                        
+                        ClientSoftwareClass.TransferFile(FS, APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe", updaterpath);
+
                         //Run with wscript.
                         Process UProc = new Process();
                         UProc.StartInfo.FileName = updaterpath;
@@ -505,7 +511,7 @@ namespace Lanstaller
                     this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
                     this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
                 }
-                
+
 
             } //End of installer queue.
 
@@ -875,8 +881,6 @@ namespace Lanstaller
         {
             this.WindowState = FormWindowState.Minimized;
         }
-
-
 
     }
 }

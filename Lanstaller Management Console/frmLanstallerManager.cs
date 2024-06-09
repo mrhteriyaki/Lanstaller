@@ -24,7 +24,7 @@ namespace Lanstaller_Management_Console
     {
         List<SoftwareInfo> SoftwareList = new List<SoftwareInfo>();
         SoftwareInfo CurrentSelectedSoftware;
-        
+
         List<Redistributable> RedistList = new List<Redistributable>();
 
         //static string status = "Status: Ready";
@@ -82,11 +82,11 @@ namespace Lanstaller_Management_Console
 
         private void frmLanstallerMmanager_Load(object sender, EventArgs e)
         {
-            lvSoftware.Columns.Add("Software",260);
-            lvSoftware.Columns.Add("Files",60);
-            lvSoftware.Columns.Add("Registry",70);
+            lvSoftware.Columns.Add("Software", 260);
+            lvSoftware.Columns.Add("Files", 60);
+            lvSoftware.Columns.Add("Registry", 70);
             lvSoftware.Columns.Add("Shortcuts", 70);
-            lvSoftware.Columns.Add("Firewall Rules",80);
+            lvSoftware.Columns.Add("Firewall Rules", 80);
 
             if (!File.Exists("config.ini"))
             {
@@ -124,10 +124,10 @@ namespace Lanstaller_Management_Console
 
             RefreshSoftware();
 
-
-            foreach (string val in Registry.CurrentUser.OpenSubKey("SOFTWARE\\Lanstaller", true).GetValueNames())
+            Registry.CurrentUser.CreateSubKey("SOFTWARE\\Lanstaller");
+            foreach (string ValueName in Registry.CurrentUser.OpenSubKey("SOFTWARE\\Lanstaller", true).GetValueNames())
             {
-                if (val == "management_basefolder")
+                if (ValueName == "management_basefolder")
                 {
                     FilesPanel.txtServerShare.Text = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Lanstaller").GetValue("management_basefolder", "").ToString();
                 }
@@ -153,7 +153,7 @@ namespace Lanstaller_Management_Console
             FilesPanel.btnRescanFileHash.Click += new System.EventHandler(this.btnRescanFileHash_Click);
             FilesPanel.btnRescanFileSize.Click += new System.EventHandler(this.btnRescanFileSize_Click);
             FilesPanel.btnCheckAllFiles.Click += new System.EventHandler(this.btnCheckAllFiles_Click);
-                        
+
 
             //Preferences
             PreferencesPanel.btnAddPrefFile.Click += new System.EventHandler(this.btnAddPrefFile_Click);
@@ -194,7 +194,7 @@ namespace Lanstaller_Management_Console
         }
 
 
-       void LoadRedist()
+        void LoadRedist()
         {
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
@@ -233,10 +233,10 @@ namespace Lanstaller_Management_Console
                 lvSoftware.Items.Add(lvi);
             }
 
-            
+
 
         }
-       
+
 
         private void btnNew_Click(object sender, EventArgs e)
         {
@@ -433,7 +433,7 @@ namespace Lanstaller_Management_Console
                 SoftwareClass.AddFile(src, dst, FI.Length, CurrentSelectedSoftware.id);
 
             }
-            RefreshSoftware(); 
+            RefreshSoftware();
             FilesPanel.btnScan.Enabled = true;
 
         }
@@ -451,7 +451,7 @@ namespace Lanstaller_Management_Console
 
         private void txtServerShare_TextChanged(object sender, EventArgs e)
         {
-           Registry.CurrentUser.OpenSubKey("SOFTWARE\\Lanstaller", true).SetValue("management_basefolder", FilesPanel.txtServerShare.Text);
+            Registry.CurrentUser.OpenSubKey("SOFTWARE\\Lanstaller", true).SetValue("management_basefolder", FilesPanel.txtServerShare.Text);
         }
 
         public void txtScanfolder_TextChanged(object sender, EventArgs e)
@@ -642,7 +642,7 @@ namespace Lanstaller_Management_Console
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)
         {
             WindowsSettingsPanel.btnFirewallRuleAdd.Enabled = false;
-            SoftwareClass.AddFirewallRule(WindowsSettingsPanel.txtFirewallPath.Text, WindowsSettingsPanel.txtRuleName.Text ,CurrentSelectedSoftware.id);
+            SoftwareClass.AddFirewallRule(WindowsSettingsPanel.txtFirewallPath.Text, WindowsSettingsPanel.txtRuleName.Text, CurrentSelectedSoftware.id);
             RefreshSoftware();
 
         }
@@ -653,7 +653,7 @@ namespace Lanstaller_Management_Console
         }
 
 
-        private void btnAddRedist_Click(object sender,EventArgs e)
+        private void btnAddRedist_Click(object sender, EventArgs e)
         {
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
@@ -693,7 +693,7 @@ namespace Lanstaller_Management_Console
             serialid_pool_selected = SoftwareClass.GetSerials(CurrentSelectedSoftware.id)[instance_index].serialid;
             RefreshSerialPoolList(); //Load serial pool into listview.
             SerialPanel.btnAddUserSerial.Enabled = true;
-           
+
         }
 
         private void RefreshSerialPoolList()
@@ -710,18 +710,18 @@ namespace Lanstaller_Management_Console
             }
         }
 
-      
+
         private void btnAddUserSerial_Click(object sender, EventArgs e)
         {
             if (String.IsNullOrEmpty(SerialPanel.txtUserSerial.Text)) return; //Skip empty input.
             //add serial to pool.
             string serial_value = SerialNumber.FilterSerial(SerialPanel.txtUserSerial.Text);
-            
+
             UserSerial.AddAvailableSerial(serialid_pool_selected, serial_value);
             SerialPanel.txtUserSerial.Text = serial_value;
             RefreshSerialPoolList();
             SerialPanel.txtUserSerial.Text = string.Empty;
-        }                    
+        }
 
         private void btnDelUserSerial_Click(object sender, EventArgs e)
         {
@@ -732,7 +732,7 @@ namespace Lanstaller_Management_Console
             RefreshSerialPoolList();
         }
 
-       
+
 
         private void lvUserSerials_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -766,7 +766,7 @@ namespace Lanstaller_Management_Console
         private void btnRescanFileHash_Click(object sender, EventArgs e)
         {
             FilesPanel.btnRescanFileHash.Enabled = false;
-            
+
             //GetUnhashedFileCount
             Thread ST = new Thread(GenerateFileHash);
             ST.Name = "File Hashing";
@@ -788,7 +788,7 @@ namespace Lanstaller_Management_Console
             }
 
 
-            if(MessageBox.Show("Verify only the unhashed files?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (MessageBox.Show("Verify only the unhashed files?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 SoftwareClass.RescanFileHashes(false, scanid);
             }
@@ -797,7 +797,8 @@ namespace Lanstaller_Management_Console
                 SoftwareClass.RescanFileHashes(true, scanid);
             }
 
-            FilesPanel.lblCopyActionInfo.Invoke((MethodInvoker)delegate {
+            FilesPanel.lblCopyActionInfo.Invoke((MethodInvoker)delegate
+            {
                 // Running on the UI thread
                 FilesPanel.lblCopyActionInfo.Visible = false;
             });
@@ -861,10 +862,71 @@ namespace Lanstaller_Management_Console
                 SerialPanel.cmbxSerialPoolInstance.Items.Add(SN.name);
             }
 
-            foreach(Redistributable RS in SoftwareClass.GetRedistributables(CurrentSelectedSoftware.id))
+            foreach (Redistributable RS in SoftwareClass.GetRedistributables(CurrentSelectedSoftware.id))
             {
                 WindowsSettingsPanel.cmbxRedist.Items.Add(RS.name);
             }
+        }
+
+        private void btnSetImage_Click(object sender, EventArgs e)
+        {
+            if (lvSoftware.SelectedItems.Count != 1)
+            {
+                MessageBox.Show("Select Software");
+                return;
+            }
+
+            string baseshare = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Lanstaller").GetValue("management_basefolder", "").ToString();
+            if (string.IsNullOrEmpty(baseshare))
+            {
+                MessageBox.Show("Images directory not found, Set server path in files section.");
+                return;
+            }
+
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "Executables (*.exe)|*.exe|All files (*.*)|*.*"
+            };
+            openFileDialog.ShowDialog();
+
+            string tmpFile = Path.GetTempPath() + "\\lanstallericontmp.exe";
+            if (File.Exists(tmpFile))
+            {
+                File.Delete(tmpFile);
+            }
+            File.Copy(openFileDialog.FileName, tmpFile);
+            Icon icon = Icon.ExtractAssociatedIcon(tmpFile);
+            Bitmap bitmap = icon.ToBitmap();
+            string saveFile = baseshare + "\\Images\\" + CurrentSelectedSoftware.Name + ".png";
+            if (File.Exists(saveFile))
+            {
+                File.Delete(saveFile);
+            }
+            try
+            {
+                bitmap.Save(saveFile, System.Drawing.Imaging.ImageFormat.Png);
+            }catch(Exception ex)
+            {
+                MessageBox.Show("Problem saving image file: " + ex.Message);
+                return;
+            }
+            
+            File.Delete(tmpFile);
+            
+            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
+            SQLCmd.CommandText = "IF EXISTS (SELECT software_id FROM tblImages WHERE software_id = @swid) " +
+                "UPDATE tblImages SET small_image = @savefile WHERE software_id = @swid " + 
+                "ELSE INSERT INTO tblImages (software_id,small_image) VALUES (@swid,@savefile)";
+            SQLCmd.Parameters.AddWithValue("@swid", CurrentSelectedSoftware.id);
+            SQLCmd.Parameters.AddWithValue("@savefile", "Images/" + CurrentSelectedSoftware.Name + ".png");
+
+            SQLConn.Open();
+            SQLCmd.ExecuteNonQuery();
+            SQLConn.Close();
+
+
         }
     }
 }

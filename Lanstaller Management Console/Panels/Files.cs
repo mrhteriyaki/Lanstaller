@@ -51,5 +51,10 @@ namespace Lanstaller_Management_Console.Panels
         {
 
         }
+
+        private void txtScanfolder_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

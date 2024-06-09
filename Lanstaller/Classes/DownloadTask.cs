@@ -14,7 +14,6 @@ namespace Lanstaller.Classes
 {
     public class DownloadTask
     {
-        Server _FileServer;
         static string _authkey;
 
         public long downloadedbytes = 0;
@@ -27,28 +26,27 @@ namespace Lanstaller.Classes
             _authkey = authkey;
         }
 
-        public DownloadTask(Server FileServer, string Source, string Destination)
+        public DownloadTask(string Source, string Destination)
         {
             _Source = Source;
             _Destination = Destination;
-            _FileServer = FileServer;
         }
 
 
         public async Task DownloadAsync()
         {
-            string SourceUri = _FileServer.path + _Source;
-
+            string SourceUri = _Source;
             HttpClient hClient = new HttpClient();
             hClient.DefaultRequestHeaders.Add("authorization", _authkey);
-
+            
+            Console.WriteLine("DownloadSync:" + _Source);
             
             try
             {
                 // Send a GET request to the specified URL
                 HttpResponseMessage response = await hClient.GetAsync(SourceUri, HttpCompletionOption.ResponseHeadersRead);
                 response.EnsureSuccessStatusCode();
-
+                
                 // Get the total file size from the response headers, if available
                 //long? totalBytes = response.Content.Headers.ContentLength;
 
@@ -57,6 +55,7 @@ namespace Lanstaller.Classes
                 //524288 - 512K.
                 //4194304 = 4MB
                 //16777216 = 16MB
+                
                 Stream contentStream = await response.Content.ReadAsStreamAsync();
                 Stream fileStream = new FileStream(_Destination, FileMode.Create, FileAccess.Write, FileShare.None, 131072, true);
                 
@@ -89,6 +88,10 @@ namespace Lanstaller.Classes
             catch (IOException e)
             {
                 Console.WriteLine($"File error: {e.Message}");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Error downloading: " + SourceUri + " " + ex.Message);
             }
             hClient.Dispose();
         }

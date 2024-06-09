@@ -414,7 +414,7 @@ namespace Lanstaller
 
         public void GenerateRedistributables(int sid) //Incomplete.
         {
-            
+
             foreach (Redistributable Redist in GetRedistributablesListFromAPI(sid))
             {
                 if (Redist.filecheck != "")
@@ -430,7 +430,7 @@ namespace Lanstaller
                 string filename = Redist.path.Substring(Redist.path.Replace("\\", "/").LastIndexOf("/"));
                 string destpath = temppath + filename;
 
-                TransferFile(GetFileServerFromAPI()[0],Redist.path, destpath);
+                TransferFile(GetFileServerFromAPI()[0], Redist.path, destpath);
 
                 if (!System.IO.File.Exists(destpath))
                 {
@@ -516,7 +516,7 @@ namespace Lanstaller
                             RegistryKey RK = Registry.LocalMachine.OpenSubKey(SN.regKey.Substring(19));
                             if (RK != null)
                             {
-                                SF.txtSerial.Text = SN.UnformatSerial(RK.GetValue(SN.regVal, "").ToString());                              
+                                SF.txtSerial.Text = SN.UnformatSerial(RK.GetValue(SN.regVal, "").ToString());
                             }
                         }
                     }
@@ -527,9 +527,9 @@ namespace Lanstaller
                     }
                 }
                 SF.ShowDialog();
-                
+
                 SN.serialnumber = SN.FormatSerial(SF.txtSerial.Text);
-                
+
                 //Check if serial has format request, check that length matches.
                 if (SN.GetFormattedLength() > 0 && SF.txtSerial.Text.Length != SN.GetFormattedLength())
                 {
@@ -708,17 +708,19 @@ namespace Lanstaller
         }
 
 
-        public static void TransferFile(Server FileServer, string Source, string Destination)
+        
+        public static async void TransferFile(Server FileServer, string Source, string Destination)
         {
             if (FileServer.protocol == 1)
             {
-                DownloadTask DT = new DownloadTask(FileServer, Source, Destination);
+                DownloadTask DT = new DownloadTask(FileServer.path + Source, Destination);
                 Task Dtask = DT.DownloadAsync();
-                Dtask.Wait();
+                Dtask.Wait(); //If stuck here - async issue occurs when running from main thread, use task with await.
             }
             else if (FileServer.protocol == 2) //SMB
             {
-                Pri.LongPath.File.Copy(FileServer.path + Uri.UnescapeDataString(Source), Destination, true);
+                string src = Uri.UnescapeDataString(Source).Replace("/", "\\");
+                Pri.LongPath.File.Copy(FileServer.path + src, Destination, true);
             }
         }
 
@@ -735,7 +737,7 @@ namespace Lanstaller
                     smallDownloadtasks.Add(Task.Run(async () =>
                     {
                         await semaphore.WaitAsync();
-                        DownloadTask DT = new DownloadTask(FileServer, FCO.fileinfo.source,FCO.destination);
+                        DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination);
                         Task Dtask = DT.DownloadAsync();
                         while (!Dtask.IsCompleted)
                         {
@@ -750,7 +752,7 @@ namespace Lanstaller
                 {
                     Task.WhenAll(smallDownloadtasks).Wait(); //Don't run multi with large file.
 
-                    DownloadTask DT = new DownloadTask(FileServer, FCO.fileinfo.source, FCO.destination);
+                    DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination);
                     Task Dtask = DT.DownloadAsync();
                     while (!Dtask.IsCompleted)
                     {
