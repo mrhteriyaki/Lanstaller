@@ -468,7 +468,6 @@ namespace Lanstaller
 
                     try
                     {
-                        //Run
                         RDProc.StartInfo.FileName = extractpath + Redist.compressed_path;
                         RDProc.StartInfo.Arguments = Redist.args;
                     }
@@ -690,6 +689,7 @@ namespace Lanstaller
                 {
                     if (FCO2.verified == false) //Validation Failure
                     {
+                        Console.WriteLine("VeriFail:" + FCO2.destination);
                         FilesNotValidated = true;
                         break;
                     }
@@ -699,14 +699,12 @@ namespace Lanstaller
                 {
                     SetStatus(Identity.Name + Environment.NewLine +
                                 "Some files failed to download."
-                                + "\nRetrying in " + (FailLoopCount * 10).ToString() + " seconds.");
+                                + "\nRetrying in " + (FailLoopCount * 1).ToString() + " seconds.");
 
-                    Thread.Sleep((FailLoopCount * 10 * 1000));
+                    Thread.Sleep((FailLoopCount * 1 * 1000));
                 }
             }
-
         }
-
 
         
         public static async void TransferFile(Server FileServer, string Source, string Destination)

@@ -106,7 +106,12 @@ namespace Lanstaller.Classes
         private void WriteListDB(List<LocalInstallRecord> updateList)
         {
             StreamWriter DBSW = new StreamWriter(_dbpath);
-            DBSW.Write(JsonConvert.SerializeObject(updateList));
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented, // This enables pretty printing
+            };
+
+            DBSW.Write(JsonConvert.SerializeObject(updateList, settings));
             DBSW.Close();
         }
 

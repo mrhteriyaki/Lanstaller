@@ -38,9 +38,7 @@ namespace Lanstaller.Classes
             string SourceUri = _Source;
             HttpClient hClient = new HttpClient();
             hClient.DefaultRequestHeaders.Add("authorization", _authkey);
-            
-            Console.WriteLine("DownloadSync:" + _Source);
-            
+                       
             try
             {
                 // Send a GET request to the specified URL

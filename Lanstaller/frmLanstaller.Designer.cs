@@ -469,6 +469,7 @@ namespace Lanstaller
             this.Controls.Add(this.pbTitleExpanded);
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmLanstaller";
             this.Text = "Lanstaller";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmLanstaller_Closing);
