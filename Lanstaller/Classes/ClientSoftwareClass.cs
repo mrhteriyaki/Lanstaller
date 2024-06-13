@@ -563,6 +563,7 @@ namespace Lanstaller
                     {
                         Thread.Sleep(1); //Delay if unable to dequeue.
                     }
+
                 }
                 CheckCounter++;
                 if (FVO.verified)
@@ -580,7 +581,12 @@ namespace Lanstaller
                         FVO.verified = true;
                         continue;
                     }
+                    Logging.LogToFile("Deleting file - failed validation: " + FVO.destination + " Expected hash: " + FVO.fileinfo.hash + " Check result: " + check_hash);
                     Pri.LongPath.File.Delete(FVO.destination); // Delete file if partially downloaded.
+                }
+                else
+                {
+                    Logging.LogToFile("Verification error - missing file: " + FVO.destination);
                 }
             }
 
@@ -636,12 +642,12 @@ namespace Lanstaller
                         {
                             SetStatus(Identity.Name, CopyIndex, FileCopyOperations.Count, SizeToString(FCO.fileinfo.size));
 
-                            if (FCO.verified || FCO.fileinfo.hash.Equals(CalculateMD5(FCO.destination))) //Compare server hash value to local, also skip if verified previously.
+                            //Compare server hash value to local, also skip if verified previously.
+                            if (FCO.verified || FCO.fileinfo.hash.Equals(CalculateMD5(FCO.destination))) 
                             {
                                 FCO.verified = true;
-
+                                Logging.LogToFile("File exists, verification complete for: " + FCO.destination);
                                 VerifyCopyOperations.Enqueue(FCO);
-
                                 CopyByteCounter += FCO.fileinfo.size;
                                 SetProgress(CopyByteCounter);
                                 CopyIndex++; //increment file counter.
@@ -689,7 +695,6 @@ namespace Lanstaller
                 {
                     if (FCO2.verified == false) //Validation Failure
                     {
-                        Console.WriteLine("VeriFail:" + FCO2.destination);
                         FilesNotValidated = true;
                         break;
                     }
@@ -742,7 +747,7 @@ namespace Lanstaller
                             SetStatus(Identity.Name, FileCopyIndex, FileCopyOperations.Count, SizeMessage);
                         }
                         Dtask.Wait();
-
+                        VerifyCopyOperations.Enqueue(FCO);
                         semaphore.Release();
                     }));
                 }
@@ -758,17 +763,16 @@ namespace Lanstaller
                         SetStatus(Identity.Name, FileCopyIndex, FileCopyOperations.Count, SizeMessage);
                     }
                     Dtask.Wait();
+                    VerifyCopyOperations.Enqueue(FCO);
                 }
             }
-            else if (FileServer.protocol == 2) //Smb
+            else if (FileServer.protocol == 2) //SMB
             {
                 Pri.LongPath.File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
                 SetStatus(Identity.Name, FileCopyIndex, FileCopyOperations.Count, SizeMessage);
                 SetProgress(InstallBytesStart + FCO.fileinfo.size);
+                VerifyCopyOperations.Enqueue(FCO);
             }
-
-            //Add to verification list.
-            VerifyCopyOperations.Enqueue(FCO);
         }
 
 

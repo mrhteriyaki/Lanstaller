@@ -9,6 +9,7 @@ using static Lanstaller_Shared.SoftwareClass;
 using System.Windows.Forms;
 using Lanstaller_Shared.Models;
 using System.Security.Principal;
+using System.Threading;
 
 namespace Lanstaller.Classes
 {
@@ -76,7 +77,6 @@ namespace Lanstaller.Classes
                     */
                 }
                 fileStream.Close();
-
                 //Console.WriteLine("File downloaded successfully. " + FCO.destination);
             }
             catch (HttpRequestException e)

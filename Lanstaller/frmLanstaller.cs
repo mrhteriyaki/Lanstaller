@@ -103,6 +103,7 @@ namespace Lanstaller
                 Application.Exit();
             }
 
+            Logging.ClearLog();
 
 
         }
