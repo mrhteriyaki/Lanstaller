@@ -370,6 +370,7 @@ namespace Lanstaller
         {
             if (install_option)
             {
+                //Install Software.
                 foreach (ListViewItem sItm in lvSoftware.SelectedItems)
                 {
                     QueueInstall(sItm.Index);
@@ -377,6 +378,7 @@ namespace Lanstaller
             }
             else
             {
+                //Run Software.
                 if (currentSoftwareShortcuts.Count == 1)
                 {
                     runShortcut(currentSoftwareShortcuts[0]);
@@ -669,6 +671,15 @@ namespace Lanstaller
         private void lvSoftware_MouseClick(object sender, MouseEventArgs e)
         {
             UpdateSpaceRequired();
+
+            if (e.Button == MouseButtons.Right)
+            {
+                var hitTestInfo = lvSoftware.HitTest(e.Location);
+                if (hitTestInfo.Item != null)
+                {
+                    csmSoftware.Show(lvSoftware, e.Location);
+                }
+            }
         }
 
         void UpdateSpaceRequired()
@@ -883,5 +894,13 @@ namespace Lanstaller
             this.WindowState = FormWindowState.Minimized;
         }
 
+        private void reinstallToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //Re-Install selected software.
+            foreach (ListViewItem sItm in lvSoftware.SelectedItems)
+            {
+                QueueInstall(sItm.Index);
+            }
+        }
     }
 }

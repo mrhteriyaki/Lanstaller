@@ -62,12 +62,15 @@ namespace Lanstaller
             this.lvSoftware = new System.Windows.Forms.ListView();
             this.pbBottomright = new System.Windows.Forms.PictureBox();
             this.btnMin = new System.Windows.Forms.Button();
+            this.csmSoftware = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.reinstallToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gbxActions.SuspendLayout();
             this.gbxPref.SuspendLayout();
             this.gbxStatus.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbTitleExpanded)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbTitle)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbBottomright)).BeginInit();
+            this.csmSoftware.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnInstall
@@ -445,6 +448,21 @@ namespace Lanstaller
             this.btnMin.UseVisualStyleBackColor = true;
             this.btnMin.Click += new System.EventHandler(this.btnMin_Click);
             // 
+            // csmSoftware
+            // 
+            this.csmSoftware.BackColor = System.Drawing.SystemColors.Control;
+            this.csmSoftware.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.reinstallToolStripMenuItem});
+            this.csmSoftware.Name = "csmSoftware";
+            this.csmSoftware.Size = new System.Drawing.Size(181, 48);
+            // 
+            // reinstallToolStripMenuItem
+            // 
+            this.reinstallToolStripMenuItem.Name = "reinstallToolStripMenuItem";
+            this.reinstallToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.reinstallToolStripMenuItem.Text = "Reinstall";
+            this.reinstallToolStripMenuItem.Click += new System.EventHandler(this.reinstallToolStripMenuItem_Click);
+            // 
             // frmLanstaller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -484,6 +502,7 @@ namespace Lanstaller
             ((System.ComponentModel.ISupportInitialize)(this.pbTitleExpanded)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbTitle)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbBottomright)).EndInit();
+            this.csmSoftware.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -521,6 +540,8 @@ namespace Lanstaller
         private System.Windows.Forms.ListView lvSoftware;
         private System.Windows.Forms.PictureBox pbBottomright;
         private System.Windows.Forms.Button btnMin;
+        private System.Windows.Forms.ContextMenuStrip csmSoftware;
+        private System.Windows.Forms.ToolStripMenuItem reinstallToolStripMenuItem;
     }
 }
 
