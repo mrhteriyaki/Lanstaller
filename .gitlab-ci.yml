@@ -44,6 +44,8 @@ stages:
 
 build_job:
   stage: build
+  tags:
+    - powershell
   only:
     - tags  # the build process will only be started by git tag commits
   script:
