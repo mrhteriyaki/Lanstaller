@@ -72,6 +72,8 @@ test_job:
       - '.\TestResult.xml'  # saving NUnit results to copy to deploy folder
   dependencies:
     - build_job
+  tags:
+    - powershell
 
 deploy_job:
   stage: deploy
@@ -94,3 +96,5 @@ deploy_job:
     - build_job
     - test_job
   environment: production
+  tags:
+    - powershell
