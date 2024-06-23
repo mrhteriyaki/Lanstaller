@@ -45,12 +45,14 @@
             this.btnCheckAllFiles = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.lblUnhashedFiles = new System.Windows.Forms.Label();
+            this.btnClear = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btnClear);
             this.groupBox1.Controls.Add(this.lblCopyActionInfo);
             this.groupBox1.Controls.Add(this.btnAddFolder);
             this.groupBox1.Controls.Add(this.btnScan);
@@ -160,9 +162,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(6, 63);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(202, 13);
+            this.label2.Size = new System.Drawing.Size(92, 13);
             this.label2.TabIndex = 4;
-            this.label2.Text = "Scan Folder (Get Files from this directory):";
+            this.label2.Text = "Subfolder to Scan";
             // 
             // btnRescanFileHash
             // 
@@ -216,6 +218,15 @@
             this.lblUnhashedFiles.TabIndex = 29;
             this.lblUnhashedFiles.Text = "Unhashed Files:";
             // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(9, 257);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(152, 28);
+            this.btnClear.TabIndex = 15;
+            this.btnClear.Text = "Clear Files and Directories";
+            this.btnClear.UseVisualStyleBackColor = true;
+            // 
             // Files
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -252,5 +263,6 @@
         public System.Windows.Forms.Button btnCheckAllFiles;
         private System.Windows.Forms.GroupBox groupBox2;
         public System.Windows.Forms.Label lblUnhashedFiles;
+        public System.Windows.Forms.Button btnClear;
     }
 }

@@ -40,6 +40,8 @@ namespace Lanstaller_Management_Console
         int panel_button_x = 150;
         int serialid_pool_selected = 0;
 
+        string[] filelist;
+        string[] directories;
 
         public frmLanstallerManager()
         {
@@ -147,6 +149,7 @@ namespace Lanstaller_Management_Console
 
             FilesPanel.btnScan.Click += new System.EventHandler(this.btnScan_Click);
             FilesPanel.btnAddFolder.Click += new System.EventHandler(this.btnAddFolder_Click);
+            FilesPanel.btnClear.Click += new EventHandler(this.btnClear_Click);
 
 
             //FilesPanel.btnGenerateNewFilehashes.Click += new System.EventHandler();
@@ -262,54 +265,52 @@ namespace Lanstaller_Management_Console
         }
 
 
-        string[] filelist;
-        string[] directories;
+        private void btnClear_Click(object sender,EventArgs e)
+        {
+            if (CurrentSelectedSoftware == null)
+            {
+                MessageBox.Show("No software selected");
+                return;
+            }
+
+            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlCommand SQLCmd = new SqlCommand();
+            SQLCmd.Connection = SQLConn;
+            
+            SQLCmd.Parameters.AddWithValue("@swid", CurrentSelectedSoftware.id);
+
+            SQLConn.Open();
+            SQLCmd.CommandText = "DELETE from tblFiles WHERE software_id = @swid";
+            SQLCmd.ExecuteNonQuery();
+            SQLCmd.CommandText = "DELETE from tblDirectories WHERE software_id = @swid";
+            SQLCmd.ExecuteNonQuery();
+            SQLConn.Close();
+        }
 
         private void btnScan_Click(object sender, EventArgs e)
         {
             //Cleanup path ends.
-            if (!(FilesPanel.txtScanfolder.Text.EndsWith("\\")))
+            if (!FilesPanel.txtServerShare.Text.EndsWith("\\"))
             {
-                MessageBox.Show("Scan path must end with backslash.");
-                return;
+                FilesPanel.txtServerShare.Text += "\\";
+            }
+            if (!FilesPanel.txtScanfolder.Text.EndsWith("\\"))
+            {
+                FilesPanel.txtScanfolder.Text += "\\";
+            }
+            if (!FilesPanel.txtSubFolder.Text.Equals("") && !FilesPanel.txtSubFolder.Text.EndsWith("\\"))
+            {
+                FilesPanel.txtSubFolder.Text += "\\";
             }
 
-            if (!(FilesPanel.txtSubFolder.Text.Equals("")))
+            string scanfolder = Path.Combine(FilesPanel.txtServerShare.Text, FilesPanel.txtScanfolder.Text);
+            if (Pri.LongPath.Directory.Exists(scanfolder) == false)
             {
-                if (!(FilesPanel.txtSubFolder.Text.EndsWith("\\")))
-                {
-                    MessageBox.Show("Sub folder path must end with backslash.");
-                    return;
-                }
-            }
-
-            if (FilesPanel.txtSubFolder.Text.StartsWith("\\"))
-            {
-                MessageBox.Show("Sub Folder path cannot start with backslash");
-                return;
-            }
-
-            if (FilesPanel.txtServerShare.Text != "" && !(FilesPanel.txtServerShare.Text.EndsWith("\\")))
-            {
-                FilesPanel.txtServerShare.Text = FilesPanel.txtServerShare.Text + "\\"; //append backslash to server share location..
-            }
-
-            //check server share location matches start of scan path.
-            if (!(FilesPanel.txtScanfolder.Text.ToLower().StartsWith(FilesPanel.txtServerShare.Text.ToLower())))
-            {
-                MessageBox.Show("Scan folder not located within share path");
+                MessageBox.Show("Scan Folder - Invalid");
                 return;
             }
 
             FilesPanel.btnScan.Enabled = false;
-            string scanfolder = FilesPanel.txtScanfolder.Text;
-
-            if (Pri.LongPath.Directory.Exists(scanfolder) == false)
-            {
-                MessageBox.Show("Scan Folder - Invalid");
-                FilesPanel.btnScan.Enabled = true;
-                return;
-            }
 
             FilesPanel.lblCopyActionInfo.Text = "Status: Scanning";
             filelist = Pri.LongPath.Directory.GetFiles(scanfolder, "*", System.IO.SearchOption.AllDirectories);
@@ -317,6 +318,8 @@ namespace Lanstaller_Management_Console
 
             FilesPanel.lblCopyActionInfo.Text = "Status: Scanned Files: " + filelist.Count() + "\nDirectories: " + directories.Count();
             FilesPanel.btnAddFolder.Enabled = true;
+
+            FilesPanel.btnScan.Enabled = true;
         }
 
         private void btnCheckAllFiles_Click(object sender, EventArgs e)
@@ -373,14 +376,7 @@ namespace Lanstaller_Management_Console
                 return;
             }
 
-
             FilesPanel.btnAddFolder.Enabled = false;
-
-            if (FilesPanel.txtScanfolder.Text.ToLower().StartsWith(FilesPanel.txtServerShare.Text.ToLower() + FilesPanel.txtSubFolder.Text.ToLower()) == false)
-            {
-                MessageBox.Show("Base folder must be part of scan folder.");
-                return;
-            }
 
             string destination = FilesPanel.txtDestination.Text;
             if (destination == "")
@@ -434,6 +430,9 @@ namespace Lanstaller_Management_Console
 
             }
             RefreshSoftware();
+
+            RunFilehashThread(false, CurrentSelectedSoftware.id);
+
             FilesPanel.btnScan.Enabled = true;
 
         }
@@ -456,7 +455,7 @@ namespace Lanstaller_Management_Console
 
         public void txtScanfolder_TextChanged(object sender, EventArgs e)
         {
-            if (Directory.Exists(FilesPanel.txtScanfolder.Text) == true)
+            if (Directory.Exists(Path.Combine(FilesPanel.txtServerShare.Text, FilesPanel.txtScanfolder.Text)) == true)
             {
                 FilesPanel.txtScanfolder.BackColor = Color.White;
             }
@@ -612,6 +611,21 @@ namespace Lanstaller_Management_Console
 
         void UpdateLabels()
         {
+            if (!FilesPanel.txtServerShare.Text.EndsWith("\\"))
+            {
+                FilesPanel.lblCopyActionInfo.Text = "Server Share must end with \\";
+                return;
+            }
+            else if (!FilesPanel.txtScanfolder.Text.EndsWith("\\"))
+            {
+                FilesPanel.lblCopyActionInfo.Text = "Scan folder must end with \\";
+                return;
+            }
+            else if (!FilesPanel.txtSubFolder.Text.Equals("") && !FilesPanel.txtSubFolder.Text.EndsWith("\\"))
+            {
+                FilesPanel.lblCopyActionInfo.Text = "Subfolder must end with \\";
+                return;
+            }
 
             string destdir = FilesPanel.txtDestination.Text;
             if (FilesPanel.txtDestination.Text.Equals(""))
@@ -619,24 +633,18 @@ namespace Lanstaller_Management_Console
                 destdir = "%INSTALLPATH%\\";
             }
 
-            int length = FilesPanel.txtServerShare.TextLength + FilesPanel.txtSubFolder.TextLength;
-
-            if (length <= FilesPanel.txtScanfolder.Text.Length)
+            try
             {
-                string dstpath = FilesPanel.txtScanfolder.Text.Substring(length);
-                string srcpath = FilesPanel.txtScanfolder.Text + "example.exe";
-                string dstfile = destdir + dstpath + "example.exe";
+                string srcpath = Path.Combine(FilesPanel.txtServerShare.Text, FilesPanel.txtScanfolder.Text) + "example.exe";
+                string dstfile = Path.Combine(destdir, FilesPanel.txtScanfolder.Text.Substring(FilesPanel.txtSubFolder.Text.Length)) + "example.exe";
                 FilesPanel.lblCopyActionInfo.Text = "Copy files from: " + srcpath + Environment.NewLine +
                     "to: " + dstfile;
             }
-            else
+            catch
             {
                 FilesPanel.lblCopyActionInfo.Text = "Error";
             }
-
-
-
-
+           
         }
 
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)
@@ -767,35 +775,45 @@ namespace Lanstaller_Management_Console
         {
             FilesPanel.btnRescanFileHash.Enabled = false;
 
-            //GetUnhashedFileCount
-            Thread ST = new Thread(GenerateFileHash);
-            ST.Name = "File Hashing";
-            ST.Start();
-
-        }
-
-        void GenerateFileHash()
-        {
             int scanid = 0;
             if (MessageBox.Show("All software?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.No)
             {
                 if (CurrentSelectedSoftware == null)
                 {
                     MessageBox.Show("No software selected.");
+
+                    //re-enable button
+                    FilesPanel.btnRescanFileHash.Invoke((MethodInvoker)delegate
+                    {
+                        FilesPanel.btnRescanFileHash.Enabled = true;
+                    });
+
                     return;
                 }
                 scanid = CurrentSelectedSoftware.id;
             }
 
-
             if (MessageBox.Show("Verify only the unhashed files?", "Scan Option", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                SoftwareClass.RescanFileHashes(false, scanid);
+                RunFilehashThread(false, scanid);
             }
             else
             {
-                SoftwareClass.RescanFileHashes(true, scanid);
+                RunFilehashThread(true, scanid);
             }
+        }
+
+        void RunFilehashThread(bool fullRescan, int ScanId)
+        {
+            //GetUnhashedFileCount
+            Thread ST = new Thread(t => GenerateFileHash(fullRescan, ScanId));
+            ST.Name = "File Hashing";
+            ST.Start();
+        }
+
+        void GenerateFileHash(bool fullRescan, int scanid)
+        {
+            SoftwareClass.RescanFileHashes(fullRescan, scanid);
 
             FilesPanel.lblCopyActionInfo.Invoke((MethodInvoker)delegate
             {
@@ -807,8 +825,6 @@ namespace Lanstaller_Management_Console
             {
                 FilesPanel.btnRescanFileHash.Enabled = true;
             });
-
-
         }
 
 
@@ -905,19 +921,20 @@ namespace Lanstaller_Management_Console
             try
             {
                 bitmap.Save(saveFile, System.Drawing.Imaging.ImageFormat.Png);
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Problem saving image file: " + ex.Message);
                 return;
             }
-            
+
             File.Delete(tmpFile);
-            
+
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
             SQLCmd.CommandText = "IF EXISTS (SELECT software_id FROM tblImages WHERE software_id = @swid) " +
-                "UPDATE tblImages SET small_image = @savefile WHERE software_id = @swid " + 
+                "UPDATE tblImages SET small_image = @savefile WHERE software_id = @swid " +
                 "ELSE INSERT INTO tblImages (software_id,small_image) VALUES (@swid,@savefile)";
             SQLCmd.Parameters.AddWithValue("@swid", CurrentSelectedSoftware.id);
             SQLCmd.Parameters.AddWithValue("@savefile", "Images/" + CurrentSelectedSoftware.Name + ".png");

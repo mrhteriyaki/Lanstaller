@@ -151,13 +151,21 @@ namespace Lanstaller_Shared
         }
 
 
-        public static List<Server> GetFileServer() //web or smb for type.
+        public static List<Server> GetFileServer(bool smbOnly = false) //web or smb for type.
         {
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
+            
+            if (smbOnly)
+            {
+                SQLCmd.CommandText = "SELECT [address],[protocol],[priority] FROM [tblServers] WHERE [protocol] = 2 ORDER BY [Priority] ASC";
+            }
+            else
+            {
+                SQLCmd.CommandText = "SELECT [address],[protocol],[priority] FROM [tblServers] ORDER BY [Priority] ASC";
+            }
 
-            SQLCmd.CommandText = "SELECT [address],[protocol],[priority] FROM [tblServers] ORDER BY [Priority] ASC";
 
             SQLConn.Open();
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
@@ -653,7 +661,7 @@ namespace Lanstaller_Shared
 
         public static void RescanFileHashes(bool fullrescan, int software_id)
         {
-            Server SA = GetFileServer()[0];
+            Server SA = GetFileServer(true)[0];
             SqlConnection SQLConn = new SqlConnection(ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
@@ -707,12 +715,14 @@ namespace Lanstaller_Shared
             QueryString = "UPDATE tblFiles SET [hash_md5] = @hash WHERE id = @fileid";
 
             //RescanFileHashes
+            SQLCmd.CommandText = QueryString;
 
             foreach (FileInfoClass FH in FileHashList)
             {
-                FH.hash = CalculateMD5(SA.path + "\\" + FH.source);
-                SQLConn = new SqlConnection(ConnectionString);
-                SQLCmd = new SqlCommand(QueryString, SQLConn);
+                string filePath = SA.path + "\\" + FH.source;
+                Console.Write(filePath);
+                FH.hash = CalculateMD5(filePath);
+                SQLCmd.Parameters.Clear();
                 SQLCmd.Parameters.AddWithValue("@fileid", FH.id);
                 SQLCmd.Parameters.AddWithValue("@hash", FH.hash);
 
@@ -738,7 +748,7 @@ namespace Lanstaller_Shared
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("File hash failed: " + ex.Message);
+                    Console.WriteLine("File hash failed: " + filename + "\nError:" + ex.Message);
                 }
             }
             return string.Empty;
