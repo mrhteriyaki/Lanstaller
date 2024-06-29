@@ -20,5 +20,5 @@ RUN dotnet publish "./LanstallerAPI/LanstallerAPI.csproj" -c $BUILD_CONFIGURATIO
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY StaticFiles ./StaticFiles
+COPY LanstallerAPI/StaticFiles ./StaticFiles
 ENTRYPOINT ["dotnet", "LanstallerAPI.dll"]
