@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanstaller Stub Installer",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LanstallerAPI", "LanstallerAPI\LanstallerAPI.csproj", "{C9F26EE0-8E1A-43AD-A22B-9B2810A67108}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanstallerWeb", "LanstallerWeb\LanstallerWeb.csproj", "{75FFACA3-69B4-4ACA-9072-AD4F840973BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{C9F26EE0-8E1A-43AD-A22B-9B2810A67108}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9F26EE0-8E1A-43AD-A22B-9B2810A67108}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9F26EE0-8E1A-43AD-A22B-9B2810A67108}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75FFACA3-69B4-4ACA-9072-AD4F840973BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75FFACA3-69B4-4ACA-9072-AD4F840973BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75FFACA3-69B4-4ACA-9072-AD4F840973BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75FFACA3-69B4-4ACA-9072-AD4F840973BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
