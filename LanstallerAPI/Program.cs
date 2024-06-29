@@ -70,3 +70,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+Console.WriteLine("Lanstaller API Started");
