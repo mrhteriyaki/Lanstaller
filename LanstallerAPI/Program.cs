@@ -7,9 +7,7 @@ using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
-SoftwareClass.ConnectionString = config["ConnectionString"];
-
-
+SoftwareClass.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
 
 builder.Services.AddAuthentication(options =>
 {
