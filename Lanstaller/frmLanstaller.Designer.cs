@@ -76,13 +76,13 @@ namespace Lanstaller
             // btnInstall
             // 
             this.btnInstall.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnInstall.BackgroundImage")));
-            this.btnInstall.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnInstall.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.btnInstall.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnInstall.ForeColor = System.Drawing.Color.White;
-            this.btnInstall.Location = new System.Drawing.Point(351, 391);
+            this.btnInstall.Location = new System.Drawing.Point(305, 381);
             this.btnInstall.Name = "btnInstall";
-            this.btnInstall.Size = new System.Drawing.Size(180, 60);
+            this.btnInstall.Size = new System.Drawing.Size(260, 70);
             this.btnInstall.TabIndex = 2;
             this.btnInstall.Text = "Install";
             this.btnInstall.UseVisualStyleBackColor = true;
@@ -92,9 +92,9 @@ namespace Lanstaller
             // 
             this.txtInstallDirectory.BackColor = System.Drawing.Color.Black;
             this.txtInstallDirectory.ForeColor = System.Drawing.Color.White;
-            this.txtInstallDirectory.Location = new System.Drawing.Point(339, 110);
+            this.txtInstallDirectory.Location = new System.Drawing.Point(305, 110);
             this.txtInstallDirectory.Name = "txtInstallDirectory";
-            this.txtInstallDirectory.Size = new System.Drawing.Size(203, 20);
+            this.txtInstallDirectory.Size = new System.Drawing.Size(260, 20);
             this.txtInstallDirectory.TabIndex = 5;
             this.txtInstallDirectory.TextChanged += new System.EventHandler(this.txtInstallDirectory_TextChanged);
             // 
@@ -102,7 +102,7 @@ namespace Lanstaller
             // 
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(336, 94);
+            this.label1.Location = new System.Drawing.Point(302, 94);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 6;
@@ -117,9 +117,9 @@ namespace Lanstaller
             this.gbxActions.Controls.Add(this.chkRegistry);
             this.gbxActions.Controls.Add(this.chkFiles);
             this.gbxActions.ForeColor = System.Drawing.Color.White;
-            this.gbxActions.Location = new System.Drawing.Point(339, 149);
+            this.gbxActions.Location = new System.Drawing.Point(305, 149);
             this.gbxActions.Name = "gbxActions";
-            this.gbxActions.Size = new System.Drawing.Size(203, 146);
+            this.gbxActions.Size = new System.Drawing.Size(260, 146);
             this.gbxActions.TabIndex = 8;
             this.gbxActions.TabStop = false;
             this.gbxActions.Text = "Actions:";
@@ -211,9 +211,9 @@ namespace Lanstaller
             this.gbxPref.Controls.Add(this.label2);
             this.gbxPref.Controls.Add(this.txtUsername);
             this.gbxPref.ForeColor = System.Drawing.Color.White;
-            this.gbxPref.Location = new System.Drawing.Point(339, 301);
+            this.gbxPref.Location = new System.Drawing.Point(305, 301);
             this.gbxPref.Name = "gbxPref";
-            this.gbxPref.Size = new System.Drawing.Size(203, 74);
+            this.gbxPref.Size = new System.Drawing.Size(260, 74);
             this.gbxPref.TabIndex = 9;
             this.gbxPref.TabStop = false;
             this.gbxPref.Text = "User Preferences";
@@ -274,7 +274,7 @@ namespace Lanstaller
             this.txtUsername.ForeColor = System.Drawing.Color.White;
             this.txtUsername.Location = new System.Drawing.Point(68, 19);
             this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(125, 20);
+            this.txtUsername.Size = new System.Drawing.Size(186, 20);
             this.txtUsername.TabIndex = 0;
             this.txtUsername.TextChanged += new System.EventHandler(this.txtUsername_TextChanged);
             // 
@@ -338,7 +338,7 @@ namespace Lanstaller
             // 
             this.lblSpaceRequired.AutoSize = true;
             this.lblSpaceRequired.ForeColor = System.Drawing.Color.White;
-            this.lblSpaceRequired.Location = new System.Drawing.Point(336, 133);
+            this.lblSpaceRequired.Location = new System.Drawing.Point(302, 133);
             this.lblSpaceRequired.Name = "lblSpaceRequired";
             this.lblSpaceRequired.Size = new System.Drawing.Size(87, 13);
             this.lblSpaceRequired.TabIndex = 16;
@@ -454,12 +454,12 @@ namespace Lanstaller
             this.csmSoftware.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.reinstallToolStripMenuItem});
             this.csmSoftware.Name = "csmSoftware";
-            this.csmSoftware.Size = new System.Drawing.Size(181, 48);
+            this.csmSoftware.Size = new System.Drawing.Size(119, 26);
             // 
             // reinstallToolStripMenuItem
             // 
             this.reinstallToolStripMenuItem.Name = "reinstallToolStripMenuItem";
-            this.reinstallToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.reinstallToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
             this.reinstallToolStripMenuItem.Text = "Reinstall";
             this.reinstallToolStripMenuItem.Click += new System.EventHandler(this.reinstallToolStripMenuItem_Click);
             // 
