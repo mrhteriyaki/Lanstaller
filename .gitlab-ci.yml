@@ -6,20 +6,20 @@ services:
 before_script:
   - docker info
 
-build:
+build_api:
   only:
     - master
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstaller .'
+    - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstaller -f LanstallerAPI/Dockerfile .'
     
-deploy:
+deploy_api:
   stage: deploy
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script: 
-    - 'docker push gitlab.mrhsystems.com:5050/lanstaller/lanstaller'
+    - 'docker push gitlab.mrhsystems.com:5050/lanstaller/lanstaller:api'
   
   only:
     - master
