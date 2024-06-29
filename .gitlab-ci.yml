@@ -30,7 +30,7 @@ build_web:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstallerweb -f LanstallerAPI/Dockerfile .'
+    - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstallerweb -f LanstallerWeb/Dockerfile .'
     
 deploy_web:
   stage: deploy
