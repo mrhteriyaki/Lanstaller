@@ -12,14 +12,14 @@ build:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstallerapi ./LanstallerAPI/'
+    - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstaller ./LanstallerAPI/'
     
 deploy:
   stage: deploy
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script: 
-    - 'docker push gitlab.mrhsystems.com:5050/lanstaller/lanstallerapi'
+    - 'docker push gitlab.mrhsystems.com:5050/lanstaller/lanstaller'
   
   only:
     - main
