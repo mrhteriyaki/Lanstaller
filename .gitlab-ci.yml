@@ -13,6 +13,9 @@ build_api:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstaller/api -f LanstallerAPI/Dockerfile .'
+  parallel:
+    matrix:
+      - PROJECT: api
     
 deploy_api:
   stage: deploy
@@ -20,7 +23,9 @@ deploy_api:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script: 
     - 'docker push gitlab.mrhsystems.com:5050/lanstaller/lanstaller/api'
-  
+  parallel:
+    matrix:
+      - PROJECT: api
   only:
     - master
 
@@ -31,6 +36,10 @@ build_web:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstaller/web -f LanstallerWeb/Dockerfile .'
+  parallel:
+    matrix:
+      - PROJECT: web
+      
     
 deploy_web:
   stage: deploy
@@ -38,4 +47,7 @@ deploy_web:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script: 
     - 'docker push gitlab.mrhsystems.com:5050/lanstaller/lanstaller/web'
+  parallel:
+    matrix:
+      - PROJECT: web
   
