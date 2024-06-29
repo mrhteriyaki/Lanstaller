@@ -23,7 +23,7 @@ namespace LanstallerAPI.Controllers
         {
             if (tokenrequest.name == null || tokenrequest.regcode == null)
             {
-                return "fail1";
+                return "fail1"; //Registration code missing.
             }
             
             int reg_response = 0;
@@ -31,7 +31,7 @@ namespace LanstallerAPI.Controllers
 
             if (reg_response == 0)
             {
-                return "fail2";
+                return "fail2"; //Server failed to generate token, dont save.
             }
              
             return Security.GetToken(reg_response).token;

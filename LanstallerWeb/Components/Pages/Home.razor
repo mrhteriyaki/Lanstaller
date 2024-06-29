@@ -1,7 +1,49 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+@inject NavigationManager NavigationManager
 
-Welcome to your new app.
+
+<PageTitle>Lanstaller</PageTitle>
+
+<h1>Lanstaller Client Download</h1>
+
+<br />
+
+
+<b>User registration code:</b>
+<input @bind="registrationCode" />
+<button @onclick="DownloadLanstaller">Download</button>
+<br />
+<br />
+@warningMessage
+
+@code {
+    private string registrationCode;
+    private string warningMessage;
+
+    protected override void OnInitialized()
+    {
+        Uri uri = new Uri(NavigationManager.Uri);
+
+
+        string? regCodeNull = System.Web.HttpUtility.ParseQueryString(uri.Query).Get("regcode");
+        if (regCodeNull != null)
+        {
+            registrationCode = regCodeNull;
+        }
+
+    }
+
+    private void DownloadLanstaller()
+    {
+        if (!string.IsNullOrWhiteSpace(registrationCode))
+        {
+            NavigationManager.NavigateTo($"/download?regcode={registrationCode}", forceLoad: true);
+        }
+        else
+        {
+            warningMessage = "Please enter registration code to download client.";
+        }
+    }
+}

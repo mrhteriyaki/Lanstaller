@@ -239,9 +239,20 @@ namespace Lanstaller
 
         void ClientUpdateCheck()
         {
+            double server_version = 0;
             try
             {
-                double server_version = double.Parse(APIClient.GetSystemInfo("version"));
+                 server_version = double.Parse(APIClient.GetSystemInfo("version"));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to check version Error:" +  ex.Message);
+                return;
+            }
+
+            try
+            {
+                
                 if (server_version != Version)
                 {
                     if (MessageBox.Show("Lanstaller Update Required.", "Update Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)

@@ -59,7 +59,7 @@ namespace Lanstaller
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error:" + ex.ToString());
+                MessageBox.Show("Failed to authenticate: " + ex.Message);
                 return;
             }
 

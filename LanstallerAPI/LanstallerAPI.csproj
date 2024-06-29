@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lanstaller Shared\Lanstaller Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Lanstaller Shared">
       <HintPath>Lanstaller Shared.dll</HintPath>
     </Reference>

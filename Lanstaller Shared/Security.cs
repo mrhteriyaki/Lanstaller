@@ -43,7 +43,7 @@ namespace Lanstaller_Shared
         public static List<Token> GetTokens()
         {
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
-            SqlCommand SQLCmd = new SqlCommand("SELECT id,name,token FROM tblSecurityTokens", SQLConn);
+            SqlCommand SQLCmd = new SqlCommand("SELECT id,token FROM tblSecurityTokens", SQLConn);
 
             SQLConn.Open();
             List<Token> tmpList = new List<Token>();
@@ -52,7 +52,6 @@ namespace Lanstaller_Shared
             {
                 Token tmpS = new Token();
                 tmpS.id = (int)SR["id"];
-                tmpS.Name = SR["name"].ToString();
                 tmpS.token = SR["token"].ToString();
                 tmpList.Add(tmpS);
             }
@@ -63,7 +62,7 @@ namespace Lanstaller_Shared
         public static Token GetToken(int id)
         {
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
-            SqlCommand SQLCmd = new SqlCommand("SELECT id,name,token FROM tblSecurityTokens where id = @tkid", SQLConn);
+            SqlCommand SQLCmd = new SqlCommand("SELECT id,token FROM tblSecurityTokens where id = @tkid", SQLConn);
             SQLCmd.Parameters.AddWithValue("@tkid", id);
 
             SQLConn.Open();
@@ -72,7 +71,6 @@ namespace Lanstaller_Shared
             while (SR.Read())
             {
                 tST.id = (int)SR["id"];
-                tST.Name = SR["name"].ToString();
                 tST.token = SR["token"].ToString();
             }
             SQLConn.Close();
@@ -91,7 +89,7 @@ namespace Lanstaller_Shared
         }
 
 
-        public static int NewToken(string Name, string registration_code)
+        public static int NewToken(string registration_code)
         {
             //Generate security token given client name and registration code, return the token ID.
             SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
@@ -129,8 +127,7 @@ namespace Lanstaller_Shared
             var tokenstring = new String(stringChars);
 
 
-            SQLCmd.CommandText = "INSERT INTO tblSecurityTokens (name,token,registration_date) OUTPUT INSERTED.id VALUES (@nval,@tkval,GETDATE())";
-            SQLCmd.Parameters.AddWithValue("@nval", Name);
+            SQLCmd.CommandText = "INSERT INTO tblSecurityTokens (token,registration_date,registration_id) OUTPUT INSERTED.id VALUES (@nval,@tkval,GETDATE(),(SELECT id FROM tblSecurityRegistration WHERE id = @rcode))";
             SQLCmd.Parameters.AddWithValue("@tkval", tokenstring);
 
             SQLConn.Open();
