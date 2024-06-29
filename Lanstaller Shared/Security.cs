@@ -127,7 +127,7 @@ namespace Lanstaller_Shared
             var tokenstring = new String(stringChars);
 
 
-            SQLCmd.CommandText = "INSERT INTO tblSecurityTokens (token,registration_date,registration_id) OUTPUT INSERTED.id VALUES (@tkval,GETDATE(),(SELECT id FROM tblSecurityRegistration WHERE id = @rcode))";
+            SQLCmd.CommandText = "INSERT INTO tblSecurityTokens (token,registration_date,registration_id) OUTPUT INSERTED.id VALUES (@tkval,GETDATE(),(SELECT id FROM tblSecurityRegistration WHERE regcode = @rcode))";
             SQLCmd.Parameters.AddWithValue("@tkval", tokenstring);
 
             SQLConn.Open();
