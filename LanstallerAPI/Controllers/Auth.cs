@@ -27,7 +27,7 @@ namespace LanstallerAPI.Controllers
             }
             
             int reg_response = 0;
-            reg_response = Security.NewToken(tokenrequest.name, tokenrequest.regcode);
+            reg_response = Security.NewToken(tokenrequest.regcode);
 
             if (reg_response == 0)
             {
