@@ -89,6 +89,7 @@
     <Compile Include="Classes\DownloadTask.cs" />
     <Compile Include="Classes\LocalDatabase.cs" />
     <Compile Include="Classes\Logging.cs" />
+    <Compile Include="Classes\Support.cs" />
     <Compile Include="frmLanstaller.cs">
       <SubType>Form</SubType>
     </Compile>

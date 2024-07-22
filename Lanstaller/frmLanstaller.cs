@@ -87,6 +87,9 @@ namespace Lanstaller
             ClientUpdateCheck();
             SetupThreads();
 
+            Thread sCheck = new Thread(t => Support.Check());
+            sCheck.Start();
+            
             //Get list of installed programs - future use to skip redist.
             //WindowsInstallerClass.CheckProgram();
 
