@@ -1,6 +1,8 @@
-Lanstaller - Deploy games / software quickly for LAN Parties.
+Lanstaller - a locally hosted rip off of Steam.
+Deploy games / software quickly at a LAN or before.
 
-Skip the slow installation process and file decompression of regular software installers.
+Avoid the pain and suffering of tech support at a lan by:
+Skipping the slow installation process and file decompression of regular software installers.
 Include Updates and Mods not provided by original release.
 
 - Supports file copy.

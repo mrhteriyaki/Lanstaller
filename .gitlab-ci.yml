@@ -1,10 +1,10 @@
 image: docker:stable
 
-services:
-  - docker:dind
+variables:
+  DOCKER_HOST: tcp://172.17.0.1:2375/
+  DOCKER_DRIVER: overlay2
 
-before_script:
-  - docker info
+
 
 build_api:
   only:
@@ -12,7 +12,7 @@ build_api:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstaller/api -f LanstallerAPI/Dockerfile .'
+    - 'docker build -t gitlab.yden.au:5050/lanstaller/lanstaller/api -f LanstallerAPI/Dockerfile .'
   parallel:
     matrix:
       - PROJECT: api
@@ -22,7 +22,7 @@ deploy_api:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script: 
-    - 'docker push gitlab.mrhsystems.com:5050/lanstaller/lanstaller/api'
+    - 'docker push gitlab.yden.au:5050/lanstaller/lanstaller/api'
   parallel:
     matrix:
       - PROJECT: api
@@ -35,7 +35,7 @@ build_web:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - 'docker build -t gitlab.mrhsystems.com:5050/lanstaller/lanstaller/web -f LanstallerWeb/Dockerfile .'
+    - 'docker build -t gitlab.yden.au:5050/lanstaller/lanstaller/web -f LanstallerWeb/Dockerfile .'
   parallel:
     matrix:
       - PROJECT: web
@@ -46,7 +46,7 @@ deploy_web:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script: 
-    - 'docker push gitlab.mrhsystems.com:5050/lanstaller/lanstaller/web'
+    - 'docker push gitlab.yden.au:5050/lanstaller/lanstaller/web'
   parallel:
     matrix:
       - PROJECT: web
