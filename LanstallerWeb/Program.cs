@@ -1,7 +1,18 @@
 using Lanstaller_Shared;
+using LanstallerWeb;
 using LanstallerWeb.Components;
 
 SoftwareClass.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
+if (string.IsNullOrEmpty(SoftwareClass.ConnectionString))
+{
+    SoftwareClass.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security = true";
+}
+
+LanstallerWebSettings.serverAddress = Environment.GetEnvironmentVariable("ADDRESS");
+if (string.IsNullOrEmpty(LanstallerWebSettings.serverAddress))
+{
+    LanstallerWebSettings.serverAddress = "localhost:5236";
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,5 +48,7 @@ app.MapRazorComponents<App>()
 
 app.MapControllers();
 
+
+Maintenance.CleanupTemp();
 
 app.Run();

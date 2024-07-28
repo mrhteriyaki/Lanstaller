@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Lanstaller Shared\Lanstaller Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="tmp\" />
+  </ItemGroup>
+
 </Project>
