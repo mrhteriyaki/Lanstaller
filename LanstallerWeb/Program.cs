@@ -5,12 +5,14 @@ using LanstallerWeb.Components;
 LanstallerShared.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
 if (string.IsNullOrEmpty(LanstallerShared.ConnectionString))
 {
+    Console.WriteLine("Database connection string variable DBSTRING not set, using default.");
     LanstallerShared.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security = true";
 }
 
 LanstallerWebSettings.serverAddress = Environment.GetEnvironmentVariable("ADDRESS");
 if (string.IsNullOrEmpty(LanstallerWebSettings.serverAddress))
 {
+    Console.WriteLine("Server address variable ADDRESS not set, using default.");
     LanstallerWebSettings.serverAddress = "localhost:5236";
 }
 
