@@ -48,30 +48,39 @@ namespace Lanstaller
             Rqst.regcode = _regcode;
             
             string _authkey;
-            string URI = _Server + "/auth/newtoken";
+            string ServerUri = _Server + "/auth/newtoken";
 
+            string MsgData = string.Empty;
             try
             {
-                string MsgData = Newtonsoft.Json.JsonConvert.SerializeObject(Rqst);
-                byte[] responsedata = WC.UploadData(URI, "POST", Encoding.UTF8.GetBytes(MsgData));
-                _authkey = Encoding.UTF8.GetString(responsedata);
-
+                MsgData = Newtonsoft.Json.JsonConvert.SerializeObject(Rqst);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to authenticate: " + ex.Message);
+                MessageBox.Show("Unable to parse request into json: " + ex.Message + "\nServer Entered:\"" + ServerUri + "\"\nRegistration code:\"" + _regcode + "\"");
+                return;
+            }
+
+            try
+            {
+                byte[] responsedata = WC.UploadData(ServerUri, "POST", Encoding.UTF8.GetBytes(MsgData));
+                _authkey = Encoding.UTF8.GetString(responsedata);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to authenticate: " + ex.Message + "\nServer Entered:\"" + ServerUri + "\"\nRegistration code:\"" + _regcode + "\"");
                 return;
             }
 
 
-            URI = _Server + "/System/version";
+            ServerUri = _Server + "/System/version";
 
             
             WC.Headers.Add("authorization", _authkey);
             
             try
             {
-                string response = WC.DownloadString(URI);
+                string response = WC.DownloadString(ServerUri);
                 double server_ver = double.Parse(response);
                 //Connection OK, write config file.
                 System.IO.StreamWriter SW = new System.IO.StreamWriter("config.ini");
@@ -97,5 +106,26 @@ namespace Lanstaller
         {
             this.Close();
         }
+
+        private void txtServer_TextChanged(object sender, EventArgs e)
+        {
+            //Validate URI.
+
+            //Check if /test returns ok to confirm server online?
+
+        }
+
+        public static bool IsValidUri(string uriString)
+        {
+            if (string.IsNullOrWhiteSpace(uriString))
+            {
+                return false;
+            }
+
+            Uri uriResult;
+            return Uri.TryCreate(uriString, UriKind.Absolute, out uriResult)
+                   && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+        }
+
     }
 }

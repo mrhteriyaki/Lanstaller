@@ -6,6 +6,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+//add controllers.
+builder.Services.AddControllers();
+
+
+//Set newtonsoft as default json.
+//builder.Services.AddControllers().AddNewtonsoftJson();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -23,5 +31,8 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapControllers();
+
 
 app.Run();

@@ -13,7 +13,7 @@ namespace Lanstaller.Classes
 
         public static void Check()
         {
-            OpenVPNCheck();
+            //OpenVPNCheck();
 
             //Check for Hyper-V.
 

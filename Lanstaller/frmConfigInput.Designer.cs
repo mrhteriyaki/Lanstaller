@@ -47,6 +47,7 @@ namespace Lanstaller
             this.txtServer.Name = "txtServer";
             this.txtServer.Size = new System.Drawing.Size(601, 26);
             this.txtServer.TabIndex = 0;
+            this.txtServer.TextChanged += new System.EventHandler(this.txtServer_TextChanged);
             // 
             // lblTitle
             // 
@@ -128,7 +129,7 @@ namespace Lanstaller
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "frmConfigInput";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "SerialForm";
+            this.Text = "Lanstaller Config";
             this.Load += new System.EventHandler(this.frmConfigInput_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
