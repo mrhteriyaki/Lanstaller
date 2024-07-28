@@ -33,7 +33,7 @@ namespace Lanstaller
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLanstaller));
             this.btnInstall = new System.Windows.Forms.Button();
             this.txtInstallDirectory = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblinstDir = new System.Windows.Forms.Label();
             this.gbxActions = new System.Windows.Forms.GroupBox();
             this.chkRedist = new System.Windows.Forms.CheckBox();
             this.chkWindowsSettings = new System.Windows.Forms.CheckBox();
@@ -98,15 +98,15 @@ namespace Lanstaller
             this.txtInstallDirectory.TabIndex = 5;
             this.txtInstallDirectory.TextChanged += new System.EventHandler(this.txtInstallDirectory_TextChanged);
             // 
-            // label1
+            // lblinstDir
             // 
-            this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(302, 94);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(82, 13);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "Install Directory:";
+            this.lblinstDir.AutoSize = true;
+            this.lblinstDir.ForeColor = System.Drawing.Color.White;
+            this.lblinstDir.Location = new System.Drawing.Point(302, 94);
+            this.lblinstDir.Name = "lblinstDir";
+            this.lblinstDir.Size = new System.Drawing.Size(82, 13);
+            this.lblinstDir.TabIndex = 6;
+            this.lblinstDir.Text = "Install Directory:";
             // 
             // gbxActions
             // 
@@ -482,7 +482,7 @@ namespace Lanstaller
             this.Controls.Add(this.gbxStatus);
             this.Controls.Add(this.gbxPref);
             this.Controls.Add(this.gbxActions);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.lblinstDir);
             this.Controls.Add(this.txtInstallDirectory);
             this.Controls.Add(this.pbTitleExpanded);
             this.ForeColor = System.Drawing.Color.White;
@@ -511,7 +511,7 @@ namespace Lanstaller
         #endregion
         private System.Windows.Forms.Button btnInstall;
         private System.Windows.Forms.TextBox txtInstallDirectory;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblinstDir;
         private System.Windows.Forms.PictureBox pbTitle;
         private System.Windows.Forms.GroupBox gbxActions;
         private System.Windows.Forms.CheckBox chkPreferences;

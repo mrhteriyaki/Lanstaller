@@ -553,6 +553,11 @@ namespace Lanstaller
             {
                 if (VerifyCopyOperations.Count == 0)
                 {
+                    if(frmLanstaller.shutdown)
+                    {
+                        //Exit if main threads have closed.
+                        return;
+                    }
                     continue;
                 }
                 else
@@ -620,9 +625,7 @@ namespace Lanstaller
                 VerifyCopyThread.Name = "Verify Copy Thread";
                 VerifyCopyThread.Start();
 
-                List<Thread> SmallFilesThreads = new List<Thread>();
-
-
+                
                 while (CopyIndex < FileCopyOperations.Count)
                 {
                     FileCopyOperation FCO = FileCopyOperations[CopyIndex];

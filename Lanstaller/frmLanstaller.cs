@@ -46,7 +46,7 @@ namespace Lanstaller
         Thread sCheck; //support checks.
 
         static bool install_option = true;
-        static bool shutdown = false;
+        public static bool shutdown = false;
         static bool InstallThreadRunning = false;
         private static object lock_InstallThreadRunning = new object();
 
@@ -552,9 +552,16 @@ namespace Lanstaller
 
         }
 
+        bool warningShown = false;
         private void txtInstallDirectory_TextChanged(object sender, EventArgs e)
         {
             UserSettings.SetInstallDirectory(txtInstallDirectory.Text);
+
+            if (InstallThreadRunning && !warningShown)
+            {
+                warningShown = true;
+                MessageBox.Show("Changes to installation directory while running will not apply until the next installation starts.");
+            }
         }
 
         private void txtWidth_TextChanged(object sender, EventArgs e)
