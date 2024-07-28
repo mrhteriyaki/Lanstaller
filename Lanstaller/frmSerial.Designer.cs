@@ -80,7 +80,7 @@ namespace Lanstaller
             this.btnPaste.Name = "btnPaste";
             this.btnPaste.Size = new System.Drawing.Size(100, 30);
             this.btnPaste.TabIndex = 3;
-            this.btnPaste.Text = "Paste";
+            this.btnPaste.Text = "Clipboard Paste";
             this.btnPaste.UseVisualStyleBackColor = false;
             this.btnPaste.Click += new System.EventHandler(this.btnPaste_Click);
             // 

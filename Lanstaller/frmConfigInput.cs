@@ -57,7 +57,7 @@ namespace Lanstaller
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Unable to parse request into json: " + ex.Message + "\nServer Entered:\"" + ServerUri + "\"\nRegistration code:\"" + _regcode + "\"");
+                MessageBox.Show("Unable to parse request into json: " + ex.Message + "\nServer Entered:\"" + _Server + "\"\nRegistration code:\"" + _regcode + "\"");
                 return;
             }
 
@@ -68,7 +68,7 @@ namespace Lanstaller
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to authenticate: " + ex.Message + "\nServer Entered:\"" + ServerUri + "\"\nRegistration code:\"" + _regcode + "\"");
+                MessageBox.Show("Failed to authenticate: " + ex.Message + "\nServer Entered:\"" + _Server + "\"\nRegistration code:\"" + _regcode + "\"");
                 return;
             }
 

@@ -1,4 +1,7 @@
+using Lanstaller_Shared;
 using LanstallerWeb.Components;
+
+SoftwareClass.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
 
 var builder = WebApplication.CreateBuilder(args);
 

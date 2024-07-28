@@ -110,6 +110,7 @@ namespace Lanstaller
             if (cmbxServerSerials.SelectedIndex != -1)
             {
                 txtSerial.Text = cmbxServerSerials.Text;
+                btnPaste.Enabled = false;
             }
         }
 

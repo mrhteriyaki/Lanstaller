@@ -129,7 +129,7 @@ namespace Lanstaller
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "frmConfigInput";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Lanstaller Config";
+            this.Text = "SerialForm";
             this.Load += new System.EventHandler(this.frmConfigInput_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

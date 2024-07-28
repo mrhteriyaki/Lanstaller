@@ -44,6 +44,7 @@ namespace Lanstaller
         Thread MThread; //Status Monitor Thread
         Thread CThread; //Chat Thread
         Thread InsTrd; //installer thread.
+        Thread sCheck; //support checks.
 
         static bool install_option = true;
         static bool shutdown = false;
@@ -85,13 +86,13 @@ namespace Lanstaller
             WindowStartSize = this.Size;
             LoadConfigFile();
             ClientUpdateCheck();
-            SetupThreads();
+                        
+            SetupThreads(); //Put other supporting threads her
 
-            Thread sCheck = new Thread(t => Support.Check());
-            sCheck.Start();
-            
             //Get list of installed programs - future use to skip redist.
             //WindowsInstallerClass.CheckProgram();
+
+            //Need to put auth/connection check - invalid auth response should re-prompt with ConfigInput.
 
             LoadClientSettings();
             InitialFormSetup();
@@ -131,6 +132,11 @@ namespace Lanstaller
             CThread = new Thread(ChatThread);
             CThread.Name = "Chat Thread";
             CThread.Start();
+
+            sCheck = new Thread(Support.Check);
+            sCheck.Name = "Support Checks Thread";
+            sCheck.Start();
+
         }
 
         void LoadConfigFile()
