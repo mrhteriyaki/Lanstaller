@@ -12,7 +12,7 @@ namespace LanstallerAPI.Controllers
         [HttpGet,Route("version"), Authorize]
         public string Version()
         {   
-            return SoftwareClass.GetSystemData("version");
+            return LanstallerShared.GetSystemData("version");
         }
 
         

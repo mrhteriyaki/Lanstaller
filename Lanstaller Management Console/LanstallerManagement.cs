@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lanstaller_Shared;
-using Lanstaller_Shared.Models;
 
 namespace Lanstaller_Management_Console
 {
@@ -17,9 +16,9 @@ namespace Lanstaller_Management_Console
         //Rescan file size and update database (use of Pri.Longpath only on windows / .net framework).
         public static void RescanFileSize(int software_id)
         {
-            string SA = SoftwareClass.GetFileServer().FirstOrDefault(s => s.protocol == 2).path;
+            string SA = FileServer.GetFileServer().FirstOrDefault(s => s.protocol == 2).path;
 
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 

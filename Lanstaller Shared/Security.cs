@@ -24,7 +24,7 @@ namespace Lanstaller_Shared
         public static bool CheckSecurityToken(string token)
         {
             //tblSecurityTokens
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("SELECT COUNT(token) FROM tblSecurityTokens WHERE token = @tkval", SQLConn);
             SQLCmd.Parameters.AddWithValue("@tkval", token);
 
@@ -42,7 +42,7 @@ namespace Lanstaller_Shared
 
         public static List<Token> GetTokens()
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("SELECT id,token FROM tblSecurityTokens", SQLConn);
 
             SQLConn.Open();
@@ -61,7 +61,7 @@ namespace Lanstaller_Shared
 
         public static Token GetToken(int id)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("SELECT id,token FROM tblSecurityTokens where id = @tkid", SQLConn);
             SQLCmd.Parameters.AddWithValue("@tkid", id);
 
@@ -79,7 +79,7 @@ namespace Lanstaller_Shared
 
         public static int GetTokenID(string token)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("SELECT id FROM tblSecurityTokens where token = @tkval", SQLConn);
             SQLCmd.Parameters.AddWithValue("@tkval", token);
             SQLConn.Open();
@@ -92,7 +92,7 @@ namespace Lanstaller_Shared
         public static int NewToken(string registration_code)
         {
             //Generate security token given client name and registration code, return the token ID.
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 
@@ -141,7 +141,7 @@ namespace Lanstaller_Shared
 
         public static void DeleteToken(int id)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("DELETE FROM tblSecurityTokens WHERE id = @tokenid", SQLConn);
             SQLCmd.Parameters.AddWithValue("@tokenid", id);
 
@@ -155,7 +155,7 @@ namespace Lanstaller_Shared
 
         public static void NewRegistrationCode(string Name, string RegistrationCode, DateTime Expiry)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("INSERT INTO tblSecurityRegistration (name,regcode,expiry) VALUES (@rname, @rcode, @rexp)", SQLConn);
             SQLCmd.Parameters.AddWithValue("@rname", Name);
             SQLCmd.Parameters.AddWithValue("@rcode", RegistrationCode);
@@ -168,7 +168,7 @@ namespace Lanstaller_Shared
 
         public static void DeleteRegistrationCode(int reg_id)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("DELETE FROM tblSecurityRegistration WHERE id = @rid", SQLConn);
             SQLCmd.Parameters.AddWithValue("@rid", reg_id);
             SQLConn.Open();
@@ -178,7 +178,7 @@ namespace Lanstaller_Shared
 
         public static List<Registration> GetRegTokens()
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand("SELECT id,name,regcode,expiry FROM tblSecurityRegistration", SQLConn);
 
             SQLConn.Open();

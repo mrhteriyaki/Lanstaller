@@ -1,5 +1,4 @@
 ﻿using Lanstaller_Shared;
-using Lanstaller_Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

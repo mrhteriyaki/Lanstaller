@@ -11,7 +11,6 @@ using System.Windows.Forms;
 
 //using Lanstaller;
 using Lanstaller_Shared;
-using Lanstaller_Shared.Models;
 
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
@@ -102,7 +101,7 @@ namespace Lanstaller_Management_Console
             {
                 if (line.StartsWith("Data Source="))
                 {
-                    SoftwareClass.ConnectionString = line;
+                    LanstallerShared.ConnectionString = line;
                 }
             }
 
@@ -199,7 +198,7 @@ namespace Lanstaller_Management_Console
 
         void LoadRedist()
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
             SQLCmd.CommandText = "SELECT ID,Name FROM [tblRedist]";
@@ -221,7 +220,7 @@ namespace Lanstaller_Management_Console
         void RefreshSoftware()
         {
             //Full software reload.
-            SoftwareList = SoftwareClass.LoadSoftware();
+            SoftwareList = SoftwareInfo.LoadSoftware();
 
             //for updating listview from local SoftwareList counts.
             lvSoftware.Items.Clear();
@@ -248,7 +247,7 @@ namespace Lanstaller_Management_Console
             {
                 MessageBox.Show("Error - Nothing in name.");
             }
-            int newid = SoftwareClass.AddSoftware(softwarename);
+            int newid = SoftwareInfo.AddSoftware(softwarename);
 
             RefreshSoftware();
             int index = 0;
@@ -273,7 +272,7 @@ namespace Lanstaller_Management_Console
                 return;
             }
 
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
             
@@ -324,7 +323,7 @@ namespace Lanstaller_Management_Console
 
         private void btnCheckAllFiles_Click(object sender, EventArgs e)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 
@@ -398,7 +397,7 @@ namespace Lanstaller_Management_Console
             foreach (string dirname in directories)
             {
                 string dst = destination + dirname.Substring(subfolder.Length);
-                SoftwareClass.AddDirectory(dst, CurrentSelectedSoftware.id);
+                FileInfoClass.AddDirectory(dst, CurrentSelectedSoftware.id);
 
             }
 
@@ -426,7 +425,7 @@ namespace Lanstaller_Management_Console
                 //MessageBox.Show(src + Environment.NewLine + dst);
 
                 Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(filename);
-                SoftwareClass.AddFile(src, dst, FI.Length, CurrentSelectedSoftware.id);
+                FileInfoClass.AddFile(src, dst, FI.Length, CurrentSelectedSoftware.id);
 
             }
             RefreshSoftware();
@@ -439,7 +438,7 @@ namespace Lanstaller_Management_Console
 
         void RefreshStatusInfo()
         {
-            SoftwareClass.LoadSoftwareCounts(CurrentSelectedSoftware); //Update counts.
+            SoftwareInfo.LoadSoftwareCounts(CurrentSelectedSoftware); //Update counts.
             string info = "";
             info += "File Copies: " + CurrentSelectedSoftware.file_count + Environment.NewLine;
             info += "Registry Operations: " + CurrentSelectedSoftware.registry_count + Environment.NewLine;
@@ -540,7 +539,7 @@ namespace Lanstaller_Management_Console
             //multi string = 7
             //qword = 11
             RegistryPanel.btnAddReg.Enabled = false;
-            SoftwareClass.AddRegistry(CurrentSelectedSoftware.id, hkeyval, RegistryPanel.txtKey.Text, RegistryPanel.txtValue.Text, regtype, RegistryPanel.txtData.Text);
+            RegistryOperation.AddRegistry(CurrentSelectedSoftware.id, hkeyval, RegistryPanel.txtKey.Text, RegistryPanel.txtValue.Text, regtype, RegistryPanel.txtData.Text);
 
             RefreshSoftware();
 
@@ -560,7 +559,7 @@ namespace Lanstaller_Management_Console
                 return;
             }
             ShortcutsPanel.btnAddShortcut.Enabled = false;
-            SoftwareClass.AddShortcut(ShortcutsPanel.txtName.Text, ShortcutsPanel.txtLocation.Text, ShortcutsPanel.txtFilepath.Text, ShortcutsPanel.txtWorking.Text, ShortcutsPanel.txtArguments.Text, ShortcutsPanel.txtIcon.Text, CurrentSelectedSoftware.id);
+            ShortcutOperation.AddShortcut(ShortcutsPanel.txtName.Text, ShortcutsPanel.txtLocation.Text, ShortcutsPanel.txtFilepath.Text, ShortcutsPanel.txtWorking.Text, ShortcutsPanel.txtArguments.Text, ShortcutsPanel.txtIcon.Text, CurrentSelectedSoftware.id);
 
             RefreshSoftware();
 
@@ -650,7 +649,7 @@ namespace Lanstaller_Management_Console
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)
         {
             WindowsSettingsPanel.btnFirewallRuleAdd.Enabled = false;
-            SoftwareClass.AddFirewallRule(WindowsSettingsPanel.txtFirewallPath.Text, WindowsSettingsPanel.txtRuleName.Text, CurrentSelectedSoftware.id);
+            FirewallRule.AddFirewallRule(WindowsSettingsPanel.txtFirewallPath.Text, WindowsSettingsPanel.txtRuleName.Text, CurrentSelectedSoftware.id);
             RefreshSoftware();
 
         }
@@ -663,7 +662,7 @@ namespace Lanstaller_Management_Console
 
         private void btnAddRedist_Click(object sender, EventArgs e)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 
@@ -679,7 +678,7 @@ namespace Lanstaller_Management_Console
 
         private void btnAddSerial_Click(object sender, EventArgs e)
         {
-            SoftwareClass.AddSerial(SerialPanel.txtSerialName.Text, int.Parse(SerialPanel.txtSerialInstance.Text), CurrentSelectedSoftware.id, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text, SerialPanel.txtFormat.Text);
+            SerialNumber.AddSerial(SerialPanel.txtSerialName.Text, int.Parse(SerialPanel.txtSerialInstance.Text), CurrentSelectedSoftware.id, SerialPanel.txtRegKey.Text, SerialPanel.txtRegVal.Text, SerialPanel.txtFormat.Text);
         }
 
         private void txtSerialName_TextChanged(object sender, EventArgs e)
@@ -698,7 +697,7 @@ namespace Lanstaller_Management_Console
 
             //Load serial list for selected serial.
             int instance_index = SerialPanel.cmbxSerialPoolInstance.SelectedIndex;
-            serialid_pool_selected = SoftwareClass.GetSerials(CurrentSelectedSoftware.id)[instance_index].serialid;
+            serialid_pool_selected = SerialNumber.GetSerials(CurrentSelectedSoftware.id)[instance_index].serialid;
             RefreshSerialPoolList(); //Load serial pool into listview.
             SerialPanel.btnAddUserSerial.Enabled = true;
 
@@ -766,7 +765,7 @@ namespace Lanstaller_Management_Console
                 MessageBox.Show("Select Software");
                 return;
             }
-            SoftwareClass.AddPreferenceFile(PreferencesPanel.txtPrefFilePath.Text, PreferencesPanel.txtTarget.Text, PreferencesPanel.txtReplace.Text, CurrentSelectedSoftware.id);
+            PreferenceOperation.AddPreferenceFile(PreferencesPanel.txtPrefFilePath.Text, PreferencesPanel.txtTarget.Text, PreferencesPanel.txtReplace.Text, CurrentSelectedSoftware.id);
         }
 
 
@@ -813,7 +812,7 @@ namespace Lanstaller_Management_Console
 
         void GenerateFileHash(bool fullRescan, int scanid)
         {
-            SoftwareClass.RescanFileHashes(fullRescan, scanid);
+            FileInfoClass.RescanFileHashes(fullRescan, scanid);
 
             FilesPanel.lblCopyActionInfo.Invoke((MethodInvoker)delegate
             {
@@ -840,7 +839,7 @@ namespace Lanstaller_Management_Console
                 return;
             }
             //Delete Software.
-            SoftwareClass.DeleteSoftware(SoftwareList[lvSoftware.SelectedItems[0].Index].id);
+            SoftwareInfo.DeleteSoftware(SoftwareList[lvSoftware.SelectedItems[0].Index].id);
 
             RefreshSoftware();
 
@@ -854,7 +853,7 @@ namespace Lanstaller_Management_Console
 
         private void tmrProgress_Tick(object sender, EventArgs e)
         {
-            FilesPanel.lblUnhashedFiles.Text = "Unhashed Files:" + SoftwareClass.GetUnhashedFileCount();
+            FilesPanel.lblUnhashedFiles.Text = "Unhashed Files:" + FileInfoClass.GetUnhashedFileCount();
         }
 
         private void lvSoftware_SelectedIndexChanged(object sender, EventArgs e)
@@ -870,15 +869,14 @@ namespace Lanstaller_Management_Console
 
             RefreshStatusInfo();
 
-
             //load serial panel details.
             SerialPanel.cmbxSerialPoolInstance.Items.Clear();
-            foreach (SerialNumber SN in SoftwareClass.GetSerials(CurrentSelectedSoftware.id))
+            foreach (SerialNumber SN in SerialNumber.GetSerials(CurrentSelectedSoftware.id))
             {
                 SerialPanel.cmbxSerialPoolInstance.Items.Add(SN.name);
             }
 
-            foreach (Redistributable RS in SoftwareClass.GetRedistributables(CurrentSelectedSoftware.id))
+            foreach (Redistributable RS in Redistributable.GetRedistributables(CurrentSelectedSoftware.id))
             {
                 WindowsSettingsPanel.cmbxRedist.Items.Add(RS.name);
             }
@@ -930,7 +928,7 @@ namespace Lanstaller_Management_Console
 
             File.Delete(tmpFile);
 
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
             SQLCmd.CommandText = "IF EXISTS (SELECT software_id FROM tblImages WHERE software_id = @swid) " +

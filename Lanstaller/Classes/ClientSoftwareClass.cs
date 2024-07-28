@@ -19,12 +19,11 @@ using System.Threading;
 using Lanstaller.Classes;
 using System.Collections.Concurrent;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
-using Lanstaller_Shared.Models;
 using System.Security.Principal;
 
 namespace Lanstaller
 {
-    public class ClientSoftwareClass : SoftwareClass //Extension of shared Software class with client / windows exclusive functions.
+    public class ClientSoftwareClass : LanstallerShared //Extension of shared Software class with client / windows exclusive functions.
     {
         string status = "Status: Ready"; //Used for status label.
         long InstallSize; //Size of current install.
@@ -150,8 +149,8 @@ namespace Lanstaller
                 GenerateFirewallRules();
 
                 //Compatibility.
-                List<Compatibility> CPL = GetCompatibilitiesFromAPI(Identity.id);
-                foreach (Compatibility CP in CPL)
+                List<CompatabilityMode> CPL = GetCompatibilitiesFromAPI(Identity.id);
+                foreach (CompatabilityMode CP in CPL)
                 {
                     GenerateCompatibility(CP.filename, CP.compat_type);
                 }
@@ -575,7 +574,7 @@ namespace Lanstaller
                 if (Pri.LongPath.File.Exists(FVO.destination))
                 {
                     //MessageBox.Show("MD5: " + FVO.destination);
-                    string check_hash = CalculateMD5(FVO.destination);
+                    string check_hash = FileInfoClass.CalculateMD5(FVO.destination);
                     if (FVO.fileinfo.hash.Equals(check_hash))
                     {
                         FVO.verified = true;
@@ -607,7 +606,7 @@ namespace Lanstaller
                 }
             }
 
-            Server FileServer = GetFileServerFromAPI()[0];
+            FileServer FileServer = GetFileServerFromAPI()[0];
 
             bool FilesNotValidated = true; //File copy validation - loop on hash failure.
             int FailLoopCount = 0;
@@ -643,7 +642,7 @@ namespace Lanstaller
                             SetStatus(Identity.Name, CopyIndex, FileCopyOperations.Count, SizeToString(FCO.fileinfo.size));
 
                             //Compare server hash value to local, also skip if verified previously.
-                            if (FCO.verified || FCO.fileinfo.hash.Equals(CalculateMD5(FCO.destination))) 
+                            if (FCO.verified || FCO.fileinfo.hash.Equals(FileInfoClass.CalculateMD5(FCO.destination))) 
                             {
                                 FCO.verified = true;
                                 Logging.LogToFile("File exists, verification complete for: " + FCO.destination);
@@ -664,7 +663,7 @@ namespace Lanstaller
                     }
                     catch (ThreadAbortException ex)
                     {
-                        SetStatus("File copy stopped - thread Abort Exception");
+                        SetStatus("File copy stopped - thread Abort Exception: " + ex.Message);
                         continue;
                     }
                     catch (Exception ex)
@@ -712,7 +711,7 @@ namespace Lanstaller
         }
 
         
-        public static async void TransferFile(Server FileServer, string Source, string Destination)
+        public static async void TransferFile(FileServer FileServer, string Source, string Destination)
         {
             if (FileServer.protocol == 1)
             {
@@ -727,7 +726,7 @@ namespace Lanstaller
             }
         }
 
-        void TransferFile(Server FileServer, int FileCopyIndex)
+        void TransferFile(FileServer FileServer, int FileCopyIndex)
         {
             FileCopyOperation FCO = FileCopyOperations[FileCopyIndex];
             string SizeMessage = SizeToString(FCO.fileinfo.size);

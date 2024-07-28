@@ -2,10 +2,10 @@ using Lanstaller_Shared;
 using LanstallerWeb;
 using LanstallerWeb.Components;
 
-SoftwareClass.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
-if (string.IsNullOrEmpty(SoftwareClass.ConnectionString))
+LanstallerShared.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
+if (string.IsNullOrEmpty(LanstallerShared.ConnectionString))
 {
-    SoftwareClass.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security = true";
+    LanstallerShared.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security = true";
 }
 
 LanstallerWebSettings.serverAddress = Environment.GetEnvironmentVariable("ADDRESS");

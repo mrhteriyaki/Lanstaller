@@ -16,13 +16,12 @@ using System.Web;
 using System.Collections.Concurrent;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using System.Net.Http;
-using static Lanstaller_Shared.SoftwareClass;
+using static Lanstaller_Shared.LanstallerShared;
 using System.Runtime.InteropServices.ComTypes;
 using Pri.LongPath;
 using System.Reflection;
 using static Lanstaller.Classes.LocalDatabase;
 using System.Linq;
-using Lanstaller_Shared.Models;
 using System.Threading.Tasks;
 
 namespace Lanstaller
@@ -189,7 +188,7 @@ namespace Lanstaller
             //SList = SoftwareClass.LoadSoftware();
 
             SList = APIClient.GetSoftwareListFromAPI();
-            Server FileServer;
+            FileServer FileServer;
             try
             {
                 FileServer = APIClient.GetFileServerFromAPI()[0];
@@ -211,7 +210,7 @@ namespace Lanstaller
             LocalDB = new LocalDatabase(LanstallerDataDir + "installed.json");
             List<int> InstalledIDs = LocalDB.GetSoftwareIDs();
             lvSoftware.SmallImageList = new ImageList();
-            Server FS = APIClient.GetFileServerFromAPI()[0];
+            FileServer FS = APIClient.GetFileServerFromAPI()[0];
             foreach (SoftwareInfo SWI in SList)
             {
                 ListViewItem LVI = new ListViewItem(SWI.Name);
@@ -275,7 +274,7 @@ namespace Lanstaller
                             File.Delete(updaterpath);
                         }
                         //Download file.
-                        Server FS = APIClient.GetFileServerFromAPI()[0];
+                        FileServer FS = APIClient.GetFileServerFromAPI()[0];
                         ClientSoftwareClass.TransferFile(FS, APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe", updaterpath);
 
                         //Run with wscript.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace Lanstaller_Shared.Models
+namespace Lanstaller_Shared
 {
     public class UserSerial
     {
@@ -18,7 +18,7 @@ namespace Lanstaller_Shared.Models
             string QueryString = "select [id],[serial_value],[serial_used] from [tblSerialsAvailable] WHERE serial_id = @serialid AND [serial_used] IS NULL";
 
             List<UserSerial> SerialList = new List<UserSerial>();
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@serialid", SerialID);
@@ -38,7 +38,7 @@ namespace Lanstaller_Shared.Models
         //Mark available serial as used.
         public static void SetAvailableSerial(int PoolSerialID)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand("UPDATE [tblSerialsAvailable] SET serial_used = GETDATE() WHERE id = @sid", SQLConn);
             SQLCmd.Parameters.AddWithValue("@sid", PoolSerialID);
@@ -50,7 +50,7 @@ namespace Lanstaller_Shared.Models
         //Add serial to pool.
         public static void AddAvailableSerial(int SerialID, string Serial)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand("INSERT INTO [tblSerialsAvailable] ([serial_id],[serial_value]) VALUES (@sid,@sval)", SQLConn);
             SQLCmd.Parameters.AddWithValue("@sid", SerialID);
@@ -62,7 +62,7 @@ namespace Lanstaller_Shared.Models
         //Remove serial from pool.
         public static void DeleteAvailableSerial(int UserSerialID)
         {
-            SqlConnection SQLConn = new SqlConnection(SoftwareClass.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand("DELETE FROM [tblSerialsAvailable] WHERE id = @usersid", SQLConn);
             SQLCmd.Parameters.AddWithValue("@usersid", UserSerialID);

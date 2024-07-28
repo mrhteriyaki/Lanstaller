@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Net;
 
 //using static Lanstaller.ClientSoftwareClass;
-using static Lanstaller_Shared.SoftwareClass;
+using static Lanstaller_Shared.LanstallerShared;
 using System.IO;
 using System.Web;
 using System.Windows.Forms;
@@ -18,7 +18,6 @@ using System.ComponentModel;
 using System.Threading;
 using Lanstaller_Shared;
 using System.Collections.Concurrent;
-using Lanstaller_Shared.Models;
 
 namespace Lanstaller.Classes
 {
@@ -57,13 +56,13 @@ namespace Lanstaller.Classes
             return AC.GetString(APIServer + "System/" + setting);
         }
 
-        public static List<Server> GetFileServerFromAPI()
+        public static List<FileServer> GetFileServerFromAPI()
         {
-            List<Server> Servers = new List<Server>();
+            List<FileServer> Servers = new List<FileServer>();
             JArray ServerArray = JArray.Parse((new APIClient()).GetString(APIServer + "InstallationList/Server"));
             foreach(JToken SrvJA in ServerArray) 
             {
-                Server FS = SrvJA.ToObject<Server>();
+                FileServer FS = SrvJA.ToObject<FileServer>();
                 if (FS.protocol == 1 && !(FS.path.EndsWith("/"))) //Trim / from url (getfiles will prepend / to source on copy operation).
                 {
                     FS.path = FS.path + "/";
@@ -155,13 +154,13 @@ namespace Lanstaller.Classes
             return RGL;
         }
 
-        public static List<Compatibility> GetCompatibilitiesFromAPI(int SoftwareID)
+        public static List<CompatabilityMode> GetCompatibilitiesFromAPI(int SoftwareID)
         {
-            List<Compatibility> CPL = new List<Compatibility>();
+            List<CompatabilityMode> CPL = new List<CompatabilityMode>();
             JArray CPArray = GetListFromAPI("Compatibility", SoftwareID);
             foreach (var CP in CPArray)
             {
-                CPL.Add(CP.ToObject<Compatibility>());
+                CPL.Add(CP.ToObject<CompatabilityMode>());
             }
             return CPL;
         }

@@ -11,12 +11,11 @@ using System.Windows;
 using System.Threading;
 using Lanstaller.Classes;
 using Lanstaller_Shared;
-using static Lanstaller_Shared.SoftwareClass;
-using Lanstaller_Shared.Models;
+using static Lanstaller_Shared.LanstallerShared;
 
 namespace Lanstaller
 {
-    
+
     public partial class frmSerial : Form
     {
         public int serialid;

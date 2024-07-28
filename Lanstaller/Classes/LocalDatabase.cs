@@ -8,7 +8,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using System.Windows.Forms;
-using Lanstaller_Shared.Models;
 
 namespace Lanstaller.Classes
 {
