@@ -111,6 +111,7 @@ namespace Lanstaller
             {
                 txtSerial.Text = cmbxServerSerials.Text;
                 btnPaste.Enabled = false;
+                btnPaste.Visible = false;
             }
         }
 

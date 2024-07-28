@@ -456,8 +456,7 @@ namespace Lanstaller
             }
 
 
-            lvSoftware.Items[SoftwareListIndex].Text = lvSoftware.Items[SoftwareListIndex].Text + " (Install Queued)";
-            lvSoftware.Items[SoftwareListIndex].ForeColor = Color.DarkGray;
+
 
             InstallSW.InstallDir = UserSettings.InstallDirectory;
             InstallSW.installfiles = chkFiles.Checked;
@@ -479,6 +478,9 @@ namespace Lanstaller
                     return;
                 }
             }
+
+            lvSoftware.Items[SoftwareListIndex].Text = lvSoftware.Items[SoftwareListIndex].Text + " (Install Queued)";
+            lvSoftware.Items[SoftwareListIndex].ForeColor = Color.DarkGray;
 
             //Queue installation request.
             lock (lock_InstallQueue)
