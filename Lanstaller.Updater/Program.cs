@@ -23,12 +23,14 @@ namespace Lanstaller.Updater
                 return;
             }
 
-            
 
-            serveraddr = args[0].ToString() + "StaticFiles/";
             //update this to read from local config file.
-
-
+            serveraddr = args[0].ToString();
+            if (!serveraddr.EndsWith("/"))
+            {
+                serveraddr += "/";
+            }
+            serveraddr += "StaticFiles/";
 
             //Shutdown any open Lanstaller.
             try
