@@ -33,15 +33,17 @@ namespace Lanstaller.Updater
             Thread.Sleep(200);
 
             //Files to download and replace.
-            List<string> FileList = new List<string>();
-            FileList.Add("Lanstaller.exe");
-            FileList.Add("Lanstaller Shared.dll");
-            FileList.Add("Newtonsoft.Json.dll");
-            FileList.Add("Pri.LongPath.dll");
-            FileList.Add("7z.exe");
-            FileList.Add("7z.dll");
+            string[] FileList = {
+                "Lanstaller.exe",
+                "Lanstaller.exe.config",
+                "Lanstaller Shared.dll",
+                "Newtonsoft.Json.dll",
+                "Pri.LongPath.dll",
+                "7z.exe",
+                "7z.dll"
+            };
 
-            foreach(string file in FileList)
+            foreach (string file in FileList)
             {
                 File.Move(file, file + ".bak"); //Backup files.
             }
@@ -52,10 +54,10 @@ namespace Lanstaller.Updater
                 {
                     DF(file); //Download files.
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     //Restore files - delete any already downloaded.
-                    foreach(string file2 in FileList)
+                    foreach (string file2 in FileList)
                     {
                         if (File.Exists(file2))
                         {
@@ -64,6 +66,15 @@ namespace Lanstaller.Updater
                         File.Move(file2 + ".bak", file2); //restore backup.
                     }
                     break;
+                }
+            }
+
+            //remove backup files.
+            foreach (string file in FileList)
+            {
+                if (File.Exists(file + ".bak"))
+                {
+                    File.Delete(file + ".bak");
                 }
             }
 

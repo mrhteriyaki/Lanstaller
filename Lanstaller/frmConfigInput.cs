@@ -91,10 +91,13 @@ namespace Lanstaller
             }
             catch (Exception ex)
             {
+                if(ex.Message.Contains("Unauthorized"))
+                {
+                    MessageBox.Show("Key is not valid.");
+                    return;
+                }
                 MessageBox.Show("Cannot connect to server. Error:" + ex.ToString());
             }
-
-
         }
 
         private void frmConfigInput_Load(object sender, EventArgs e)

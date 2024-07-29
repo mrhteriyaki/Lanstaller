@@ -64,6 +64,7 @@ namespace Lanstaller
             this.btnMin = new System.Windows.Forms.Button();
             this.csmSoftware = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.reinstallToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lblWANMode = new System.Windows.Forms.Label();
             this.gbxActions.SuspendLayout();
             this.gbxPref.SuspendLayout();
             this.gbxStatus.SuspendLayout();
@@ -463,12 +464,23 @@ namespace Lanstaller
             this.reinstallToolStripMenuItem.Text = "Reinstall";
             this.reinstallToolStripMenuItem.Click += new System.EventHandler(this.reinstallToolStripMenuItem_Click);
             // 
+            // lblWANMode
+            // 
+            this.lblWANMode.AutoSize = true;
+            this.lblWANMode.Location = new System.Drawing.Point(844, 47);
+            this.lblWANMode.Name = "lblWANMode";
+            this.lblWANMode.Size = new System.Drawing.Size(105, 13);
+            this.lblWANMode.TabIndex = 24;
+            this.lblWANMode.Text = "WAN Mode Enabled";
+            this.lblWANMode.Visible = false;
+            // 
             // frmLanstaller
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(952, 583);
+            this.Controls.Add(this.lblWANMode);
             this.Controls.Add(this.btnMin);
             this.Controls.Add(this.pbBottomright);
             this.Controls.Add(this.lvSoftware);
@@ -542,6 +554,7 @@ namespace Lanstaller
         private System.Windows.Forms.Button btnMin;
         private System.Windows.Forms.ContextMenuStrip csmSoftware;
         private System.Windows.Forms.ToolStripMenuItem reinstallToolStripMenuItem;
+        private System.Windows.Forms.Label lblWANMode;
     }
 }
 

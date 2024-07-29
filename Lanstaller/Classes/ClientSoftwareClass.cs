@@ -39,7 +39,7 @@ namespace Lanstaller
 
         SemaphoreSlim semaphore = new SemaphoreSlim(4); //Maximum concurrent small file transfers. Set to 4.
         List<Task> smallDownloadtasks = new List<Task>();
-
+        public static bool WANMode = false;
 
         public string InstallDir;
         public bool installfiles;
@@ -736,7 +736,7 @@ namespace Lanstaller
             long InstallBytesStart = InstalledBytes;
             if (FileServer.protocol == 1) //Web
             {
-                if (FCO.fileinfo.size < 524288) //Less than 512KB
+                if (WANMode || FCO.fileinfo.size < 524288) //Less than 512KB or WAN mode, run concurrent downloads.
                 {
                     //Multi Thread smaller files to avoid overhead blocking file transfer.
                     smallDownloadtasks.Add(Task.Run(async () =>
@@ -755,7 +755,7 @@ namespace Lanstaller
                 }
                 else
                 {
-                    Task.WhenAll(smallDownloadtasks).Wait(); //Don't run multi with large file.
+                    Task.WhenAll(smallDownloadtasks).Wait(); //Finish all smaller downloads.
 
                     DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination);
                     Task Dtask = DT.DownloadAsync();

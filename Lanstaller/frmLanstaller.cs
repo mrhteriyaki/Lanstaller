@@ -83,9 +83,14 @@ namespace Lanstaller
         {
             CheckCoreFilesExist();
             WindowStartSize = this.Size;
-            LoadConfigFile();
+            if (!LoadConfigFile())
+            {
+                Application.Exit();
+                return;
+            }
+            
             ClientUpdateCheck();
-                        
+
             SetupThreads(); //Put other supporting threads her
 
             //Get list of installed programs - future use to skip redist.
@@ -94,20 +99,19 @@ namespace Lanstaller
             //Need to put auth/connection check - invalid auth response should re-prompt with ConfigInput.
 
             LoadClientSettings();
+           
             InitialFormSetup();
-
+            
             try
             {
-                LoadSoftwareList();
+                LoadSoftwareList(); //causing 2 second load delay, add load spash in future.
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to connect to server. Error: " + ex.Message);
                 Application.Exit();
             }
-
             Logging.ClearLog();
-
 
         }
 
@@ -138,7 +142,7 @@ namespace Lanstaller
 
         }
 
-        void LoadConfigFile()
+        bool LoadConfigFile()
         {
             if (!File.Exists("config.ini"))
             {
@@ -149,7 +153,7 @@ namespace Lanstaller
             if (!File.Exists("config.ini"))
             {
                 MessageBox.Show("Config File Missing.");
-                Application.Exit();
+                return false;
             }
             foreach (string line in System.IO.File.ReadAllLines("config.ini"))
             {
@@ -171,6 +175,7 @@ namespace Lanstaller
                     ChatClient.ChatServer = APIClient.APIServer;
                 }
             }
+            return true;
         }
 
         void LoadClientSettings()
@@ -199,6 +204,12 @@ namespace Lanstaller
                 return;
             }
 
+            ClientSoftwareClass.WANMode = FileServer.IsWAN();
+            if(ClientSoftwareClass.WANMode)
+            {
+                lblWANMode.Visible = true;
+            }
+            
 
             string ImageDir = LanstallerDataDir + "Images";
             if (!Directory.Exists(ImageDir))
@@ -285,6 +296,7 @@ namespace Lanstaller
                         UProc.Start();
                         UProc.WaitForExit();
 
+                        //Wait for updater to kill process.
                         Thread.Sleep(10000);
                         MessageBox.Show("Update timeout");
                         this.BeginInvoke(new MethodInvoker(this.Close));

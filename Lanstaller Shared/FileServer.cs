@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Net;
+using System.Net.Http;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 
 namespace Lanstaller_Shared
@@ -40,8 +44,84 @@ namespace Lanstaller_Shared
                 });
             }
             SQLConn.Close();
+
+            
             return tmpList;
         }
 
+
+        public bool IsWAN()
+        {
+            bool isWAN = true;
+            if (this.protocol == 1)
+            {
+                Uri sUri = new Uri(this.path);
+                
+                IPAddress[] addresses = Dns.GetHostAddresses(sUri.Host);
+                foreach (IPAddress address in addresses)
+                {
+                    if (IsInLocalSubnet(address))
+                    {
+                        isWAN = false;
+                    }
+                }
+            }
+            else
+            {
+                //all smb servers assumed lan.
+                isWAN = false;
+            }
+            return isWAN;
+        }
+
+        private static bool IsInLocalSubnet(IPAddress address)
+        {
+            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                foreach (UnicastIPAddressInformation ipInfo in ni.GetIPProperties().UnicastAddresses)
+                {
+                    if (ipInfo.Address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        IPAddress localAddress = ipInfo.Address;
+                        IPAddress subnetMask = ipInfo.IPv4Mask;
+
+                        if (subnetMask != null)
+                        {
+                            if (IsInSameSubnet(localAddress, address, subnetMask))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        static bool IsInSameSubnet(IPAddress address1, IPAddress address2, IPAddress subnetMask)
+        {
+            byte[] ipBytes1 = address1.GetAddressBytes();
+            byte[] ipBytes2 = address2.GetAddressBytes();
+            byte[] maskBytes = subnetMask.GetAddressBytes();
+
+            if (ipBytes1.Length != ipBytes2.Length || ipBytes1.Length != maskBytes.Length)
+            {
+                //throw new ArgumentException("Lengths of IP address and subnet mask do not match.");
+                return false; //mismatch check of ipv4 and ipv6 address.
+            }
+
+            for (int i = 0; i < ipBytes1.Length; i++)
+            {
+                if ((ipBytes1[i] & maskBytes[i]) != (ipBytes2[i] & maskBytes[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
     }
+
 }
