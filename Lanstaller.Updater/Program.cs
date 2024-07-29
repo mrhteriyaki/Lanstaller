@@ -59,19 +59,24 @@ namespace Lanstaller.Updater
             RemoveBackups(FileList);
 
             Console.WriteLine("Renaming files for backup.");
-            foreach (string file in FileList)
+            
+            while(CheckFilesExist(FileList))
             {
-                try
+                foreach (string file in FileList)
                 {
-                    File.Move(file, file + ".bak"); //Backup files.
+                    try
+                    {
+                        File.Move(file, file + ".bak"); //Backup files.
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error moving file: " + ex.ToString());
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error moving file: " + ex.ToString());
-                }
-
-
+                Thread.Sleep(1000);
             }
+
+
 
             foreach (string file in FileList)
             {
@@ -104,6 +109,18 @@ namespace Lanstaller.Updater
             LST.StartInfo.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
             LST.Start();
 
+        }
+
+        static bool CheckFilesExist(string[] FileList)
+        {
+            foreach(string file in FileList)
+            {
+                if(File.Exists(file))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         static void RemoveBackups(string[] FileList)
