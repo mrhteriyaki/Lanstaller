@@ -23,6 +23,7 @@ using System.Reflection;
 using static Lanstaller.Classes.LocalDatabase;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace Lanstaller
 {
@@ -89,7 +90,11 @@ namespace Lanstaller
                 return;
             }
             
-            ClientUpdateCheck();
+            if (!ClientUpdateCheck())
+            {
+                Application.Exit();
+                return;
+            }
 
             SetupThreads(); //Put other supporting threads her
 
@@ -256,7 +261,7 @@ namespace Lanstaller
             }
         }
 
-        void ClientUpdateCheck()
+        bool ClientUpdateCheck()
         {
             double server_version = 0;
             try
@@ -266,7 +271,7 @@ namespace Lanstaller
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to check version Error:" +  ex.Message);
-                return;
+                return false;
             }
 
             try
@@ -286,7 +291,16 @@ namespace Lanstaller
                         }
                         //Download file.
                         FileServer FS = APIClient.GetFileServerFromAPI()[0];
-                        ClientSoftwareClass.TransferFile(FS, APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe", updaterpath);
+                        try
+                        {
+                            WebClient UWC = new WebClient();
+                            UWC.DownloadFile(APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe", updaterpath);
+                        }
+                        catch(Exception ex)
+                        {
+                            MessageBox.Show("Failed to get updater " + ex.Message);
+                        }
+                        
 
                         //Run with wscript.
                         Process UProc = new Process();
@@ -304,16 +318,22 @@ namespace Lanstaller
                     else
                     {
                         this.BeginInvoke(new MethodInvoker(this.Close));
-                        //return;
+                        
                     }
+                    return false;
                 }
+                else
+                {
+                    return true; //Version OK.
+                }
+
             }
             catch (Exception ex)
             {
                 //Exit on failure.
                 MessageBox.Show("Version Check / Update Failure" + ex.ToString() + "\nApplication will now close.", "Update Failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 this.BeginInvoke(new MethodInvoker(this.Close));
-                return;
+                return false;
             }
         }
 
