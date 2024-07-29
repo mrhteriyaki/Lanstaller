@@ -16,36 +16,63 @@ namespace Lanstaller.Updater
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Lanstaller Updater");
+
             if (args.Length == 0)
             {
                 return;
             }
 
+            
+
             serveraddr = args[0].ToString() + "StaticFiles/";
+            //update this to read from local config file.
+
+
 
             //Shutdown any open Lanstaller.
-            Process LSTKill = new Process();
-            LSTKill.StartInfo.FileName = "C:\\Windows\\System32\\taskkill.exe";
-            LSTKill.StartInfo.Arguments = "/f /im Lanstaller.exe";
-            LSTKill.Start();
-            LSTKill.WaitForExit();
+            try
+            {
+                Console.WriteLine("Stopping Lanstaller process.");
+                Process LSTKill = new Process();
+                LSTKill.StartInfo.FileName = "C:\\Windows\\System32\\taskkill.exe";
+                LSTKill.StartInfo.Arguments = "/f /im Lanstaller.exe";
+                LSTKill.Start();
+                LSTKill.WaitForExit();
 
-            Thread.Sleep(200);
+                Thread.Sleep(500);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+                return;
+            }
 
             //Files to download and replace.
             string[] FileList = {
                 "Lanstaller.exe",
-                "Lanstaller.exe.config",
                 "Lanstaller Shared.dll",
                 "Newtonsoft.Json.dll",
                 "Pri.LongPath.dll",
                 "7z.exe",
                 "7z.dll"
             };
+            RemoveBackups(FileList);
 
+            Console.WriteLine("Renaming files for backup.");
             foreach (string file in FileList)
             {
-                File.Move(file, file + ".bak"); //Backup files.
+                try
+                {
+                    File.Move(file, file + ".bak"); //Backup files.
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error moving file: " + ex.ToString());
+                }
+
+
             }
 
             foreach (string file in FileList)
@@ -56,6 +83,7 @@ namespace Lanstaller.Updater
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine("Failed to download file: " + ex.Message);
                     //Restore files - delete any already downloaded.
                     foreach (string file2 in FileList)
                     {
@@ -69,14 +97,7 @@ namespace Lanstaller.Updater
                 }
             }
 
-            //remove backup files.
-            foreach (string file in FileList)
-            {
-                if (File.Exists(file + ".bak"))
-                {
-                    File.Delete(file + ".bak");
-                }
-            }
+            RemoveBackups(FileList);
 
 
             //Launch.
@@ -85,6 +106,18 @@ namespace Lanstaller.Updater
             LST.StartInfo.WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory;
             LST.Start();
 
+        }
+
+        static void RemoveBackups(string[] FileList)
+        {
+            foreach (string file in FileList)
+            {
+                if (File.Exists(file + ".bak"))
+                {
+                    File.Delete(file + ".bak");
+                }
+            }
+            Thread.Sleep(500); //Allow file system completion time.
         }
 
         static void DF(string File)
