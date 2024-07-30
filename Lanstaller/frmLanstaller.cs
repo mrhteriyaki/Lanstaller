@@ -31,7 +31,7 @@ namespace Lanstaller
 
     public partial class frmLanstaller : Form
     {
-        static readonly Double Version = 0.22; //Increment Version in tblSystem when changed.
+        static readonly Double Version = 0.23; //Increment Version in tblSystem when changed.
         readonly static string LanstallerDataDir = "C:\\ProgramData\\Lanstaller\\";
         LocalDatabase LocalDB;
 
