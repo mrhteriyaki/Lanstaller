@@ -25,12 +25,12 @@ namespace Lanstaller.Updater
             }
             else
             {
-                if (args[0].ToString().EndsWith("/"))
+                serveraddr = args[0].ToString();
+                if(!serveraddr.EndsWith("/"))
                 {
-                    Console.WriteLine("Server address cannot end with /");
-                    return;
+                    serveraddr = serveraddr + "/";
                 }
-                serveraddr = args[0].ToString() + "/StaticFiles/";
+                serveraddr = serveraddr + "StaticFiles/";
             }
 
 

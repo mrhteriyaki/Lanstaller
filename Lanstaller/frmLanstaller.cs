@@ -31,7 +31,7 @@ namespace Lanstaller
 
     public partial class frmLanstaller : Form
     {
-        static readonly Double Version = 0.23; //Increment Version in tblSystem when changed.
+        static readonly Double Version = 0.22; //Increment Version in tblSystem when changed.
         readonly static string LanstallerDataDir = "C:\\ProgramData\\Lanstaller\\";
         LocalDatabase LocalDB;
 
@@ -291,18 +291,18 @@ namespace Lanstaller
                         }
                         //Download file.
                         FileServer FS = APIClient.GetFileServerFromAPI()[0];
+                        string updaterUrl = APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe";
                         try
                         {
                             WebClient UWC = new WebClient();
-                            UWC.DownloadFile(APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe", updaterpath);
+                            
+                            UWC.DownloadFile(updaterUrl, updaterpath);
                         }
                         catch(Exception ex)
                         {
                             MessageBox.Show("Failed to get updater " + ex.Message);
                         }
-                        
 
-                        //Run with wscript.
                         Process UProc = new Process();
                         UProc.StartInfo.FileName = updaterpath;
                         UProc.StartInfo.WorkingDirectory = upath;
@@ -312,7 +312,7 @@ namespace Lanstaller
 
                         //Wait for updater to kill process.
                         Thread.Sleep(10000);
-                        MessageBox.Show("Update timeout to: " + APIClient.APIServer);
+                        MessageBox.Show("Updater failed to run correctly.");
                         this.BeginInvoke(new MethodInvoker(this.Close));
                     }
                     else
