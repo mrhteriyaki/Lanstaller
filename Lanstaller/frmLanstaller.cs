@@ -312,7 +312,7 @@ namespace Lanstaller
 
                         //Wait for updater to kill process.
                         Thread.Sleep(10000);
-                        MessageBox.Show("Update timeout");
+                        MessageBox.Show("Update timeout to: " + APIClient.APIServer);
                         this.BeginInvoke(new MethodInvoker(this.Close));
                     }
                     else
