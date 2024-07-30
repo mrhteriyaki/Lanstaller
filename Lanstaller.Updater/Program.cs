@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using System.ComponentModel;
 
 namespace Lanstaller.Updater
 {
@@ -22,11 +23,19 @@ namespace Lanstaller.Updater
             {
                 return;
             }
+            else
+            {
+                if (args[0].ToString().EndsWith("/"))
+                {
+                    Console.WriteLine("Server address cannot end with /");
+                    return;
+                }
+                serveraddr = args[0].ToString() + "/StaticFiles/";
+            }
+
 
 
             //update this to read from local config file.
-            serveraddr = args[0].ToString() + "/StaticFiles/";
-            serveraddr = serveraddr.Replace("//", "/");
 
             //Shutdown any open Lanstaller.
             try
@@ -56,11 +65,13 @@ namespace Lanstaller.Updater
                 "7z.exe",
                 "7z.dll"
             };
+
+
             RemoveBackups(FileList);
 
             Console.WriteLine("Renaming files for backup.");
-            
-            while(CheckFilesExist(FileList))
+
+            while (CheckFilesExist(FileList))
             {
                 foreach (string file in FileList)
                 {
@@ -87,6 +98,7 @@ namespace Lanstaller.Updater
                 catch (Exception ex)
                 {
                     Console.WriteLine("Failed to download file: " + ex.Message);
+                    Console.ReadLine();
                     //Restore files - delete any already downloaded.
                     foreach (string file2 in FileList)
                     {
@@ -113,9 +125,9 @@ namespace Lanstaller.Updater
 
         static bool CheckFilesExist(string[] FileList)
         {
-            foreach(string file in FileList)
+            foreach (string file in FileList)
             {
-                if(File.Exists(file))
+                if (File.Exists(file))
                 {
                     return true;
                 }
@@ -138,31 +150,16 @@ namespace Lanstaller.Updater
         static void DF(string File)
         {
             WebClient WC = new WebClient();
-            string destination = AppDomain.CurrentDomain.BaseDirectory + "/" + File;
-            int retry = 0;
-            while (System.IO.File.Exists(destination))
-            {
-                try
-                {
-                    System.IO.File.Delete(destination);
-                }
-                catch (Exception ex)
-                {
-                    Thread.Sleep(1000);
-                    retry += 1;
-                    if (retry == 5)
-                    {
-                        throw new Exception("Unable to remove file: " + File + "\n" + ex.ToString());
-                    }
-                }
-            }
+            string destination = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, File);
+            string source = serveraddr + File;
+
             try
             {
-                WC.DownloadFile(serveraddr + File, destination);
+                WC.DownloadFile(source, destination);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed to download: " + serveraddr + File);
+                Console.WriteLine("Failed to download: " + serveraddr + File + " -> " + destination);
                 throw ex;
             }
         }
