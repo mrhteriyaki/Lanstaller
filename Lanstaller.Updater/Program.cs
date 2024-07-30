@@ -21,16 +21,25 @@ namespace Lanstaller.Updater
 
             if (args.Length == 0)
             {
-                return;
+                if(File.Exists("config.ini"))
+                {
+                    foreach(string line in File.ReadAllLines("config.ini"))
+                    {
+                        if (line.StartsWith("apiserver="))
+                        {
+                            Console.WriteLine(line.Substring(10));
+                            SetServer(line.Substring(10));                           
+                        }
+                    }
+                }
+                else
+                {
+                    return;
+                }                
             }
             else
             {
-                serveraddr = args[0].ToString();
-                if(!serveraddr.EndsWith("/"))
-                {
-                    serveraddr = serveraddr + "/";
-                }
-                serveraddr = serveraddr + "StaticFiles/";
+                SetServer(args[0].ToString());               
             }
 
 
@@ -162,6 +171,16 @@ namespace Lanstaller.Updater
                 Console.WriteLine("Failed to download: " + serveraddr + File + " -> " + destination);
                 throw ex;
             }
+        }
+
+        static void SetServer(string baseaddr)
+        {
+            serveraddr = baseaddr;
+            if (!serveraddr.EndsWith("/"))
+            {
+                serveraddr = serveraddr + "/";
+            }
+            serveraddr = serveraddr + "StaticFiles/";
         }
     }
 }
