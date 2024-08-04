@@ -824,7 +824,7 @@ namespace Lanstaller
                 else if (REGOP.hkey == 3)
                 {
                     Registry.Users.CreateSubKey(REGOP.subkey, true);
-                    HKEY = Registry.Users.OpenSubKey(REGOP.subkey, true);
+                    HKEY = Registry.Users.OpenSubKey(REGOP.subkey, true); 
                 }
 
                 if ((RegistryValueKind)REGOP.regtype == RegistryValueKind.String || (RegistryValueKind)REGOP.regtype == RegistryValueKind.ExpandString)

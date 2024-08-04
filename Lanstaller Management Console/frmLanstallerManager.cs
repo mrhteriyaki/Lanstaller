@@ -246,6 +246,7 @@ namespace Lanstaller_Management_Console
             if (softwarename.Equals(""))
             {
                 MessageBox.Show("Error - Nothing in name.");
+                return;
             }
             int newid = SoftwareInfo.AddSoftware(softwarename);
 

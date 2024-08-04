@@ -226,6 +226,11 @@ namespace Lanstaller
             LocalDB = new LocalDatabase(LanstallerDataDir + "installed.json");
             List<int> InstalledIDs = LocalDB.GetSoftwareIDs();
             lvSoftware.SmallImageList = new ImageList();
+            
+            //Set size of listview Icon Images.
+            lvSoftware.SmallImageList.ImageSize = new Size(30, 30);
+            
+            
             FileServer FS = APIClient.GetFileServerFromAPI()[0];
             foreach (SoftwareInfo SWI in SList)
             {

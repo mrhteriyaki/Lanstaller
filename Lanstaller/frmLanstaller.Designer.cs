@@ -407,6 +407,7 @@ namespace Lanstaller
             this.lvSoftware.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.lvSoftware.BackColor = System.Drawing.Color.Black;
+            this.lvSoftware.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lvSoftware.ForeColor = System.Drawing.Color.White;
             this.lvSoftware.HideSelection = false;
             this.lvSoftware.Location = new System.Drawing.Point(0, 93);
