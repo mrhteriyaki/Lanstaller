@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Lanstaller_Shared;
+using LanstallerShared;
 
 namespace Lanstaller_Management_Console
 {
@@ -18,7 +18,7 @@ namespace Lanstaller_Management_Console
         {
             string SA = FileServer.GetFileServer().FirstOrDefault(s => s.protocol == 2).path;
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 

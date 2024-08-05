@@ -1,5 +1,5 @@
 ﻿
-using Lanstaller_Shared;
+using LanstallerShared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using static Lanstaller_Shared.SharedChat;
+using static LanstallerShared.SharedChat;
 
 namespace Lanstaller
 {

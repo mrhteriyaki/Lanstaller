@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
     public class FirewallRule
     {
@@ -25,7 +25,7 @@ namespace Lanstaller_Shared
         {
             string QueryString = "INSERT into tblFirewallExceptions ([filepath],[software_id],[rulename]) VALUES (@filepath,@softwareid,@rulename)";
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
 
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
@@ -54,7 +54,7 @@ namespace Lanstaller_Shared
             string softwarename = SoftwareInfo.GetSoftwareName(SoftwareID);
 
             string QueryString = "select [filepath],[rulename],[proto_scope],[port_scope] from tblFirewallExceptions WHERE software_id = @softwareid";
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);

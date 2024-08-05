@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
     public class RegistryOperation
     {
@@ -28,7 +28,7 @@ namespace Lanstaller_Shared
         {
             string QueryString = "INSERT into tblRegistry ([hkey],[subkey],[value],[type],[data],[software_id]) VALUES (@hkey,@subkey,@value,@type,@data,@softwareid)";
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
 
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
@@ -51,7 +51,7 @@ namespace Lanstaller_Shared
 
             string QueryString = "select [hkey],[subkey],[value],[type],[data] from [tblRegistry] WHERE software_id = @softwareid";
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);

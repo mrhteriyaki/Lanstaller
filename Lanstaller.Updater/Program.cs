@@ -68,7 +68,7 @@ namespace Lanstaller.Updater
             //Files to download and replace.
             string[] FileList = {
                 "Lanstaller.exe",
-                "Lanstaller Shared.dll",
+                "LanstallerShared.dll",
                 "Newtonsoft.Json.dll",
                 "Pri.LongPath.dll",
                 "7z.exe",

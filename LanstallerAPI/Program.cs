@@ -1,4 +1,4 @@
-using Lanstaller_Shared;
+using LanstallerShared;
 using LanstallerAPI.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.StaticFiles;
@@ -7,7 +7,7 @@ using Microsoft.Extensions.FileProviders;
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
-LanstallerShared.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
+LanstallerServer.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
 
 builder.Services.AddAuthentication(options =>
 {

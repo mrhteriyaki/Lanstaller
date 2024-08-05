@@ -10,7 +10,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 //using Lanstaller;
-using Lanstaller_Shared;
+using LanstallerShared;
 
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
@@ -101,7 +101,7 @@ namespace Lanstaller_Management_Console
             {
                 if (line.StartsWith("Data Source="))
                 {
-                    LanstallerShared.ConnectionString = line;
+                    LanstallerServer.ConnectionString = line;
                 }
             }
 
@@ -198,7 +198,7 @@ namespace Lanstaller_Management_Console
 
         void LoadRedist()
         {
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
             SQLCmd.CommandText = "SELECT ID,Name FROM [tblRedist]";
@@ -273,7 +273,7 @@ namespace Lanstaller_Management_Console
                 return;
             }
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
             
@@ -324,7 +324,7 @@ namespace Lanstaller_Management_Console
 
         private void btnCheckAllFiles_Click(object sender, EventArgs e)
         {
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 
@@ -663,7 +663,7 @@ namespace Lanstaller_Management_Console
 
         private void btnAddRedist_Click(object sender, EventArgs e)
         {
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 
@@ -929,7 +929,7 @@ namespace Lanstaller_Management_Console
 
             File.Delete(tmpFile);
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
             SQLCmd.CommandText = "IF EXISTS (SELECT software_id FROM tblImages WHERE software_id = @swid) " +

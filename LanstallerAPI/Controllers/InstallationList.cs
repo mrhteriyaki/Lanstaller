@@ -1,4 +1,4 @@
-﻿using Lanstaller_Shared;
+﻿using LanstallerShared;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using Newtonsoft.Json;

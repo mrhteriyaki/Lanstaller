@@ -12,30 +12,20 @@ using System.Diagnostics;
 
 using System.IO;
 
-using Lanstaller_Shared;
+using LanstallerShared;
 
 using static Lanstaller.Classes.APIClient;
 using System.Threading;
 using Lanstaller.Classes;
 using System.Collections.Concurrent;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
-using System.Security.Principal;
 
 namespace Lanstaller
 {
-    public class ClientSoftwareClass : LanstallerShared //Extension of shared Software class with client / windows exclusive functions.
+    public class ClientSoftwareClass //Extension of shared Software class with client / windows exclusive functions.
     {
-        string status = "Status: Ready"; //Used for status label.
-        long InstallSize; //Size of current install.
-        double InstallSizeGB;
-
-        long InstalledBytes; //Progres of current install.
-
         //List<Servers> ServerList = new List<Servers>();
-
-        //Locks.
-        readonly object _statuslock = new object();
-        readonly object _progresslock = new object();
+        public SoftwareInfo SInfo;
+        public Status statusInfo;
 
         SemaphoreSlim semaphore = new SemaphoreSlim(4); //Maximum concurrent small file transfers. Set to 4.
         List<Task> smallDownloadtasks = new List<Task>();
@@ -60,11 +50,17 @@ namespace Lanstaller
         List<PreferenceOperation> PreferenceOperations;
         List<string> DirectoryList = new List<string>();
 
+
+
         APIClient InstallAPIClient;
-        public ClientSoftwareClass()
+        public ClientSoftwareClass(SoftwareInfo InstallInfo)
         {
             SerialList = new List<SerialNumber>(); //Serials are set before install process.
+
             InstallAPIClient = new APIClient();
+
+            SInfo = InstallInfo;
+            statusInfo = new Status(SInfo);
         }
 
         public void Install()
@@ -73,30 +69,30 @@ namespace Lanstaller
 
             if (installregistry)
             {
-                SetStatus("Applying Registry - " + Identity.Name);
+                statusInfo.SetStage(1);
 
                 //DB
-                //RegistryList = GetRegistry(Identity.id);
+                //RegistryList = GetRegistry(SInfo.id);
 
                 //Web
-                RegistryOperations = GetRegistryListFromAPI(Identity.id);
+                RegistryOperations = GetRegistryListFromAPI(SInfo.id);
                 GenerateRegistry();
             }
 
 
             if (installfiles)
             {
-                SetStatus("Indexing - " + Identity.Name);
+                statusInfo.SetStage(2);
 
                 //DB
-                //FCL = GetFiles(Identity.id);
+                //FCL = GetFiles(SInfo.id);
 
                 //Web
-                FileCopyOperations = GetFilesListFromAPI(Identity.id);
+                FileCopyOperations = GetFilesListFromAPI(SInfo.id);
                 VerifyCopyOperations = new ConcurrentQueue<FileCopyOperation>();
 
                 //Get Directories, split up all sub directory paths and add to generation list.
-                foreach (string Dir in GetDirectoriesFromAPI(Identity.id))
+                foreach (string Dir in GetDirectoriesFromAPI(SInfo.id))
                 {
                     GetSubFolders(ReplaceVariable(Dir));
                 }
@@ -109,15 +105,12 @@ namespace Lanstaller
                     GetSubFolders(filedirectory);
                 }
 
-                SetInstallSize(Identity.install_size);
-                InstalledBytes = 0;
 
-                SetStatus("Copying Files - " + Identity.Name);
                 CopyFiles();
             }
 
 
-            ShortcutOperations = GetShortcutListFromAPI(Identity.id);
+            ShortcutOperations = GetShortcutListFromAPI(SInfo.id);
             foreach (ShortcutOperation SCO in ShortcutOperations)
             {
                 SCO.location = ReplaceVariable(SCO.location);
@@ -128,28 +121,27 @@ namespace Lanstaller
             }
             if (installshortcuts)
             {
-                SetStatus("Generating Shortcuts - " + Identity.Name);
+                statusInfo.SetStage(5);
                 //DB
-                //SCO = GetShortcuts(Identity.id);
+                //SCO = GetShortcuts(SInfo.id);
 
                 //WEB  
                 GenerateShortcuts();
             }
 
-            SetStatus(Identity.Name + Environment.NewLine + "Updating Windows Settings" + Environment.NewLine + "(Firewall Rules and Compatibility)");
             //Windows Settings (Firewall rules, Compatibility)
             if (apply_windowssettings)
             {
-
+                statusInfo.SetStage(6);
                 //DB
-                //FWL = GetFirewallRules(Identity.id);
+                //FWL = GetFirewallRules(SInfo.id);
 
                 //WEB
-                FirewallRules = GetFirewallRulesListFromAPI(Identity.id);
+                FirewallRules = GetFirewallRulesListFromAPI(SInfo.id);
                 GenerateFirewallRules();
 
                 //Compatibility.
-                List<CompatabilityMode> CPL = GetCompatibilitiesFromAPI(Identity.id);
+                List<CompatabilityMode> CPL = GetCompatibilitiesFromAPI(SInfo.id);
                 foreach (CompatabilityMode CP in CPL)
                 {
                     GenerateCompatibility(CP.filename, CP.compat_type);
@@ -157,76 +149,29 @@ namespace Lanstaller
 
             }
 
-            SetStatus("Applying Preferences - " + Identity.Name);
+
             if (apply_preferences)
             {
-
+                statusInfo.SetStage(7);
                 //DB
-                //POList = GetPreferenceFiles(Identity.id);
+                //POList = GetPreferenceFiles(SInfo.id);
 
                 //WEB
-                PreferenceOperations = GetPreferencesListFromAPI(Identity.id);
+                PreferenceOperations = GetPreferencesListFromAPI(SInfo.id);
 
                 GeneratePreferenceFiles();
             }
 
-            SetStatus("Installing Redistributables - " + Identity.Name);
             if (install_redist)
             {
-                GenerateRedistributables(Identity.id);
+                statusInfo.SetStage(8);
+                GenerateRedistributables(SInfo.id);
             }
 
-            SetStatus("Install Complete:" + Environment.NewLine + Identity.Name);
-        }
-
-
-        void SetStatus(string message)
-        {
-            lock (_statuslock)
-            {
-                status = message.Replace("&", "&&");
-            }
-        }
-        void SetStatus(string Name, int CopyIndex, int EndCount, string Message)
-        {
-            double gbsize = (double)InstalledBytes / 1073741824;
-
-            SetStatus("Installing: \n" + Name +
-                "\nFile:" + (CopyIndex + 1) + " / " + EndCount +
-                "\nProgress (GB): " + Math.Round(gbsize, 2) + " / " + Math.Round(InstallSizeGB, 2) +
-                "\n" + Message);
+            statusInfo.SetStage(9);
 
         }
 
-        public string GetStatus()
-        {
-            lock (_statuslock)
-            {
-                return status;
-            }
-        }
-
-        public void SetProgress(long currentbytes)
-        {
-            lock (_progresslock)
-            {
-                InstalledBytes = currentbytes;
-            }
-        }
-
-        public int GetProgressPercentage()
-        {
-            lock (_progresslock)
-            {
-                if (InstallSize == 0 || InstalledBytes == 0)
-                {
-                    return 0;
-                }
-                double perc = ((double)InstalledBytes / (double)InstallSize) * 100;
-
-                return Convert.ToInt32(perc);
-            }
-        }
 
         //Gets all sub folders for given directory, adds to list.
         void GetSubFolders(string directory)
@@ -553,7 +498,7 @@ namespace Lanstaller
             {
                 if (VerifyCopyOperations.Count == 0)
                 {
-                    if(frmLanstaller.shutdown)
+                    if (frmLanstaller.shutdown)
                     {
                         //Exit if main threads have closed.
                         return;
@@ -600,8 +545,7 @@ namespace Lanstaller
         //Copy files from list provided, directory list for folder generation (Including empty dirs)
         void CopyFiles()
         {
-            SetStatus("Status: Installing " + Identity.Name + Environment.NewLine + " - Generating Directories");
-
+            statusInfo.SetStage(3);
             //Generate any required Directories for Files.
             foreach (string dir in DirectoryList)
             {
@@ -618,14 +562,14 @@ namespace Lanstaller
             while (FilesNotValidated)
             {
                 int CopyIndex = 0;
-                long CopyByteCounter = 0;
+
                 VerifyCopyOperations = new ConcurrentQueue<FileCopyOperation>();
 
                 Thread VerifyCopyThread = new Thread(() => VerifyFilesThread(FileCopyOperations.Count));
                 VerifyCopyThread.Name = "Verify Copy Thread";
                 VerifyCopyThread.Start();
 
-                
+
                 while (CopyIndex < FileCopyOperations.Count)
                 {
                     FileCopyOperation FCO = FileCopyOperations[CopyIndex];
@@ -642,16 +586,12 @@ namespace Lanstaller
                         }
                         else
                         {
-                            SetStatus(Identity.Name, CopyIndex, FileCopyOperations.Count, SizeToString(FCO.fileinfo.size));
-
                             //Compare server hash value to local, also skip if verified previously.
-                            if (FCO.verified || FCO.fileinfo.hash.Equals(FileInfoClass.CalculateMD5(FCO.destination))) 
+                            if (FCO.verified || FCO.fileinfo.hash.Equals(FileInfoClass.CalculateMD5(FCO.destination)))
                             {
                                 FCO.verified = true;
-                                Logging.LogToFile("File exists, verification complete for: " + FCO.destination);
                                 VerifyCopyOperations.Enqueue(FCO);
-                                CopyByteCounter += FCO.fileinfo.size;
-                                SetProgress(CopyByteCounter);
+                                statusInfo.SetCopyState(CopyIndex, FCO.fileinfo.size);
                                 CopyIndex++; //increment file counter.
                                 continue; //Skip file copy, go to next.
                             }
@@ -666,29 +606,25 @@ namespace Lanstaller
                     }
                     catch (ThreadAbortException ex)
                     {
-                        SetStatus("File copy stopped - thread Abort Exception: " + ex.Message);
+                        statusInfo.SetError("File copy stopped - thread Abort Exception: " + ex.Message);
                         continue;
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "Destination:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
-                        SetStatus("Download error:" + ex.ToString());
+                        //SetStatus("Download error:" + ex.ToString());
                         Thread.Sleep(500);
                         continue;
                     }
-
-                    CopyByteCounter += FCO.fileinfo.size;
-                    SetProgress(CopyByteCounter);
                 }
 
                 //Complete validation of downloaded files.
                 //restart previous loop if failures exist.
-                SetStatus("Waiting for small file transfers to complete");
 
                 Task.WhenAll(smallDownloadtasks).Wait();
 
+                statusInfo.SetStage(4);
 
-                SetStatus(Identity.Name + Environment.NewLine + "Waiting for file verification to complete");
                 VerifyCopyThread.Join();
                 FilesNotValidated = false;
 
@@ -704,16 +640,16 @@ namespace Lanstaller
 
                 if (FailLoopCount > 1)
                 {
-                    SetStatus(Identity.Name + Environment.NewLine +
-                                "Some files failed to download."
-                                + "\nRetrying in " + (FailLoopCount * 1).ToString() + " seconds.");
+                    statusInfo.SetError(
+                        "Some files failed to download.\nRetrying in" +
+                        (FailLoopCount * 1).ToString() + " seconds.");
 
                     Thread.Sleep((FailLoopCount * 1 * 1000));
                 }
             }
         }
 
-        
+
         public static async void TransferFile(FileServer FileServer, string Source, string Destination)
         {
             if (FileServer.protocol == 1)
@@ -729,11 +665,10 @@ namespace Lanstaller
             }
         }
 
-        void TransferFile(FileServer FileServer, int FileCopyIndex)
+        async void TransferFile(FileServer FileServer, int FileCopyIndex)
         {
             FileCopyOperation FCO = FileCopyOperations[FileCopyIndex];
-            string SizeMessage = SizeToString(FCO.fileinfo.size);
-            long InstallBytesStart = InstalledBytes;
+            
             if (FileServer.protocol == 1) //Web
             {
                 if (WANMode || FCO.fileinfo.size < 524288) //Less than 512KB or WAN mode, run concurrent downloads.
@@ -744,11 +679,15 @@ namespace Lanstaller
                         await semaphore.WaitAsync();
                         DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination);
                         Task Dtask = DT.DownloadAsync();
-                        while (!Dtask.IsCompleted)
+                        if (WANMode)
                         {
-                            SetStatus(Identity.Name, FileCopyIndex, FileCopyOperations.Count, SizeMessage);
+                            while (!Dtask.IsCompleted)
+                            {
+                                statusInfo.SetPartialState(FileCopyIndex, DT.downloadedbytes);
+                            }
                         }
                         Dtask.Wait();
+                        statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                         VerifyCopyOperations.Enqueue(FCO);
                         semaphore.Release();
                     }));
@@ -761,36 +700,23 @@ namespace Lanstaller
                     Task Dtask = DT.DownloadAsync();
                     while (!Dtask.IsCompleted)
                     {
-                        SetProgress(InstallBytesStart + DT.downloadedbytes);
-                        SetStatus(Identity.Name, FileCopyIndex, FileCopyOperations.Count, SizeMessage);
+                        statusInfo.SetPartialState(FileCopyIndex, DT.downloadedbytes);                       
                     }
                     Dtask.Wait();
+                    statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                     VerifyCopyOperations.Enqueue(FCO);
                 }
             }
             else if (FileServer.protocol == 2) //SMB
             {
                 Pri.LongPath.File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
-                SetStatus(Identity.Name, FileCopyIndex, FileCopyOperations.Count, SizeMessage);
-                SetProgress(InstallBytesStart + FCO.fileinfo.size);
+                statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                 VerifyCopyOperations.Enqueue(FCO);
             }
         }
 
 
-        static string SizeToString(long Size)
-        {
-            if (Size > 1073741824) //Larger than 1GB.
-            {
-                double currentgbsize = (double)Size / 1073741824;
-                return "Current File Size: " + Math.Round(currentgbsize, 2).ToString() + "GB";
-            }
-            else //if (Size > 1048576) //larger than 1MB
-            {
-                double currentmbsize = (double)Size / 1048576;
-                return "Current File Size: " + Math.Round(currentmbsize, 0).ToString() + "MB";
-            }
-        }
+        
 
 
         public static void GenerateCompatibility(string filename, int compat_type)
@@ -824,7 +750,7 @@ namespace Lanstaller
                 else if (REGOP.hkey == 3)
                 {
                     Registry.Users.CreateSubKey(REGOP.subkey, true);
-                    HKEY = Registry.Users.OpenSubKey(REGOP.subkey, true); 
+                    HKEY = Registry.Users.OpenSubKey(REGOP.subkey, true);
                 }
 
                 if ((RegistryValueKind)REGOP.regtype == RegistryValueKind.String || (RegistryValueKind)REGOP.regtype == RegistryValueKind.ExpandString)
@@ -978,11 +904,7 @@ namespace Lanstaller
             SerialList.Add(Serial);
         }
 
-        public void SetInstallSize(long byteCount)
-        {
-            InstallSize = byteCount;
-            InstallSizeGB = (double)InstallSize / 1073741824;
-        }
+
 
     }
 

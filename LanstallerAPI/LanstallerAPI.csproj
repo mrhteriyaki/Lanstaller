@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lanstaller Shared\Lanstaller Shared.csproj" />
+    <ProjectReference Include="..\Lanstaller Shared\LanstallerShared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

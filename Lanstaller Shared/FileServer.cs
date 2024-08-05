@@ -7,7 +7,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
     public class FileServer
     {
@@ -17,7 +17,7 @@ namespace Lanstaller_Shared
 
         public static List<FileServer> GetFileServer(bool smbOnly = false) //web or smb for type.
         {
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 

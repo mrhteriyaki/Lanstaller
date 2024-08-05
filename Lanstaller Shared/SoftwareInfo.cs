@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
     public class SoftwareInfo
     {
@@ -22,7 +22,7 @@ namespace Lanstaller_Shared
         {
             //Get counts for install items.
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
 
@@ -60,7 +60,7 @@ namespace Lanstaller_Shared
 
         public static string GetSoftwareName(int softwareid)
         {
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand()
             {
@@ -81,7 +81,7 @@ namespace Lanstaller_Shared
             //Get List of Software from Server
             string QueryString = "SELECT tblSoftware.[id],tblSoftware.[name],tblImages.small_image FROM tblSoftware LEFT JOIN tblImages on tblSoftware.id = tblImages.software_id order by [name]";
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SqlDataReader SQLOutput = SQLCmd.ExecuteReader();
@@ -110,7 +110,7 @@ namespace Lanstaller_Shared
         {
             string QueryString = "INSERT into tblSoftware ([name]) VALUES (@softname); SELECT SCOPE_IDENTITY();";
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@softname", softwarename);
@@ -122,7 +122,7 @@ namespace Lanstaller_Shared
 
         public static void DeleteSoftware(int software_id)
         {
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
             SQLCmd.Parameters.AddWithValue("@softid", software_id);
@@ -148,7 +148,7 @@ namespace Lanstaller_Shared
         {
             string QueryString = "SELECT SUM(filesize) FROM tblFiles where software_id = @softwareid";
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID);

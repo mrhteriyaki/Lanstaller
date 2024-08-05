@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
     public class CompatabilityMode
     {
@@ -17,7 +17,7 @@ namespace Lanstaller_Shared
 
             string QueryString = "select filename,compat_type from tblCompatibility where software_id = @softwareid";
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@softwareid", swid);

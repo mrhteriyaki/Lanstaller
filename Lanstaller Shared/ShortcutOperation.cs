@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
     public class ShortcutOperation
     {
@@ -18,7 +18,7 @@ namespace Lanstaller_Shared
         {
             List<ShortcutOperation> ShortcutList = new List<ShortcutOperation>();
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
@@ -46,7 +46,7 @@ namespace Lanstaller_Shared
 
             string QueryString = "INSERT into tblShortcut ([name],[location],[filepath],[runpath],[arguments],[icon],[software_id]) VALUES (@name,@location,@filepath,@runpath,@arguments,@icon,@softwareid)";
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
 
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using static Lanstaller_Shared.LanstallerShared;
+using static LanstallerShared.LanstallerServer;
 using System.Windows.Forms;
-using Lanstaller_Shared;
+using LanstallerShared;
 using System.Security.Principal;
 using System.Threading;
 

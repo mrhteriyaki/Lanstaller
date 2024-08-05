@@ -10,8 +10,8 @@ using System.Windows.Forms;
 using System.Windows;
 using System.Threading;
 using Lanstaller.Classes;
-using Lanstaller_Shared;
-using static Lanstaller_Shared.LanstallerShared;
+using LanstallerShared;
+using static LanstallerShared.LanstallerServer;
 
 namespace Lanstaller
 {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Lanstaller_Shared;
+using LanstallerShared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using static Lanstaller_Shared.SharedChat;
+using static LanstallerShared.SharedChat;
 using Microsoft.AspNetCore.Authorization;
 
 

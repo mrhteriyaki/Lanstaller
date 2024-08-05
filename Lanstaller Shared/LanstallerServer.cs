@@ -20,13 +20,11 @@ using System.Threading;
 //Shared library of functions for client and API (Server).
 
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
-    public class LanstallerShared
+    public class LanstallerServer
     {
         public static string ConnectionString;
-        public SoftwareInfo Identity = new SoftwareInfo();
-
 
         public static string GetSystemData(string setting)
         {
@@ -38,12 +36,6 @@ namespace Lanstaller_Shared
             SQLConn.Close();
             return data;
         }
-              
-
-       
-       
-      
-
 
     }
 }

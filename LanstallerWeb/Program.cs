@@ -1,12 +1,12 @@
-using Lanstaller_Shared;
+using LanstallerShared;
 using LanstallerWeb;
 using LanstallerWeb.Components;
 
-LanstallerShared.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
-if (string.IsNullOrEmpty(LanstallerShared.ConnectionString))
+LanstallerServer.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING");
+if (string.IsNullOrEmpty(LanstallerServer.ConnectionString))
 {
     Console.WriteLine("Database connection string variable DBSTRING not set, using default.");
-    LanstallerShared.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security = true";
+    LanstallerServer.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security = true";
 }
 
 LanstallerWebSettings.serverAddress = Environment.GetEnvironmentVariable("ADDRESS");

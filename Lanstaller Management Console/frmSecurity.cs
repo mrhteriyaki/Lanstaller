@@ -1,4 +1,4 @@
-﻿using Lanstaller_Shared;
+﻿using LanstallerShared;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

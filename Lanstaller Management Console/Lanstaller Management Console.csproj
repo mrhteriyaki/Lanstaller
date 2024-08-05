@@ -161,9 +161,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lanstaller Shared\Lanstaller Shared.csproj">
+    <ProjectReference Include="..\Lanstaller Shared\LanstallerShared.csproj">
       <Project>{6E28D0C4-FC93-415C-B8BF-F4AED62F74BF}</Project>
-      <Name>Lanstaller Shared</Name>
+      <Name>LanstallerShared</Name>
     </ProjectReference>
     <ProjectReference Include="..\Lanstaller\Lanstaller.csproj">
       <Project>{8B255B64-FDB3-4072-AA2E-651E01DD984A}</Project>

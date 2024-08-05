@@ -1,4 +1,4 @@
-﻿using Lanstaller_Shared;
+﻿using LanstallerShared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +12,7 @@ namespace LanstallerAPI.Controllers
         [HttpGet,Route("version"), Authorize]
         public string Version()
         {   
-            return LanstallerShared.GetSystemData("version");
+            return LanstallerServer.GetSystemData("version");
         }
 
         

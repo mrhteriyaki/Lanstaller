@@ -7,23 +7,13 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Lanstaller_Shared;
-using Lanstaller.Classes;
-using System.Diagnostics.Eventing.Reader;
-using System.Runtime.Remoting.Channels;
-using System.Security.Policy;
-using System.Web;
-using System.Collections.Concurrent;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
-using System.Net.Http;
-using static Lanstaller_Shared.LanstallerShared;
-using System.Runtime.InteropServices.ComTypes;
-using Pri.LongPath;
-using System.Reflection;
-using static Lanstaller.Classes.LocalDatabase;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Net;
+
+using LanstallerShared;
+using Lanstaller.Classes;
+using Pri.LongPath;
 
 namespace Lanstaller
 {
@@ -37,7 +27,6 @@ namespace Lanstaller
 
         private static object lock_InstallQueue = new object();
         Queue<ClientSoftwareClass> InstallQueue = new Queue<ClientSoftwareClass>();
-        ClientSoftwareClass CurrentCSW = new ClientSoftwareClass();
 
         List<SoftwareInfo> SList; //List of Software.
 
@@ -50,6 +39,8 @@ namespace Lanstaller
         public static bool shutdown = false;
         static bool InstallThreadRunning = false;
         private static object lock_InstallThreadRunning = new object();
+
+        ClientSoftwareClass CurrentCSW;
 
         Size WindowStartSize;
 
@@ -65,7 +56,7 @@ namespace Lanstaller
             string[] core_files = {
                 "7z.exe",
                 "7z.dll",
-                "Lanstaller Shared.dll",
+                "LanstallerShared.dll",
                 "Newtonsoft.Json.dll",
                 "Pri.LongPath.dll"
             };
@@ -228,7 +219,7 @@ namespace Lanstaller
             lvSoftware.SmallImageList = new ImageList();
             
             //Set size of listview Icon Images.
-            lvSoftware.SmallImageList.ImageSize = new Size(30, 30);
+            lvSoftware.SmallImageList.ImageSize = new Size(25, 25);
             
             
             FileServer FS = APIClient.GetFileServerFromAPI()[0];
@@ -346,19 +337,23 @@ namespace Lanstaller
         {
             while (shutdown == false)
             {
+                Thread.Sleep(50);
+
+                if (CurrentCSW == null)
+                {
+                    continue;
+                }
 
                 lblStatus.Invoke((MethodInvoker)delegate
                  {
-                     lblStatus.Text = CurrentCSW.GetStatus();
+                     lblStatus.Text = CurrentCSW.statusInfo.GetStatus();
                  });
 
                 pbInstall.Invoke((MethodInvoker)delegate
                 {
-                    pbInstall.Value = CurrentCSW.GetProgressPercentage();
+                    pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
                 });
-
-                //Wait 100 ms before next update.
-                Thread.Sleep(100);
+                
             }
         }
 
@@ -472,11 +467,10 @@ namespace Lanstaller
 
         void QueueInstall(int SoftwareListIndex)
         {
-            ClientSoftwareClass InstallSW = new ClientSoftwareClass();
-            InstallSW.Identity = SList[SoftwareListIndex];
+            ClientSoftwareClass InstallSW = new ClientSoftwareClass(SList[SoftwareListIndex]);
 
             //Check if already in queue.
-            if (CurrentCSW.Identity.id == InstallSW.Identity.id)
+            if (CurrentCSW != null && CurrentCSW.SInfo.id == InstallSW.SInfo.id)
             {
                 MessageBox.Show("Installation already running.");
                 return;
@@ -484,15 +478,12 @@ namespace Lanstaller
 
             lock (lock_InstallQueue)
             {
-                if (InstallQueue.Any(inst => inst.Identity.id == InstallSW.Identity.id))
+                if (InstallQueue.Any(inst => inst.SInfo.id == InstallSW.SInfo.id))
                 {
                     MessageBox.Show("Installation already queued.");
                     return;
                 }
             }
-
-
-
 
             InstallSW.InstallDir = UserSettings.InstallDirectory;
             InstallSW.installfiles = chkFiles.Checked;
@@ -505,7 +496,7 @@ namespace Lanstaller
             //Get serial keys from user - may need to put on another thread to stop gui block.
             if (InstallSW.installregistry) //Only request serials if registry checked.
             {
-                foreach (SerialNumber SN in APIClient.GetSerialsListFromAPI(InstallSW.Identity.id))
+                foreach (SerialNumber SN in APIClient.GetSerialsListFromAPI(InstallSW.SInfo.id))
                 {
                     InstallSW.AddSerial(SN);
                 }
@@ -539,6 +530,7 @@ namespace Lanstaller
 
         void InstallThread()
         {
+            
             while (InstallQueue.Count > 0)
             {
                 lock (lock_InstallQueue)
@@ -554,13 +546,13 @@ namespace Lanstaller
 
                 this.BeginInvoke((MethodInvoker)(() => gbxStatus.Visible = true));
 
-                int SListIndex = SList.FindIndex(swi => swi.id == CurrentCSW.Identity.id);
+                int SListIndex = SList.FindIndex(swi => swi.id == CurrentCSW.SInfo.id);
 
-                this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.Identity.Name + " (Installing)"));
+                this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.SInfo.Name + " (Installing)"));
 
                 CurrentCSW.Install();
 
-                this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.Identity.Name));
+                this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.SInfo.Name));
                 if (CurrentCSW.GetErrored())
                 {
                     MessageBox.Show("Some or all files failed to download and pass verification.");
@@ -568,15 +560,13 @@ namespace Lanstaller
                 else
                 {
                     //if (ShortcutAndFileExist(CurrentCSW.Identity.id))
-                    LocalDB.AddLocalInstall(CurrentCSW.Identity.id, CurrentCSW.GetShortcutOperations());
+                    LocalDB.AddLocalInstall(CurrentCSW.SInfo.id, CurrentCSW.GetShortcutOperations());
                     this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
                     this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
                 }
 
 
             } //End of installer queue.
-
-            CurrentCSW = new ClientSoftwareClass(); //Clear current CSW object.
 
             //Disable progress bar while no installs running.
             this.BeginInvoke((MethodInvoker)(() => gbxStatus.Visible = false));

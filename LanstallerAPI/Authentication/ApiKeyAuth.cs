@@ -1,4 +1,4 @@
-﻿using Lanstaller_Shared;
+﻿using LanstallerShared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;

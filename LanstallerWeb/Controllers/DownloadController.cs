@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Lanstaller_Shared;
+using LanstallerShared;
 using System.IO.Compression;
 
 

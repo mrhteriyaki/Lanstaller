@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Threading;
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
     public class SharedChat
     {
@@ -23,7 +23,7 @@ namespace Lanstaller_Shared
         public static int GetMessageCount(int lastId)
         {
             string QueryString = "SELECT COUNT([id]) from tblMessages WHERE [id] > @lid AND [timestamp] > DATEADD(day,-2,GETDATE())";
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);         
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);         
 
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
@@ -42,7 +42,7 @@ namespace Lanstaller_Shared
             //Returns last hour of chat messages.
             //string QueryString = "SELECT TOP(50) [timestamp],[message],[sender] from tblMessages WHERE [timestamp] > DATEADD(HOUR, -1, GETDATE()) ORDER BY [timestamp] ASC";
             string QueryString = "SELECT TOP(35) [id],[timestamp],[message],[sender] from tblMessages WHERE [timestamp] > DATEADD(day,-2,GETDATE()) ORDER BY [id] DESC";
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
 
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
@@ -64,7 +64,7 @@ namespace Lanstaller_Shared
 
         public static void SendMessage(string Message, string Sender)
         {
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand("INSERT INTO tblMessages (timestamp,message,sender) VALUES (GETDATE(),@message,@sender)", SQLConn);
             SQLCmd.Parameters.AddWithValue("@message", Message);

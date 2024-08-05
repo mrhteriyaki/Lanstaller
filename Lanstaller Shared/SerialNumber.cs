@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
     public class SerialNumber
     {
@@ -93,7 +93,7 @@ namespace Lanstaller_Shared
         {
             //Check no existing serial present with same software id and instance number.
             string QueryString = "SELECT COUNT(instance) from tblSerials where [instance] = @instancenumb and [software_id] = @softwareid";
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
 
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
@@ -128,7 +128,7 @@ namespace Lanstaller_Shared
         public static void AddUserSerial(int SerialID, string Serial)
         {
             //Add serial number 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
             SQLConn.Open();
@@ -144,7 +144,7 @@ namespace Lanstaller_Shared
         {
             List<SerialNumber> SerialList = new List<SerialNumber>();
             SqlCommand SQLCmd = new SqlCommand();
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLCmd.Connection = SQLConn;
 
             SQLConn.Open();

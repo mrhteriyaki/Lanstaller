@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace Lanstaller_Shared
+namespace LanstallerShared
 {
     public class FileCopyOperation
     {
@@ -17,7 +17,7 @@ namespace Lanstaller_Shared
 
             string QueryString = "SELECT [id],[source],[destination],[filesize],[hash_md5] from tblFiles WHERE software_id = @softwareid ORDER BY filesize ASC";
 
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand(QueryString, SQLConn);
             SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID); //Identity.id
@@ -63,7 +63,7 @@ namespace Lanstaller_Shared
         public static List<string> GetDirectories(int SoftwareID)
         {
             List<string> DirList = new List<string>();
-            SqlConnection SQLConn = new SqlConnection(LanstallerShared.ConnectionString);
+            SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
             SqlCommand SQLCmd = new SqlCommand("SELECT [path] FROM tblDirectories WHERE software_id = @softwareid", SQLConn);
             SQLCmd.Parameters.AddWithValue("@softwareid", SoftwareID); //Identity.id

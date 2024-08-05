@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Net;
 
 //using static Lanstaller.ClientSoftwareClass;
-using static Lanstaller_Shared.LanstallerShared;
+using static LanstallerShared.LanstallerServer;
 using System.IO;
 using System.Web;
 using System.Windows.Forms;
@@ -16,7 +16,7 @@ using System.Net.Http;
 
 using System.ComponentModel;
 using System.Threading;
-using Lanstaller_Shared;
+using LanstallerShared;
 using System.Collections.Concurrent;
 
 namespace Lanstaller.Classes
