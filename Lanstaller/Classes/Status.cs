@@ -57,6 +57,7 @@ namespace Lanstaller.Classes
         public void SetStage(int Stage)
         {
             stage = Stage;
+            //-1 = Error
             //0 = Ready.
             //1 = Registry
             //2 = Indexing Files
@@ -109,36 +110,38 @@ namespace Lanstaller.Classes
         public void SetError(string message)
         {
             //Incomplete, handles failure messages.
+            stage = -1;
+            status = message;
 
         }
 
         public string GetStatus()
         {
-            long copiedBytes = InstalledBytes;
-            for(long i = 0; i < SInfo.file_count; i++)
-            {
-                if (!copyStates[i])
-                {
-                    copiedBytes += bytesCopied[i];
-                }
-            }
 
-            double gbsize = GetGBSize(copiedBytes);
+            if (stage == 3)
+            {
+                long copiedBytes = InstalledBytes;
+                for (long i = 0; i < SInfo.file_count; i++)
+                {
+                    if (!copyStates[i])
+                    {
+                        copiedBytes += bytesCopied[i];
+                    }
+                }
+
+                double gbsize = GetGBSize(copiedBytes);
+
+                status = "Installing: \n" + SInfo.Name +
+                "\nFile:" + GetCopyCount().ToString() + " / " + SInfo.file_count.ToString() +
+                "\nProgress (GB): " + Math.Round(gbsize, 2).ToString() +
+                " / " + Math.Round(InstallSizeGB, 2).ToString();
+            }
 
             lock (_statuslock)
             {
-                if (stage == 3)
-                {
-                    return "Installing: \n" + SInfo.Name +
-                    "\nFile:" + GetCopyCount().ToString() + " / " + SInfo.file_count.ToString() +
-                    "\nProgress (GB): " + Math.Round(gbsize, 2).ToString() + 
-                    " / " + Math.Round(InstallSizeGB, 2).ToString();
-                }
-                else
-                {
-                    return status;
-                }
+                return status;
             }
+
         }
 
 
@@ -166,7 +169,7 @@ namespace Lanstaller.Classes
         {
             lock (_progresslock)
             {
-                if (SInfo.install_size == 0 || InstalledBytes == 0)
+                if (SInfo.install_size == 0 || InstalledBytes == 0 || stage == -1)
                 {
                     return 0;
                 }

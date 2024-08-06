@@ -32,7 +32,7 @@ namespace Lanstaller
 
         Thread MThread; //Status Monitor Thread
         Thread CThread; //Chat Thread
-        Thread InsTrd; //installer thread.
+        Thread InstallThread; //installer thread.
         Thread sCheck; //support checks.
 
         static bool install_option = true;
@@ -72,7 +72,7 @@ namespace Lanstaller
         }
 
         private void frmLanstaller_Load(object sender, EventArgs e)
-        {
+        {          
             CheckCoreFilesExist();
             WindowStartSize = this.Size;
             if (!LoadConfigFile())
@@ -521,14 +521,14 @@ namespace Lanstaller
                 if (!InstallThreadRunning)
                 {
                     InstallThreadRunning = true;
-                    InsTrd = new Thread(InstallThread);
-                    InsTrd.Name = "Installer Thread";
-                    InsTrd.Start();
+                    InstallThread = new Thread(InstThread);
+                    InstallThread.Name = "Installer Thread";
+                    InstallThread.Start();
                 }
             }
         }
 
-        void InstallThread()
+        void InstThread()
         {
             
             while (InstallQueue.Count > 0)
@@ -565,6 +565,7 @@ namespace Lanstaller
                     this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
                 }
 
+                CurrentCSW = null; //Clear after installs complete.
 
             } //End of installer queue.
 
@@ -619,9 +620,9 @@ namespace Lanstaller
                 CThread.Abort();
             }
 
-            if (InsTrd != null)
+            if (InstallThread != null)
             {
-                InsTrd.Abort();
+                InstallThread.Abort();
             }
         }
 
@@ -957,5 +958,7 @@ namespace Lanstaller
                 QueueInstall(sItm.Index);
             }
         }
+
+       
     }
 }
