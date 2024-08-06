@@ -47,7 +47,20 @@ namespace Lanstaller.Classes
    
         string GetString(string Uri)
         {
-            return WC.DownloadString(Uri);
+            string response = "";
+            while (string.IsNullOrEmpty(response))
+            {
+                try
+                {
+                    response = WC.DownloadString(Uri); 
+                }
+                catch(Exception ex) 
+                {
+                    Console.WriteLine("Failed to query server: " + ex.Message);
+                    Thread.Sleep(1000);
+                }
+            }
+            return response;
         }
 
        

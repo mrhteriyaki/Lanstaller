@@ -346,12 +346,18 @@ namespace Lanstaller
 
                 lblStatus.Invoke((MethodInvoker)delegate
                  {
-                     lblStatus.Text = CurrentCSW.statusInfo.GetStatus();
+                     if (CurrentCSW != null)
+                     {
+                         lblStatus.Text = CurrentCSW.statusInfo.GetStatus();
+                     }
                  });
 
                 pbInstall.Invoke((MethodInvoker)delegate
                 {
-                    pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
+                    if (CurrentCSW != null)
+                    {
+                        pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
+                    }
                 });
                 
             }
