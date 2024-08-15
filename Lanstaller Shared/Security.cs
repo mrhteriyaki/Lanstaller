@@ -25,7 +25,7 @@ namespace LanstallerShared
         {
             //tblSecurityTokens
             SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
-            SqlCommand SQLCmd = new SqlCommand("SELECT COUNT(token) FROM tblSecurityTokens WHERE token = @tkval", SQLConn);
+            SqlCommand SQLCmd = new SqlCommand("SELECT COUNT(token) FROM tblSecurityTokens WHERE token = @tkval AND active = 1", SQLConn);
             SQLCmd.Parameters.AddWithValue("@tkval", token);
 
             int tokencount = 0;
@@ -127,7 +127,7 @@ namespace LanstallerShared
             var tokenstring = new String(stringChars);
 
 
-            SQLCmd.CommandText = "INSERT INTO tblSecurityTokens (token,registration_date,registration_id) OUTPUT INSERTED.id VALUES (@tkval,GETDATE(),(SELECT id FROM tblSecurityRegistration WHERE regcode = @rcode))";
+            SQLCmd.CommandText = "INSERT INTO tblSecurityTokens (token,registration_date,registration_id,active) OUTPUT INSERTED.id VALUES (@tkval,GETDATE(),(SELECT id FROM tblSecurityRegistration WHERE regcode = @rcode),1)";
             SQLCmd.Parameters.AddWithValue("@tkval", tokenstring);
 
             SQLConn.Open();
