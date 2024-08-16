@@ -474,7 +474,17 @@ namespace Lanstaller
 
         void QueueInstall(int SoftwareListIndex)
         {
-            ClientSoftwareClass InstallSW = new ClientSoftwareClass(SList[SoftwareListIndex]);
+            //Setup settings and copy information from SoftwareInfo object into SInfo.
+            ClientSoftwareClass InstallSW = new ClientSoftwareClass(SList[SoftwareListIndex])
+            {
+                InstallDir = UserSettings.InstallDirectory,
+                installfiles = chkFiles.Checked,
+                installregistry = chkRegistry.Checked,
+                installshortcuts = chkShortcuts.Checked,
+                apply_windowssettings = chkWindowsSettings.Checked,
+                apply_preferences = chkPreferences.Checked,
+                install_redist = chkRedist.Checked
+            };
 
             //Check if already in queue.
             if (CurrentCSW != null && CurrentCSW.SInfo.id == InstallSW.SInfo.id)
@@ -482,15 +492,6 @@ namespace Lanstaller
                 MessageBox.Show("Installation already running.");
                 return;
             }
-
-            //Set Settings.           
-            InstallSW.InstallDir = UserSettings.InstallDirectory;
-            InstallSW.installfiles = chkFiles.Checked;
-            InstallSW.installregistry = chkRegistry.Checked;
-            InstallSW.installshortcuts = chkShortcuts.Checked;
-            InstallSW.apply_windowssettings = chkWindowsSettings.Checked;
-            InstallSW.apply_preferences = chkPreferences.Checked;
-            InstallSW.install_redist = chkRedist.Checked;
 
 
             //Check storage has enough free for install.
