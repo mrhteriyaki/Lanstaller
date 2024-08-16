@@ -15,6 +15,7 @@ using LanstallerShared;
 using Lanstaller.Classes;
 using Pri.LongPath;
 
+
 namespace Lanstaller
 {
     //Lanstaller Project
@@ -482,6 +483,27 @@ namespace Lanstaller
                 return;
             }
 
+            //Set Settings.           
+            InstallSW.InstallDir = UserSettings.InstallDirectory;
+            InstallSW.installfiles = chkFiles.Checked;
+            InstallSW.installregistry = chkRegistry.Checked;
+            InstallSW.installshortcuts = chkShortcuts.Checked;
+            InstallSW.apply_windowssettings = chkWindowsSettings.Checked;
+            InstallSW.apply_preferences = chkPreferences.Checked;
+            InstallSW.install_redist = chkRedist.Checked;
+
+
+            //Check storage has enough free for install.
+            System.IO.DriveInfo drive = new System.IO.DriveInfo(Pri.LongPath.Path.GetPathRoot(InstallSW.InstallDir));
+            if (InstallSW.SInfo.install_size > drive.AvailableFreeSpace)
+            {
+                MessageBox.Show("Not enough space to complete installation.");
+                return;
+            }
+
+            Logging.LogToFile("Install queued for: " + InstallSW.SInfo.Name);
+
+
             lock (lock_InstallQueue)
             {
                 if (InstallQueue.Any(inst => inst.SInfo.id == InstallSW.SInfo.id))
@@ -491,13 +513,6 @@ namespace Lanstaller
                 }
             }
 
-            InstallSW.InstallDir = UserSettings.InstallDirectory;
-            InstallSW.installfiles = chkFiles.Checked;
-            InstallSW.installregistry = chkRegistry.Checked;
-            InstallSW.installshortcuts = chkShortcuts.Checked;
-            InstallSW.apply_windowssettings = chkWindowsSettings.Checked;
-            InstallSW.apply_preferences = chkPreferences.Checked;
-            InstallSW.install_redist = chkRedist.Checked;
 
             //Get serial keys from user - may need to put on another thread to stop gui block.
             if (InstallSW.installregistry) //Only request serials if registry checked.
