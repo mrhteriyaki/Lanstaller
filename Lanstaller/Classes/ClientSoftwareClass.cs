@@ -492,6 +492,10 @@ namespace Lanstaller
 
         void VerifyFilesThread(int FileCount)
         {
+            try
+            {
+
+            
             int CheckCounter = 0;
             FileCopyOperation FVO;
             while (CheckCounter < FileCount) //When all files queued for verification and hashed.
@@ -523,6 +527,10 @@ namespace Lanstaller
                 //Console.WriteLine("Checking hash for: " + FVO.destination);
                 if (Pri.LongPath.File.Exists(FVO.destination))
                 {
+                    //Possible optimisation
+                    //Where some files are missing, split verification of existing files and missing files into threads.
+
+
                     //MessageBox.Show("MD5: " + FVO.destination);
                     string check_hash = FileInfoClass.CalculateMD5(FVO.destination);
                     if (FVO.fileinfo.hash.Equals(check_hash))
@@ -538,7 +546,11 @@ namespace Lanstaller
                     Logging.LogToFile("Verification error - missing file: " + FVO.destination);
                 }
             }
-
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Verification thread crashed - error message: " + ex.Message);
+            }
         }
 
 
@@ -562,6 +574,7 @@ namespace Lanstaller
             while (FilesNotValidated)
             {
                 int CopyIndex = 0;
+                statusInfo.ResetCopyState();
 
                 VerifyCopyOperations = new ConcurrentQueue<FileCopyOperation>();
 
@@ -591,6 +604,7 @@ namespace Lanstaller
                             {
                                 FCO.verified = true;
                                 VerifyCopyOperations.Enqueue(FCO);
+
                                 statusInfo.SetCopyState(CopyIndex, FCO.fileinfo.size);
                                 CopyIndex++; //increment file counter.
                                 continue; //Skip file copy, go to next.
@@ -641,7 +655,7 @@ namespace Lanstaller
                 if (FailLoopCount > 1)
                 {
                     statusInfo.SetError(
-                        "Some files failed to download.\nRetrying in" +
+                        "Some files failed to download.\nRetrying in " +
                         (FailLoopCount * 1).ToString() + " seconds.");
 
                     Thread.Sleep((FailLoopCount * 1 * 1000));

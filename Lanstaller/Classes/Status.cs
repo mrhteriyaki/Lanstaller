@@ -37,6 +37,15 @@ namespace Lanstaller.Classes
         string status = "Status: Ready";
         int stage = 0;
 
+        public void ResetCopyState()
+        {
+            lock (_progresslock)
+            {
+                InstalledBytes = 0;
+            }
+        }
+
+
         public void SetCopyState(int index, long byteSize)
         {
             copyStates[index] = true;
@@ -174,7 +183,6 @@ namespace Lanstaller.Classes
                     return 0;
                 }
                 double perc = ((double)InstalledBytes / (double)SInfo.install_size) * 100;
-
                 return Convert.ToInt32(perc);
             }
         }

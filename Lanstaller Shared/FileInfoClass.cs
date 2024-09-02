@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 
 namespace LanstallerShared
 {
@@ -53,6 +54,7 @@ namespace LanstallerShared
         }
 
 
+        //Scan files and save hash values to database.
         public static void RescanFileHashes(bool fullrescan, int software_id)
         {
             FileServer SA = FileServer.GetFileServer(true)[0];
@@ -114,7 +116,7 @@ namespace LanstallerShared
             foreach (FileInfoClass FH in FileHashList)
             {
                 string filePath = SA.path + "\\" + FH.source;
-                Console.Write(filePath);
+                //Console.Write(filePath);
                 FH.hash = CalculateMD5(filePath);
                 SQLCmd.Parameters.Clear();
                 SQLCmd.Parameters.AddWithValue("@fileid", FH.id);
@@ -128,8 +130,8 @@ namespace LanstallerShared
 
         public static string CalculateMD5(string filename)
         {
-            bool filelockerror = true; //loop on file lock errors.
-            while (filelockerror)
+            int filelockerror = 0; //loop on file lock errors.
+            while (filelockerror < 10) //Max 10 attempts.
             {
                 try
                 {
@@ -137,13 +139,26 @@ namespace LanstallerShared
                     FileStream stream = File.OpenRead(filename);
                     byte[] hash = md5.ComputeHash(stream);
                     stream.Close();
-                    filelockerror = false;
                     return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+                catch(FileNotFoundException fnEx)
+                {
+                    //File missing - typical result of AV deletion.
+                    Logging.LogToFile("File hash failed: " + filename + "\nError:" + fnEx.Message);
+                    return string.Empty;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("File hash failed: " + filename + "\nError:" + ex.Message);
+                    Logging.LogToFile("File hash failed: " + filename + "\nError:" + ex.Message);
+
+                    if(ex.Message.Contains("virus"))
+                    {
+                        //MessageBox.Show("Antivirus has blocked verification of file. File:" + filename);
+                        return string.Empty;
+                    }
+                    Thread.Sleep(500); //Wait before looping.
                 }
+                filelockerror++;
             }
             return string.Empty;
 

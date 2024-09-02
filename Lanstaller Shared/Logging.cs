@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lanstaller.Classes
+namespace LanstallerShared
 {
     public class Logging
     {

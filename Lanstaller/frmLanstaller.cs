@@ -108,7 +108,7 @@ namespace Lanstaller
                 MessageBox.Show("Failed to connect to server. Error: " + ex.Message);
                 Application.Exit();
             }
-            Logging.ClearLog();
+            Logging.LogToFile("Lanstaller Started");
 
         }
 
@@ -357,7 +357,7 @@ namespace Lanstaller
                 {
                     if (CurrentCSW != null)
                     {
-                        pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
+                         pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
                     }
                 });
                 
