@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnClear = new System.Windows.Forms.Button();
             this.lblCopyActionInfo = new System.Windows.Forms.Label();
             this.btnAddFolder = new System.Windows.Forms.Button();
             this.btnScan = new System.Windows.Forms.Button();
@@ -45,7 +46,6 @@
             this.btnCheckAllFiles = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.lblUnhashedFiles = new System.Windows.Forms.Label();
-            this.btnClear = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -70,6 +70,16 @@
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Files:";
+            // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(9, 257);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(152, 28);
+            this.btnClear.TabIndex = 15;
+            this.btnClear.Text = "Clear Files and Directories";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
             // 
             // lblCopyActionInfo
             // 
@@ -217,15 +227,6 @@
             this.lblUnhashedFiles.Size = new System.Drawing.Size(83, 13);
             this.lblUnhashedFiles.TabIndex = 29;
             this.lblUnhashedFiles.Text = "Unhashed Files:";
-            // 
-            // btnClear
-            // 
-            this.btnClear.Location = new System.Drawing.Point(9, 257);
-            this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(152, 28);
-            this.btnClear.TabIndex = 15;
-            this.btnClear.Text = "Clear Files and Directories";
-            this.btnClear.UseVisualStyleBackColor = true;
             // 
             // Files
             // 

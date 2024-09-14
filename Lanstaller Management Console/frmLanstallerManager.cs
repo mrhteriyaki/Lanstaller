@@ -145,7 +145,6 @@ namespace Lanstaller_Management_Console
             FilesPanel.txtDestination.TextChanged += new System.EventHandler(this.txtDestination_TextChanged);
             FilesPanel.txtSubFolder.TextChanged += new System.EventHandler(this.txtSubFolder_TextChanged);
             FilesPanel.txtServerShare.TextChanged += new System.EventHandler(this.txtServerShare_TextChanged);
-
             FilesPanel.btnScan.Click += new System.EventHandler(this.btnScan_Click);
             FilesPanel.btnAddFolder.Click += new System.EventHandler(this.btnAddFolder_Click);
             FilesPanel.btnClear.Click += new EventHandler(this.btnClear_Click);
@@ -285,6 +284,8 @@ namespace Lanstaller_Management_Console
             SQLCmd.CommandText = "DELETE from tblDirectories WHERE software_id = @swid";
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
+
+            RefreshSoftware();
         }
 
         private void btnScan_Click(object sender, EventArgs e)

@@ -98,6 +98,8 @@ namespace Lanstaller.Classes
 
         public void AddLocalInstall(int SoftwareID, List<ShortcutOperation> shortcutOperations)
         {
+            RemoveLocalInstall(SoftwareID);
+
             _records.Add(new LocalInstallRecord(SoftwareID, shortcutOperations));
             WriteListDB(_records);
         }
@@ -116,16 +118,23 @@ namespace Lanstaller.Classes
 
         public void RemoveLocalInstall(int SoftwareID)
         {
-            int index = 0;
+            bool updateRequired = false;
+            List<LocalInstallRecord> newRecords = new List<LocalInstallRecord>();
             foreach (LocalInstallRecord localInst in _records)
             {
                 if (localInst.SoftwareID == SoftwareID)
                 {
-                    _records.RemoveAt(index);
-                    WriteListDB(_records);
-                    break;
+                    updateRequired = true;
                 }
-                index++;
+                else
+                {
+                    newRecords.Add(localInst);
+                }
+            }
+            if (updateRequired)
+            {
+                _records = newRecords;
+                WriteListDB(newRecords);
             }
         }
 

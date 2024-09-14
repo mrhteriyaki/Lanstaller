@@ -56,5 +56,10 @@ namespace Lanstaller_Management_Console.Panels
         {
 
         }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
