@@ -22,6 +22,8 @@ namespace Lanstaller.Classes
             //add discord detection (interference with some games)
 
 
+            //Check for listen port conflict - if existing program or service is using the typical LAN ports of a game.
+
         }
 
 
