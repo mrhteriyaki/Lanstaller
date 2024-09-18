@@ -375,8 +375,15 @@ namespace Lanstaller
                 string destpath = temppath + filename;
 
 
-
-                TransferFile(GetFileServerFromAPI()[0], Redist.path, destpath);
+                try
+                {
+                    TransferFile(GetFileServerFromAPI()[0], Redist.path, destpath);
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show("Failed to download redistributable. " + ex.Message);
+                    return;
+                }
 
                 if (!System.IO.File.Exists(destpath))
                 {
