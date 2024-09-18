@@ -1,37 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{982EC2B2-53D0-48BC-91A5-49176056DBA6}</ProjectGuid>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Lanstaller_Management_Console</RootNamespace>
-    <AssemblyName>Lanstaller Management Console</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -41,135 +15,33 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Pri.LongPath, Version=2.0.53.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Pri.LongPath.2.0.53\lib\net45\Pri.LongPath.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.SqlClient, Version=4.6.1.6, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SqlClient.4.8.6\lib\net461\System.Data.SqlClient.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="frmLanstallerManager.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmLanstallerManager.Designer.cs">
-      <DependentUpon>frmLanstallerManager.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmSecurity.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmSecurity.Designer.cs">
-      <DependentUpon>frmSecurity.cs</DependentUpon>
-    </Compile>
-    <Compile Include="LanstallerManagement.cs" />
-    <Compile Include="Panels\Files.cs">
+    <Compile Update="Panels\Files.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Panels\Files.Designer.cs">
-      <DependentUpon>Files.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Panels\Preferences.cs">
+    <Compile Update="Panels\Preferences.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Panels\Preferences.Designer.cs">
-      <DependentUpon>Preferences.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Panels\Registry.cs">
+    <Compile Update="Panels\Registry.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Panels\Registry.Designer.cs">
-      <DependentUpon>Registry.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Panels\Serial.cs">
+    <Compile Update="Panels\Serial.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Panels\Serial.Designer.cs">
-      <DependentUpon>Serial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Panels\Shortcuts.cs">
+    <Compile Update="Panels\Shortcuts.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Panels\Shortcuts.Designer.cs">
-      <DependentUpon>Shortcuts.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Panels\Windows.cs">
+    <Compile Update="Panels\Windows.cs">
       <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Panels\Windows.Designer.cs">
-      <DependentUpon>Windows.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="frmLanstallerManager.resx">
-      <DependentUpon>frmLanstallerManager.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmSecurity.resx">
-      <DependentUpon>frmSecurity.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Panels\Files.resx">
-      <DependentUpon>Files.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Panels\Preferences.resx">
-      <DependentUpon>Preferences.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Panels\Registry.resx">
-      <DependentUpon>Registry.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Panels\Serial.resx">
-      <DependentUpon>Serial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Panels\Shortcuts.resx">
-      <DependentUpon>Shortcuts.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Panels\Windows.resx">
-      <DependentUpon>Windows.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <None Include="app.manifest" />
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <ProjectReference Include="..\Lanstaller Shared\LanstallerShared.csproj" />
+    <ProjectReference Include="..\Lanstaller\Lanstaller.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lanstaller Shared\LanstallerShared.csproj">
-      <Project>{6E28D0C4-FC93-415C-B8BF-F4AED62F74BF}</Project>
-      <Name>LanstallerShared</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Lanstaller\Lanstaller.csproj">
-      <Project>{8B255B64-FDB3-4072-AA2E-651E01DD984A}</Project>
-      <Name>Lanstaller</Name>
-    </ProjectReference>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

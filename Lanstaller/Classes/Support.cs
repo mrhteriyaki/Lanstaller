@@ -19,7 +19,7 @@ namespace Lanstaller.Classes
 
             //Check for audio input device.
 
-
+            //add discord detection (interference with some games)
 
 
         }

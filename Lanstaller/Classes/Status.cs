@@ -35,7 +35,7 @@ namespace Lanstaller.Classes
 
         //Used for status label.
         string status = "Status: Ready";
-        int stage = 0;
+        double stage = 0;
 
         public void ResetCopyState()
         {
@@ -63,7 +63,7 @@ namespace Lanstaller.Classes
 
 
         //Set Stages.
-        public void SetStage(int Stage)
+        public void SetStage(double Stage)
         {
             stage = Stage;
             //-1 = Error
@@ -86,7 +86,15 @@ namespace Lanstaller.Classes
             {
                 status = "Indexing - " + SInfo.Name;
             }
-            else if (stage == 3)
+            else if (stage == 3.1)
+            {
+                status = "Generating Directories - " + SInfo.Name;
+            }
+            else if (stage == 3.2)
+            {
+                status = "Getting File Server - " + SInfo.Name;
+            }
+            else if (stage == 3.3)
             {
                 status = "Copying Files - " + SInfo.Name;
             }
@@ -141,7 +149,7 @@ namespace Lanstaller.Classes
                 double gbsize = GetGBSize(copiedBytes);
 
                 status = "Installing: \n" + SInfo.Name +
-                "\nFile:" + GetCopyCount().ToString() + " / " + SInfo.file_count.ToString() +
+                "\nFile: " + GetCopyCount().ToString() + " / " + SInfo.file_count.ToString() +
                 "\nProgress (GB): " + Math.Round(gbsize, 2).ToString() +
                 " / " + Math.Round(InstallSizeGB, 2).ToString();
             }

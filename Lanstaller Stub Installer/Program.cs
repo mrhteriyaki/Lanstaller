@@ -26,7 +26,7 @@ namespace Lanstaller_Stub_Installer
             DF("Lanstaller.exe");
             DF("Lanstaller Shared.dll");
             DF("Newtonsoft.Json.dll");
-            DF("Pri.LongPath.dll");
+            DF("dll");
             DF("7z.exe");
             DF("7z.dll");
 

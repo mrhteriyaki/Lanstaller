@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -305,7 +305,7 @@ namespace Lanstaller_Management_Console
             }
 
             string scanfolder = Path.Combine(FilesPanel.txtServerShare.Text, FilesPanel.txtScanfolder.Text);
-            if (Pri.LongPath.Directory.Exists(scanfolder) == false)
+            if (Directory.Exists(scanfolder) == false)
             {
                 MessageBox.Show("Scan Folder - Invalid");
                 return;
@@ -314,8 +314,8 @@ namespace Lanstaller_Management_Console
             FilesPanel.btnScan.Enabled = false;
 
             FilesPanel.lblCopyActionInfo.Text = "Status: Scanning";
-            filelist = Pri.LongPath.Directory.GetFiles(scanfolder, "*", System.IO.SearchOption.AllDirectories);
-            directories = Pri.LongPath.Directory.GetDirectories(scanfolder, "*", SearchOption.AllDirectories);
+            filelist = Directory.GetFiles(scanfolder, "*", System.IO.SearchOption.AllDirectories);
+            directories = Directory.GetDirectories(scanfolder, "*", SearchOption.AllDirectories);
 
             FilesPanel.lblCopyActionInfo.Text = "Status: Scanned Files: " + filelist.Count() + "\nDirectories: " + directories.Count();
             FilesPanel.btnAddFolder.Enabled = true;
@@ -426,7 +426,7 @@ namespace Lanstaller_Management_Console
                 //Messagebox for each file:
                 //MessageBox.Show(src + Environment.NewLine + dst);
 
-                Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(filename);
+                FileInfo FI = new FileInfo(filename);
                 FileInfoClass.AddFile(src, dst, FI.Length, CurrentSelectedSoftware.id);
 
             }

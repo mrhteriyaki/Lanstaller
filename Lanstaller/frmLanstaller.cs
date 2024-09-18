@@ -13,8 +13,7 @@ using System.Net;
 
 using LanstallerShared;
 using Lanstaller.Classes;
-using Pri.LongPath;
-
+using System.IO;
 
 namespace Lanstaller
 {
@@ -36,8 +35,8 @@ namespace Lanstaller
         Thread InstallThread; //installer thread.
         Thread sCheck; //support checks.
 
+        public static CancellationTokenSource shutdownToken = new CancellationTokenSource();
         static bool install_option = true;
-        public static bool shutdown = false;
         static bool InstallThreadRunning = false;
         private static object lock_InstallThreadRunning = new object();
 
@@ -58,8 +57,7 @@ namespace Lanstaller
                 "7z.exe",
                 "7z.dll",
                 "LanstallerShared.dll",
-                "Newtonsoft.Json.dll",
-                "Pri.LongPath.dll"
+                "Newtonsoft.Json.dll"
             };
 
             foreach (string cfile in core_files)
@@ -73,7 +71,7 @@ namespace Lanstaller
         }
 
         private void frmLanstaller_Load(object sender, EventArgs e)
-        {          
+        {
             CheckCoreFilesExist();
             WindowStartSize = this.Size;
             if (!LoadConfigFile())
@@ -81,7 +79,7 @@ namespace Lanstaller
                 Application.Exit();
                 return;
             }
-            
+
             if (!ClientUpdateCheck())
             {
                 Application.Exit();
@@ -96,9 +94,9 @@ namespace Lanstaller
             //Need to put auth/connection check - invalid auth response should re-prompt with ConfigInput.
 
             LoadClientSettings();
-           
+
             InitialFormSetup();
-            
+
             try
             {
                 LoadSoftwareList(); //causing 2 second load delay, add load spash in future.
@@ -126,7 +124,7 @@ namespace Lanstaller
         void SetupThreads()
         {
             MThread = new Thread(StatusMonitorThread);
-            MThread.Name = "Status Monitor";
+            MThread.Name = "Status Monitor Thread";
             MThread.Start();
 
             CThread = new Thread(ChatThread);
@@ -202,11 +200,11 @@ namespace Lanstaller
             }
 
             ClientSoftwareClass.WANMode = FileServer.IsWAN();
-            if(ClientSoftwareClass.WANMode)
+            if (ClientSoftwareClass.WANMode)
             {
                 lblWANMode.Visible = true;
             }
-            
+
 
             string ImageDir = LanstallerDataDir + "Images";
             if (!Directory.Exists(ImageDir))
@@ -218,11 +216,11 @@ namespace Lanstaller
             LocalDB = new LocalDatabase(LanstallerDataDir + "installed.json");
             List<int> InstalledIDs = LocalDB.GetSoftwareIDs();
             lvSoftware.SmallImageList = new ImageList();
-            
+
             //Set size of listview Icon Images.
             lvSoftware.SmallImageList.ImageSize = new Size(25, 25);
-            
-            
+
+
             FileServer FS = APIClient.GetFileServerFromAPI()[0];
             foreach (SoftwareInfo SWI in SList)
             {
@@ -263,17 +261,17 @@ namespace Lanstaller
             double server_version = 0;
             try
             {
-                 server_version = double.Parse(APIClient.GetSystemInfo("version"));
+                server_version = double.Parse(APIClient.GetSystemInfo("version"));
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to check version Error:" +  ex.Message);
+                MessageBox.Show("Failed to check version Error:" + ex.Message);
                 return false;
             }
 
             try
             {
-                
+
                 if (server_version != Version)
                 {
                     if (MessageBox.Show("Lanstaller Update Required.", "Update Required", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
@@ -292,10 +290,10 @@ namespace Lanstaller
                         try
                         {
                             WebClient UWC = new WebClient();
-                            
+
                             UWC.DownloadFile(updaterUrl, updaterpath);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             MessageBox.Show("Failed to get updater " + ex.Message);
                         }
@@ -315,7 +313,7 @@ namespace Lanstaller
                     else
                     {
                         this.BeginInvoke(new MethodInvoker(this.Close));
-                        
+
                     }
                     return false;
                 }
@@ -336,10 +334,8 @@ namespace Lanstaller
 
         void StatusMonitorThread()
         {
-            while (shutdown == false)
+            while (!shutdownToken.IsCancellationRequested)
             {
-                Thread.Sleep(50);
-
                 if (CurrentCSW == null)
                 {
                     continue;
@@ -357,10 +353,11 @@ namespace Lanstaller
                 {
                     if (CurrentCSW != null)
                     {
-                         pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
+                        pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
                     }
                 });
-                
+
+                Thread.Sleep(50);
             }
         }
 
@@ -369,7 +366,7 @@ namespace Lanstaller
         {
             UpdateChatMessages();
             //lastcheck = CM.timestamp;
-            while (shutdown == false)
+            while (!shutdownToken.IsCancellationRequested)
             {
                 if (ChatClient.GetMessageCount(lastid) != 0)
                 {
@@ -495,7 +492,7 @@ namespace Lanstaller
 
 
             //Check storage has enough free for install.
-            System.IO.DriveInfo drive = new System.IO.DriveInfo(Pri.LongPath.Path.GetPathRoot(InstallSW.InstallDir));
+            DriveInfo drive = new DriveInfo(Path.GetPathRoot(InstallSW.InstallDir));
             if (InstallSW.SInfo.install_size > drive.AvailableFreeSpace)
             {
                 MessageBox.Show("Not enough space to complete installation.");
@@ -552,8 +549,8 @@ namespace Lanstaller
 
         void InstThread()
         {
-            
-            while (InstallQueue.Count > 0)
+
+            while (InstallQueue.Count > 0 || !shutdownToken.IsCancellationRequested)
             {
                 lock (lock_InstallQueue)
                 {
@@ -573,6 +570,11 @@ namespace Lanstaller
                 this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.SInfo.Name + " (Installing)"));
 
                 CurrentCSW.Install();
+
+                if (shutdownToken.IsCancellationRequested)
+                {
+                    return;
+                }
 
                 this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].Text = CurrentCSW.SInfo.Name));
                 if (CurrentCSW.GetErrored())
@@ -631,21 +633,7 @@ namespace Lanstaller
 
         private void frmLanstaller_Closing(object sender, FormClosingEventArgs e)
         {
-            shutdown = true;
-            //Shutdown Threads.
-            if (MThread != null)
-            {
-                MThread.Abort();
-            }
-            if (CThread != null)
-            {
-                CThread.Abort();
-            }
-
-            if (InstallThread != null)
-            {
-                InstallThread.Abort();
-            }
+            shutdownToken.Cancel();
         }
 
 
@@ -981,6 +969,6 @@ namespace Lanstaller
             }
         }
 
-       
+
     }
 }

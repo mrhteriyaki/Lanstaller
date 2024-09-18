@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Text;
 
 namespace LanstallerShared
@@ -31,29 +31,27 @@ namespace LanstallerShared
             SQLCmd.Parameters.Clear();
             SQLCmd.Parameters.AddWithValue("@softwareid", tmpSoftwareInfo.id);
 
-            //File count.
-            SQLCmd.CommandText = "SELECT COUNT(id) from tblFiles where software_id = @softwareid";
-            tmpSoftwareInfo.file_count = (int)SQLCmd.ExecuteScalar();
+            SQLCmd.CommandText = @"
+                SELECT 
+                (SELECT COUNT(id) FROM tblFiles WHERE software_id = @softwareid) AS file_count,
+                (SELECT COUNT(id) FROM tblRegistry WHERE software_id = @softwareid) AS registry_count,
+                (SELECT COUNT(id) FROM tblShortcut WHERE software_id = @softwareid) AS shortcut_count,
+                (SELECT COUNT(id) FROM tblFirewallExceptions WHERE software_id = @softwareid) AS firewall_count,
+                (SELECT COUNT(id) FROM tblPreferenceFiles WHERE software_id = @softwareid) AS preference_count,
+                (SELECT COUNT(redist_id) FROM tblRedistUsage WHERE software_id = @softwareid) AS redist_count";
 
-            //registry count
-            SQLCmd.CommandText = "SELECT COUNT(id) from tblRegistry WHERE software_id = @softwareid";
-            tmpSoftwareInfo.registry_count = (int)SQLCmd.ExecuteScalar();
-
-            //shortcut count
-            SQLCmd.CommandText = "SELECT COUNT(id) from [tblShortcut] WHERE software_id = @softwareid";
-            tmpSoftwareInfo.shortcut_count = (int)SQLCmd.ExecuteScalar();
-
-            //Firewall rule count.
-            SQLCmd.CommandText = "SELECT COUNT(id) from tblFirewallExceptions WHERE software_id = @softwareid";
-            tmpSoftwareInfo.firewall_count = (int)SQLCmd.ExecuteScalar();
-
-            //Preference files.
-            SQLCmd.CommandText = "SELECT COUNT(id) from tblPreferenceFiles WHERE software_id = @softwareid";
-            tmpSoftwareInfo.preference_count = (int)SQLCmd.ExecuteScalar();
-
-            //Redist 
-            SQLCmd.CommandText = "SELECT COUNT(redist_id) from tblRedistUsage WHERE software_id = @softwareid";
-            tmpSoftwareInfo.redist_count = (int)SQLCmd.ExecuteScalar();
+            using (SqlDataReader reader = SQLCmd.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    tmpSoftwareInfo.file_count = reader.GetInt32(0);
+                    tmpSoftwareInfo.registry_count = reader.GetInt32(1);
+                    tmpSoftwareInfo.shortcut_count = reader.GetInt32(2);
+                    tmpSoftwareInfo.firewall_count = reader.GetInt32(3);
+                    tmpSoftwareInfo.preference_count = reader.GetInt32(4);
+                    tmpSoftwareInfo.redist_count = reader.GetInt32(5);
+                }
+            }
 
             SQLConn.Close();
         }

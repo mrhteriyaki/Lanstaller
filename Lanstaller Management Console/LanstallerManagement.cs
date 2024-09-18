@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LanstallerShared;
+using System.IO;
 
 namespace Lanstaller_Management_Console
 {
@@ -32,7 +33,7 @@ namespace Lanstaller_Management_Console
                 FileCopyOperation tmpFCO = new FileCopyOperation();
                 tmpFCO.fileinfo.id = (int)SR[0];
                 tmpFCO.fileinfo.source = SR[1].ToString();
-                Pri.LongPath.FileInfo FI = new Pri.LongPath.FileInfo(SA + "\\" + SR[1].ToString());
+                FileInfo FI = new FileInfo(SA + "\\" + SR[1].ToString());
                 tmpFCO.fileinfo.size = FI.Length;
                 FileList.Add(tmpFCO);
             }

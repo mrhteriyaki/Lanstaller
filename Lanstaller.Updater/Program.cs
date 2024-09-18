@@ -70,7 +70,7 @@ namespace Lanstaller.Updater
                 "Lanstaller.exe",
                 "LanstallerShared.dll",
                 "Newtonsoft.Json.dll",
-                "Pri.LongPath.dll",
+                "dll",
                 "7z.exe",
                 "7z.dll"
             };

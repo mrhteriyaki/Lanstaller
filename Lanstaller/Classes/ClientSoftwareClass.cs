@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 
-using IWshRuntimeLibrary;
+
 using System.Windows.Forms;
 
 using System.Text.RegularExpressions; //Regex
@@ -502,7 +502,7 @@ namespace Lanstaller
             {
                 if (VerifyCopyOperations.Count == 0)
                 {
-                    if (frmLanstaller.shutdown)
+                    if (frmLanstaller.shutdownToken.IsCancellationRequested)
                     {
                         //Exit if main threads have closed.
                         return;
@@ -525,7 +525,7 @@ namespace Lanstaller
                 }
 
                 //Console.WriteLine("Checking hash for: " + FVO.destination);
-                if (Pri.LongPath.File.Exists(FVO.destination))
+                if (File.Exists(FVO.destination))
                 {
                     //Possible optimisation
                     //Where some files are missing, split verification of existing files and missing files into threads.
@@ -539,7 +539,7 @@ namespace Lanstaller
                         continue;
                     }
                     Logging.LogToFile("Deleting file - failed validation: " + FVO.destination + " Expected hash: " + FVO.fileinfo.hash + " Check result: " + check_hash);
-                    Pri.LongPath.File.Delete(FVO.destination); // Delete file if partially downloaded.
+                    File.Delete(FVO.destination); // Delete file if partially downloaded.
                 }
                 else
                 {
@@ -557,22 +557,29 @@ namespace Lanstaller
         //Copy files from list provided, directory list for folder generation (Including empty dirs)
         void CopyFiles()
         {
-            statusInfo.SetStage(3);
+            statusInfo.SetStage(3.1);
             //Generate any required Directories for Files.
             foreach (string dir in DirectoryList)
             {
-                if (Pri.LongPath.Directory.Exists(dir) == false)
+                if (Directory.Exists(dir) == false)
                 {
-                    Pri.LongPath.Directory.CreateDirectory(dir);
+                    Directory.CreateDirectory(dir);
                 }
             }
-
+            statusInfo.SetStage(3.2);
             FileServer FileServer = GetFileServerFromAPI()[0];
+
+            statusInfo.SetStage(3.3);
 
             bool FilesNotValidated = true; //File copy validation - loop on hash failure.
             int FailLoopCount = 0;
             while (FilesNotValidated)
             {
+                if (frmLanstaller.shutdownToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
                 int CopyIndex = 0;
                 statusInfo.ResetCopyState();
 
@@ -585,10 +592,15 @@ namespace Lanstaller
 
                 while (CopyIndex < FileCopyOperations.Count)
                 {
+                    if (frmLanstaller.shutdownToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     FileCopyOperation FCO = FileCopyOperations[CopyIndex];
 
                     //Verify existing files.
-                    if (System.IO.File.Exists(FCO.destination))
+                    if (File.Exists(FCO.destination))
                     {
                         if (string.IsNullOrEmpty(FCO.fileinfo.hash))
                         {
@@ -675,7 +687,7 @@ namespace Lanstaller
             else if (FileServer.protocol == 2) //SMB
             {
                 string src = Uri.UnescapeDataString(Source).Replace("/", "\\");
-                Pri.LongPath.File.Copy(FileServer.path + src, Destination, true);
+                File.Copy(FileServer.path + src, Destination, true);
             }
         }
 
@@ -723,7 +735,7 @@ namespace Lanstaller
             }
             else if (FileServer.protocol == 2) //SMB
             {
-                Pri.LongPath.File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
+                File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
                 statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                 VerifyCopyOperations.Enqueue(FCO);
             }
@@ -791,8 +803,8 @@ namespace Lanstaller
         {
             foreach (ShortcutOperation SCO in ShortcutOperations)
             {
-                WshShell shell = new WshShell();
-                IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(SCO.location + "\\" + SCO.name + ".lnk");
+                IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
+                IWshRuntimeLibrary.IWshShortcut shortcut = (IWshRuntimeLibrary.IWshShortcut)shell.CreateShortcut(SCO.location + "\\" + SCO.name + ".lnk");
                 shortcut.TargetPath = SCO.filepath;
                 shortcut.WorkingDirectory = SCO.runpath;
                 shortcut.Arguments = SCO.arguments;
@@ -861,7 +873,7 @@ namespace Lanstaller
         {
             filename = ReplaceVariable(filename); //Adjust for any variables in filename.
 
-            if (!Pri.LongPath.File.Exists(filename))
+            if (!File.Exists(filename))
             {
                 MessageBox.Show("Preference File Missing  - " + filename);
                 return;
@@ -894,7 +906,7 @@ namespace Lanstaller
             configfiledata = configfiledata.Replace(target, replace); //Apply replacement to target in file data.
 
             //Move Existing File.
-            Pri.LongPath.File.Move(filename, filename + ".bak");
+            File.Move(filename, filename + ".bak");
 
             //Write New file.
             FileStream FS = new FileStream(filename, FileMode.Create);
@@ -904,7 +916,7 @@ namespace Lanstaller
             SW.Close();
 
             //Delete Backup of Existing File.
-            Pri.LongPath.File.Delete(filename + ".bak");
+            File.Delete(filename + ".bak");
 
         }
 
