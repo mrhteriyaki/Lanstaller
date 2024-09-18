@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using System.Text;
+using System.Reflection.PortableExecutable;
 
 namespace LanstallerShared
 {
@@ -18,8 +19,10 @@ namespace LanstallerShared
         public long install_size;
         public string image_small; //Icon Image for List.
 
-        public static void LoadSoftwareCounts(SoftwareInfo tmpSoftwareInfo)
+        public static void UpdateSoftwareCounts(SoftwareInfo tmpSoftwareInfo)
         {
+            tmpSoftwareInfo.install_size = GetInstallSize(tmpSoftwareInfo.id);
+
             //Get counts for install items.
 
             SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
@@ -77,7 +80,53 @@ namespace LanstallerShared
             List<SoftwareInfo> tmpList = new List<SoftwareInfo>();
 
             //Get List of Software from Server
-            string QueryString = "SELECT tblSoftware.[id],tblSoftware.[name],tblImages.small_image FROM tblSoftware LEFT JOIN tblImages on tblSoftware.id = tblImages.software_id order by [name]";
+            string QueryString = @"
+SELECT 
+    s.id AS software_id,
+    s.name,
+    tblImages.small_image,
+    COALESCE(f.file_count, 0) AS file_count,
+    COALESCE(f.totalsize, 0) AS totalsize,
+    COALESCE(r.registry_count, 0) AS registry_count,
+    COALESCE(sh.shortcut_count, 0) AS shortcut_count,
+    COALESCE(fw.firewall_count, 0) AS firewall_count,
+    COALESCE(p.preference_count, 0) AS preference_count,
+    COALESCE(rd.redist_count, 0) AS redist_count
+FROM 
+    tblSoftware s
+LEFT JOIN (
+    SELECT software_id, COUNT(id) AS file_count, SUM(filesize) as totalsize
+    FROM tblFiles
+    GROUP BY software_id
+) f ON s.id = f.software_id
+LEFT JOIN (
+    SELECT software_id, COUNT(id) AS registry_count
+    FROM tblRegistry
+    GROUP BY software_id
+) r ON s.id = r.software_id
+LEFT JOIN (
+    SELECT software_id, COUNT(id) AS shortcut_count
+    FROM tblShortcut
+    GROUP BY software_id
+) sh ON s.id = sh.software_id
+LEFT JOIN (
+    SELECT software_id, COUNT(id) AS firewall_count
+    FROM tblFirewallExceptions
+    GROUP BY software_id
+) fw ON s.id = fw.software_id
+LEFT JOIN (
+    SELECT software_id, COUNT(id) AS preference_count
+    FROM tblPreferenceFiles
+    GROUP BY software_id
+) p ON s.id = p.software_id
+LEFT JOIN (
+    SELECT software_id, COUNT(redist_id) AS redist_count
+    FROM tblRedistUsage
+    GROUP BY software_id
+) rd ON s.id = rd.software_id
+
+LEFT JOIN tblImages on s.id = tblImages.software_id order by [name]
+";
 
             SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SQLConn.Open();
@@ -89,16 +138,20 @@ namespace LanstallerShared
                 tmpSoftware.id = (int)SQLOutput[0];
                 tmpSoftware.Name = SQLOutput[1].ToString();
                 tmpSoftware.image_small = SQLOutput[2].ToString();
+
+                tmpSoftware.file_count = SQLOutput.GetInt32(3);
+                tmpSoftware.install_size = SQLOutput.GetInt64(4);
+                tmpSoftware.registry_count = SQLOutput.GetInt32(5);
+                tmpSoftware.shortcut_count = SQLOutput.GetInt32(6);
+                tmpSoftware.firewall_count = SQLOutput.GetInt32(7);
+                tmpSoftware.preference_count = SQLOutput.GetInt32(8);
+                tmpSoftware.redist_count = SQLOutput.GetInt32(9);
+
+
                 tmpList.Add(tmpSoftware);
             }
             SQLOutput.Close();
             SQLConn.Close();
-
-            foreach (SoftwareInfo SW in tmpList)
-            {
-                LoadSoftwareCounts(SW);
-                SW.install_size = GetInstallSize(SW.id);
-            }
 
             return tmpList;
         }

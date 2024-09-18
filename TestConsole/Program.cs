@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 Console.WriteLine("Hello, World!");
 
-LanstallerServer.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security=true";
+LanstallerServer.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security=true;TrustServerCertificate=True";
 
 Console.WriteLine(DateTime.Now.ToString("HH:mm:ss.fffff"));
 

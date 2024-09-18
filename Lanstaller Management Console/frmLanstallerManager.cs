@@ -440,7 +440,7 @@ namespace Lanstaller_Management_Console
 
         void RefreshStatusInfo()
         {
-            SoftwareInfo.LoadSoftwareCounts(CurrentSelectedSoftware); //Update counts.
+            SoftwareInfo.UpdateSoftwareCounts(CurrentSelectedSoftware); //Update counts.
             string info = "";
             info += "File Copies: " + CurrentSelectedSoftware.file_count + Environment.NewLine;
             info += "Registry Operations: " + CurrentSelectedSoftware.registry_count + Environment.NewLine;
