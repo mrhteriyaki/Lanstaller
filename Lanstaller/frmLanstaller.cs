@@ -550,7 +550,7 @@ namespace Lanstaller
         void InstThread()
         {
 
-            while (InstallQueue.Count > 0 || !shutdownToken.IsCancellationRequested)
+            while (InstallQueue.Count > 0 && !shutdownToken.IsCancellationRequested)
             {
                 lock (lock_InstallQueue)
                 {
@@ -588,6 +588,8 @@ namespace Lanstaller
                     this.BeginInvoke((MethodInvoker)(() => lvSoftware.Items[SListIndex].ForeColor = Color.White));
                     this.BeginInvoke((MethodInvoker)(() => CheckInstalled()));
                 }
+
+                Logging.LogToFile("Install completed: " + CurrentCSW.SInfo.Name);
 
                 CurrentCSW = null; //Clear after installs complete.
 

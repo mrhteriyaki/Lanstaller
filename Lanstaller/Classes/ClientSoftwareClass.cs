@@ -374,6 +374,8 @@ namespace Lanstaller
                 string filename = Redist.path.Substring(Redist.path.Replace("\\", "/").LastIndexOf("/"));
                 string destpath = temppath + filename;
 
+
+
                 TransferFile(GetFileServerFromAPI()[0], Redist.path, destpath);
 
                 if (!System.IO.File.Exists(destpath))

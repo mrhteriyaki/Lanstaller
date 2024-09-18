@@ -94,7 +94,7 @@ namespace Lanstaller.Classes
             {
                 status = "Getting File Server - " + SInfo.Name;
             }
-            else if (stage == 3.3)
+            else if (stage == 3.3) //3.3 is matched up change of format in GetStatus()
             {
                 status = "Copying Files - " + SInfo.Name;
             }
@@ -135,7 +135,7 @@ namespace Lanstaller.Classes
         public string GetStatus()
         {
 
-            if (stage == 3)
+            if (stage == 3.3)
             {
                 long copiedBytes = InstalledBytes;
                 for (long i = 0; i < SInfo.file_count; i++)
