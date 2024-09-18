@@ -6,7 +6,7 @@ LanstallerServer.ConnectionString = Environment.GetEnvironmentVariable("DBSTRING
 if (string.IsNullOrEmpty(LanstallerServer.ConnectionString))
 {
     Console.WriteLine("Database connection string variable DBSTRING not set, using default.");
-    LanstallerServer.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security = true";
+    LanstallerServer.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security = true;TrustServerCertificate=True";
 }
 
 LanstallerWebSettings.serverAddress = Environment.GetEnvironmentVariable("ADDRESS");

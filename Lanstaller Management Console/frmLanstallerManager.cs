@@ -89,13 +89,18 @@ namespace Lanstaller_Management_Console
             lvSoftware.Columns.Add("Shortcuts", 70);
             lvSoftware.Columns.Add("Firewall Rules", 80);
 
+
+
+            LanstallerServer.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security=true;TrustServerCertificate=True";
+            
+            
+            /*
             if (!File.Exists("config.ini"))
             {
                 MessageBox.Show("missing config.ini");
                 this.Close();
                 return;
             }
-
 
             foreach (string line in System.IO.File.ReadAllLines("config.ini"))
             {
@@ -104,7 +109,7 @@ namespace Lanstaller_Management_Console
                     LanstallerServer.ConnectionString = line;
                 }
             }
-
+            */
 
             AddPanel(FilesPanel);
             AddPanel(PreferencesPanel);
@@ -314,9 +319,9 @@ namespace Lanstaller_Management_Console
             FilesPanel.btnScan.Enabled = false;
 
             FilesPanel.lblCopyActionInfo.Text = "Status: Scanning";
-            filelist = Directory.GetFiles(scanfolder, "*", System.IO.SearchOption.AllDirectories);
+            filelist = Directory.GetFiles(scanfolder, "*", SearchOption.AllDirectories);
             directories = Directory.GetDirectories(scanfolder, "*", SearchOption.AllDirectories);
-
+            
             FilesPanel.lblCopyActionInfo.Text = "Status: Scanned Files: " + filelist.Count() + "\nDirectories: " + directories.Count();
             FilesPanel.btnAddFolder.Enabled = true;
 
