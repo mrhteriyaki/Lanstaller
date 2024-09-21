@@ -938,9 +938,11 @@ namespace Lanstaller_Management_Console
             SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
-            SQLCmd.CommandText = "IF EXISTS (SELECT software_id FROM tblImages WHERE software_id = @swid) " +
-                "UPDATE tblImages SET small_image = @savefile WHERE software_id = @swid " +
-                "ELSE INSERT INTO tblImages (software_id,small_image) VALUES (@swid,@savefile)";
+            SQLCmd.CommandText = 
+                @"IF EXISTS (SELECT software_id FROM tblImages WHERE software_id = @swid) 
+                UPDATE tblImages SET small_image = @savefile WHERE software_id = @swid 
+                ELSE INSERT INTO tblImages (software_id,small_image) VALUES (@swid,@savefile)";
+
             SQLCmd.Parameters.AddWithValue("@swid", CurrentSelectedSoftware.id);
             SQLCmd.Parameters.AddWithValue("@savefile", "Images/" + CurrentSelectedSoftware.Name + ".png");
 

@@ -18,6 +18,7 @@ namespace Lanstaller.Classes
         static string _authkey;
 
         public long downloadedbytes = 0;
+        public long totalSize = 0;
         string _Source;
         string _Destination;
         
@@ -27,10 +28,11 @@ namespace Lanstaller.Classes
             _authkey = authkey;
         }
 
-        public DownloadTask(string Source, string Destination)
+        public DownloadTask(string Source, string Destination, long fileSize = 0) //Optional file size param allows for more efficient memory buffer allocation.
         {
             _Source = Source;
             _Destination = Destination;
+            totalSize = fileSize;
         }
 
 
@@ -45,7 +47,7 @@ namespace Lanstaller.Classes
                 // Send a GET request to the specified URL
                 HttpResponseMessage response = await hClient.GetAsync(SourceUri, HttpCompletionOption.ResponseHeadersRead);
                 response.EnsureSuccessStatusCode();
-                
+
                 // Get the total file size from the response headers, if available
                 //long? totalBytes = response.Content.Headers.ContentLength;
 
@@ -54,13 +56,18 @@ namespace Lanstaller.Classes
                 //524288 - 512K.
                 //4194304 = 4MB
                 //16777216 = 16MB
-                
-                Stream contentStream = await response.Content.ReadAsStreamAsync();
-                Stream fileStream = new FileStream(_Destination, FileMode.Create, FileAccess.Write, FileShare.None, 131072, true);
-                
-                byte[] buffer = new byte[131072];
-                int bytesRead;
+                int chunkSize = 131072;
+                if (totalSize < 131072)
+                {
+                    chunkSize = 8192;
+                }
 
+
+                Stream contentStream = await response.Content.ReadAsStreamAsync();
+                Stream fileStream = new FileStream(_Destination, FileMode.Create, FileAccess.Write, FileShare.None, chunkSize, true);
+
+                byte[] buffer = new byte[chunkSize];
+                int bytesRead;
                 while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
                     fileStream.Write(buffer, 0, bytesRead);

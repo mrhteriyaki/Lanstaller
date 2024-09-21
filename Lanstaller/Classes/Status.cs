@@ -80,27 +80,35 @@ namespace Lanstaller.Classes
 
             if (stage == 1)
             {
-                status = "Applying Registry - " + SInfo.Name;
+                status = SInfo.Name + "\nApplying Registry";
             }
-            else if (stage == 2)
+            else if (stage == 2.1)
             {
-                status = "Indexing - " + SInfo.Name;
+                status = SInfo.Name + "\nDownloading file list";
+            }
+            else if (stage == 2.2)
+            {
+                status = SInfo.Name + "\nBuilding directory list" ;
+            }
+            else if (stage == 2.3)
+            {
+                status = SInfo.Name + "\nUpdating file list";
             }
             else if (stage == 3.1)
             {
-                status = "Generating Directories - " + SInfo.Name;
+                status = SInfo.Name + "\nGenerating directories";
             }
             else if (stage == 3.2)
             {
-                status = "Getting File Server - " + SInfo.Name;
+                status = SInfo.Name + "\nGetting file server";
             }
             else if (stage == 3.3) //3.3 is matched up change of format in GetStatus()
             {
-                status = "Copying Files - " + SInfo.Name;
+                status = SInfo.Name + "\nCopying Files";
             }
             else if (stage == 4)
             {
-                status = "Verifying Files - " + SInfo.Name;
+                status = SInfo.Name + "\nVerifying Files";
             }
             else if (stage == 5)
             {

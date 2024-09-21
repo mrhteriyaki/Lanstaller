@@ -72,6 +72,7 @@ namespace Lanstaller
 
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
+            
             CheckCoreFilesExist();
             WindowStartSize = this.Size;
             if (!LoadConfigFile())
@@ -341,13 +342,16 @@ namespace Lanstaller
                     continue;
                 }
 
+
                 lblStatus.Invoke((MethodInvoker)delegate
-                 {
-                     if (CurrentCSW != null)
-                     {
-                         lblStatus.Text = CurrentCSW.statusInfo.GetStatus();
-                     }
-                 });
+                {
+                    if (CurrentCSW != null)
+                    {
+                        lblStatus.Text = CurrentCSW.statusInfo.GetStatus();
+                    }
+                });
+
+
 
                 pbInstall.Invoke((MethodInvoker)delegate
                 {
@@ -356,6 +360,7 @@ namespace Lanstaller
                         pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
                     }
                 });
+
 
                 Thread.Sleep(50);
             }

@@ -82,30 +82,6 @@ namespace Lanstaller
 
             if (installfiles)
             {
-                statusInfo.SetStage(2);
-
-                //DB
-                //FCL = GetFiles(SInfo.id);
-
-                //Web
-                FileCopyOperations = GetFilesListFromAPI(SInfo.id);
-                VerifyCopyOperations = new ConcurrentQueue<FileCopyOperation>();
-
-                //Get Directories, split up all sub directory paths and add to generation list.
-                foreach (string Dir in GetDirectoriesFromAPI(SInfo.id))
-                {
-                    GetSubFolders(ReplaceVariable(Dir));
-                }
-
-                //Remove filename from path.
-                foreach (FileCopyOperation FCO in FileCopyOperations)
-                {
-                    FCO.destination = ReplaceVariable(FCO.destination);
-                    string filedirectory = FCO.destination.Substring(0, FCO.destination.LastIndexOf("\\"));
-                    GetSubFolders(filedirectory);
-                }
-
-
                 CopyFiles();
             }
 
@@ -173,50 +149,6 @@ namespace Lanstaller
         }
 
 
-        //Gets all sub folders for given directory, adds to list.
-        void GetSubFolders(string directory)
-        {
-            //Check if already in list, if so skip.
-            foreach (string dir in DirectoryList)
-            {
-                if (dir == directory)
-                {
-                    return;
-                }
-            }
-
-            //Split up file directory for parent folders.
-            int count = 0;
-            string directorypath = "";
-            foreach (string FileDirSection in directory.Split(Char.Parse("\\")))
-            {
-                //Check each directory including parents against list and add if missing.
-                directorypath = directorypath + FileDirSection + "\\";
-
-                count++;
-                if (count == 1)
-                {
-                    //Skip Drive Root (Eg: C:).
-                    continue;
-                }
-
-                //Check if path already added to list.
-                bool missing = true;
-                foreach (string existingdir in DirectoryList)
-                {
-                    if (existingdir.Equals(directorypath))
-                    {
-                        missing = false;
-                        break;
-                    }
-                }
-                if (missing == true)
-                {
-                    DirectoryList.Add(directorypath);
-                }
-            }
-
-        }
 
 
         void GeneratePreferenceFiles()
@@ -562,12 +494,38 @@ namespace Lanstaller
             }
         }
 
-
+       
         //Copy files from list provided, directory list for folder generation (Including empty dirs)
         void CopyFiles()
         {
-            statusInfo.SetStage(3.1);
+            statusInfo.SetStage(2.1);
+            //Get File List from DB Directly.
+            //FCL = GetFiles(SInfo.id);
+
+            //Get File List from Web Api
+            FileCopyOperations = GetFilesListFromAPI(SInfo.id);
+            VerifyCopyOperations = new ConcurrentQueue<FileCopyOperation>();
+
+
+            //Get Directories, split up all sub directory paths and add to generation list.
+            statusInfo.SetStage(2.2);
+            foreach (string Dir in GetDirectoriesFromAPI(SInfo.id))
+            {
+                DirectoryList.Add(ReplaceVariable(Dir));
+            }
+
+            //Update destination paths.
+            statusInfo.SetStage(2.3);
+            foreach (FileCopyOperation FCO in FileCopyOperations)
+            {
+                FCO.destination = ReplaceVariable(FCO.destination);
+                //string filedirectory = FCO.destination.Substring(0, FCO.destination.LastIndexOf("\\"));
+                //GetSubFolders(filedirectory);
+            }
+            
+
             //Generate any required Directories for Files.
+            statusInfo.SetStage(3.1);
             foreach (string dir in DirectoryList)
             {
                 if (Directory.Exists(dir) == false)
@@ -598,7 +556,6 @@ namespace Lanstaller
                 VerifyCopyThread.Name = "Verify Copy Thread";
                 VerifyCopyThread.Start();
 
-
                 while (CopyIndex < FileCopyOperations.Count)
                 {
                     if (frmLanstaller.shutdownToken.IsCancellationRequested)
@@ -609,7 +566,7 @@ namespace Lanstaller
                     FileCopyOperation FCO = FileCopyOperations[CopyIndex];
 
                     //Verify existing files.
-                    if (File.Exists(FCO.destination))
+                    if (File.Exists(FCO.destination)) //Check directory first, prevent directory exception on file exists.
                     {
                         if (string.IsNullOrEmpty(FCO.fileinfo.hash))
                         {
@@ -646,9 +603,10 @@ namespace Lanstaller
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "Destination:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
+                        statusInfo.SetError("File copy failed - thread Abort Exception: " + ex.Message);
+                        //MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "Destination:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
                         //SetStatus("Download error:" + ex.ToString());
-                        Thread.Sleep(500);
+                        Thread.Sleep(5);
                         continue;
                     }
                 }
@@ -685,6 +643,7 @@ namespace Lanstaller
         }
 
 
+        //Public method for transfering file - used by redist.
         public static async void TransferFile(FileServer FileServer, string Source, string Destination)
         {
             if (FileServer.protocol == 1)
@@ -700,6 +659,7 @@ namespace Lanstaller
             }
         }
 
+        //Used for install file copy with local FileCopyOperations list.
         async void TransferFile(FileServer FileServer, int FileCopyIndex)
         {
             FileCopyOperation FCO = FileCopyOperations[FileCopyIndex];
@@ -712,18 +672,13 @@ namespace Lanstaller
                     smallDownloadtasks.Add(Task.Run(async () =>
                     {
                         await semaphore.WaitAsync();
-                        DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination);
+
+                        DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.size);
                         Task Dtask = DT.DownloadAsync();
-                        if (WANMode)
-                        {
-                            while (!Dtask.IsCompleted)
-                            {
-                                statusInfo.SetPartialState(FileCopyIndex, DT.downloadedbytes);
-                            }
-                        }
                         Dtask.Wait();
                         statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                         VerifyCopyOperations.Enqueue(FCO);
+
                         semaphore.Release();
                     }));
                 }
@@ -731,7 +686,7 @@ namespace Lanstaller
                 {
                     Task.WhenAll(smallDownloadtasks).Wait(); //Finish all smaller downloads.
 
-                    DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination);
+                    DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.size);
                     Task Dtask = DT.DownloadAsync();
                     while (!Dtask.IsCompleted)
                     {
@@ -740,6 +695,7 @@ namespace Lanstaller
                     Dtask.Wait();
                     statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                     VerifyCopyOperations.Enqueue(FCO);
+
                 }
             }
             else if (FileServer.protocol == 2) //SMB
