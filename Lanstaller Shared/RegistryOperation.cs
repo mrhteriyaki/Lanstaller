@@ -21,7 +21,7 @@ namespace LanstallerShared
         //qword = 11
 
         public string subkey;
-        public string value;
+        public string valueName;
         public string data;
 
         public static void AddRegistry(int softwareid, int hkey, string subkey, string value, int regtype, string data)
@@ -61,7 +61,7 @@ namespace LanstallerShared
                 RegistryOperation tReg = new RegistryOperation();
                 tReg.hkey = (int)SQLOutput[0]; //Hive Key.
                 tReg.subkey = SQLOutput[1].ToString(); //Sub Key.
-                tReg.value = SQLOutput[2].ToString();
+                tReg.valueName = SQLOutput[2].ToString();
                 tReg.regtype = (int)SQLOutput[3];
                 tReg.data = SQLOutput[4].ToString();
 

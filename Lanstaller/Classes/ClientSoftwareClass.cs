@@ -788,6 +788,12 @@ namespace Lanstaller
                     HKEY = Registry.Users.OpenSubKey(REGOP.subkey, true);
                 }
 
+                //Apply variables to registry Name.
+                if (REGOP.valueName != null)
+                {
+                    REGOP.valueName = ReplaceVariable(REGOP.valueName);
+                }
+
                 if ((RegistryValueKind)REGOP.regtype == RegistryValueKind.String || (RegistryValueKind)REGOP.regtype == RegistryValueKind.ExpandString)
                 {
                     //Update data with variable for string.
@@ -796,13 +802,16 @@ namespace Lanstaller
                     //Update data with serials.
                     REGOP.data = ReplaceSerial(REGOP.data);
                 }
+
+                //Set registry value.
+
                 try
                 {
-                    HKEY.SetValue(REGOP.value, REGOP.data, (RegistryValueKind)REGOP.regtype);
+                    HKEY.SetValue(REGOP.valueName, REGOP.data, (RegistryValueKind)REGOP.regtype);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error setting registry key " + REGOP.subkey + ":" + REGOP.value + "\n" + ex.ToString());
+                    MessageBox.Show("Error setting registry key " + REGOP.subkey + ":" + REGOP.valueName + "\n" + ex.ToString());
 
                 }
             }
