@@ -29,139 +29,159 @@ namespace Lanstaller_Management_Console
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.label1 = new System.Windows.Forms.Label();
-            this.btnNew = new System.Windows.Forms.Button();
-            this.lblVariable = new System.Windows.Forms.Label();
-            this.lblInstallInfo = new System.Windows.Forms.Label();
-            this.gbxInfo = new System.Windows.Forms.GroupBox();
-            this.btnRemove = new System.Windows.Forms.Button();
-            this.btnSecurity = new System.Windows.Forms.Button();
-            this.tmrProgress = new System.Windows.Forms.Timer(this.components);
-            this.lvSoftware = new System.Windows.Forms.ListView();
-            this.btnSetImage = new System.Windows.Forms.Button();
-            this.gbxInfo.SuspendLayout();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            label1 = new System.Windows.Forms.Label();
+            btnNew = new System.Windows.Forms.Button();
+            lblVariable = new System.Windows.Forms.Label();
+            lblInstallInfo = new System.Windows.Forms.Label();
+            gbxInfo = new System.Windows.Forms.GroupBox();
+            btnRemove = new System.Windows.Forms.Button();
+            btnSecurity = new System.Windows.Forms.Button();
+            tmrProgress = new System.Windows.Forms.Timer(components);
+            lvSoftware = new System.Windows.Forms.ListView();
+            btnSetImage = new System.Windows.Forms.Button();
+            btnLLA = new System.Windows.Forms.Button();
+            gbxInfo.SuspendLayout();
+            SuspendLayout();
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(5, 44);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(71, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Software List:";
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(6, 51);
+            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(77, 15);
+            label1.TabIndex = 1;
+            label1.Text = "Software List:";
             // 
             // btnNew
             // 
-            this.btnNew.Location = new System.Drawing.Point(503, 39);
-            this.btnNew.Name = "btnNew";
-            this.btnNew.Size = new System.Drawing.Size(75, 23);
-            this.btnNew.TabIndex = 2;
-            this.btnNew.Text = "Add New";
-            this.btnNew.UseVisualStyleBackColor = true;
-            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
+            btnNew.Location = new System.Drawing.Point(587, 45);
+            btnNew.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnNew.Name = "btnNew";
+            btnNew.Size = new System.Drawing.Size(88, 27);
+            btnNew.TabIndex = 2;
+            btnNew.Text = "Add New";
+            btnNew.UseVisualStyleBackColor = true;
+            btnNew.Click += btnNew_Click;
             // 
             // lblVariable
             // 
-            this.lblVariable.AutoSize = true;
-            this.lblVariable.Location = new System.Drawing.Point(215, 16);
-            this.lblVariable.Name = "lblVariable";
-            this.lblVariable.Size = new System.Drawing.Size(69, 13);
-            this.lblVariable.TabIndex = 20;
-            this.lblVariable.Text = "Variable Info:";
+            lblVariable.AutoSize = true;
+            lblVariable.Location = new System.Drawing.Point(251, 18);
+            lblVariable.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblVariable.Name = "lblVariable";
+            lblVariable.Size = new System.Drawing.Size(75, 15);
+            lblVariable.TabIndex = 20;
+            lblVariable.Text = "Variable Info:";
             // 
             // lblInstallInfo
             // 
-            this.lblInstallInfo.AutoSize = true;
-            this.lblInstallInfo.Location = new System.Drawing.Point(6, 16);
-            this.lblInstallInfo.Name = "lblInstallInfo";
-            this.lblInstallInfo.Size = new System.Drawing.Size(81, 13);
-            this.lblInstallInfo.TabIndex = 21;
-            this.lblInstallInfo.Text = "Installation Info:";
+            lblInstallInfo.AutoSize = true;
+            lblInstallInfo.Location = new System.Drawing.Point(7, 18);
+            lblInstallInfo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblInstallInfo.Name = "lblInstallInfo";
+            lblInstallInfo.Size = new System.Drawing.Size(92, 15);
+            lblInstallInfo.TabIndex = 21;
+            lblInstallInfo.Text = "Installation Info:";
             // 
             // gbxInfo
             // 
-            this.gbxInfo.Controls.Add(this.lblVariable);
-            this.gbxInfo.Controls.Add(this.lblInstallInfo);
-            this.gbxInfo.Location = new System.Drawing.Point(584, 62);
-            this.gbxInfo.Name = "gbxInfo";
-            this.gbxInfo.Size = new System.Drawing.Size(754, 110);
-            this.gbxInfo.TabIndex = 24;
-            this.gbxInfo.TabStop = false;
-            this.gbxInfo.Text = "Info";
+            gbxInfo.Controls.Add(lblVariable);
+            gbxInfo.Controls.Add(lblInstallInfo);
+            gbxInfo.Location = new System.Drawing.Point(681, 72);
+            gbxInfo.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxInfo.Name = "gbxInfo";
+            gbxInfo.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxInfo.Size = new System.Drawing.Size(880, 127);
+            gbxInfo.TabIndex = 24;
+            gbxInfo.TabStop = false;
+            gbxInfo.Text = "Info";
             // 
             // btnRemove
             // 
-            this.btnRemove.Location = new System.Drawing.Point(422, 39);
-            this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(75, 23);
-            this.btnRemove.TabIndex = 25;
-            this.btnRemove.Text = "Remove";
-            this.btnRemove.UseVisualStyleBackColor = true;
-            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+            btnRemove.Location = new System.Drawing.Point(492, 45);
+            btnRemove.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnRemove.Name = "btnRemove";
+            btnRemove.Size = new System.Drawing.Size(88, 27);
+            btnRemove.TabIndex = 25;
+            btnRemove.Text = "Remove";
+            btnRemove.UseVisualStyleBackColor = true;
+            btnRemove.Click += btnRemove_Click;
             // 
             // btnSecurity
             // 
-            this.btnSecurity.Location = new System.Drawing.Point(8, 4);
-            this.btnSecurity.Name = "btnSecurity";
-            this.btnSecurity.Size = new System.Drawing.Size(109, 23);
-            this.btnSecurity.TabIndex = 26;
-            this.btnSecurity.Text = "Security";
-            this.btnSecurity.UseVisualStyleBackColor = true;
-            this.btnSecurity.Click += new System.EventHandler(this.btnSecurity_Click);
+            btnSecurity.Location = new System.Drawing.Point(9, 5);
+            btnSecurity.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnSecurity.Name = "btnSecurity";
+            btnSecurity.Size = new System.Drawing.Size(127, 27);
+            btnSecurity.TabIndex = 26;
+            btnSecurity.Text = "Security";
+            btnSecurity.UseVisualStyleBackColor = true;
+            btnSecurity.Click += btnSecurity_Click;
             // 
             // tmrProgress
             // 
-            this.tmrProgress.Enabled = true;
-            this.tmrProgress.Interval = 1000;
-            this.tmrProgress.Tick += new System.EventHandler(this.tmrProgress_Tick);
+            tmrProgress.Enabled = true;
+            tmrProgress.Interval = 1000;
+            tmrProgress.Tick += tmrProgress_Tick;
             // 
             // lvSoftware
             // 
-            this.lvSoftware.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.lvSoftware.FullRowSelect = true;
-            this.lvSoftware.GridLines = true;
-            this.lvSoftware.HideSelection = false;
-            this.lvSoftware.Location = new System.Drawing.Point(8, 68);
-            this.lvSoftware.Name = "lvSoftware";
-            this.lvSoftware.Size = new System.Drawing.Size(570, 623);
-            this.lvSoftware.TabIndex = 27;
-            this.lvSoftware.UseCompatibleStateImageBehavior = false;
-            this.lvSoftware.View = System.Windows.Forms.View.Details;
-            this.lvSoftware.SelectedIndexChanged += new System.EventHandler(this.lvSoftware_SelectedIndexChanged);
+            lvSoftware.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            lvSoftware.FullRowSelect = true;
+            lvSoftware.GridLines = true;
+            lvSoftware.Location = new System.Drawing.Point(9, 78);
+            lvSoftware.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            lvSoftware.Name = "lvSoftware";
+            lvSoftware.Size = new System.Drawing.Size(664, 718);
+            lvSoftware.TabIndex = 27;
+            lvSoftware.UseCompatibleStateImageBehavior = false;
+            lvSoftware.View = System.Windows.Forms.View.Details;
+            lvSoftware.SelectedIndexChanged += lvSoftware_SelectedIndexChanged;
             // 
             // btnSetImage
             // 
-            this.btnSetImage.Location = new System.Drawing.Point(271, 39);
-            this.btnSetImage.Name = "btnSetImage";
-            this.btnSetImage.Size = new System.Drawing.Size(90, 23);
-            this.btnSetImage.TabIndex = 28;
-            this.btnSetImage.Text = "Set Icon Image";
-            this.btnSetImage.UseVisualStyleBackColor = true;
-            this.btnSetImage.Click += new System.EventHandler(this.btnSetImage_Click);
+            btnSetImage.Location = new System.Drawing.Point(361, 45);
+            btnSetImage.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnSetImage.Name = "btnSetImage";
+            btnSetImage.Size = new System.Drawing.Size(105, 27);
+            btnSetImage.TabIndex = 28;
+            btnSetImage.Text = "Set Icon Image";
+            btnSetImage.UseVisualStyleBackColor = true;
+            btnSetImage.Click += btnSetImage_Click;
+            // 
+            // btnLLA
+            // 
+            btnLLA.Location = new System.Drawing.Point(234, 45);
+            btnLLA.Name = "btnLLA";
+            btnLLA.Size = new System.Drawing.Size(120, 27);
+            btnLLA.TabIndex = 29;
+            btnLLA.Text = "LLA Check";
+            btnLLA.UseVisualStyleBackColor = true;
+            btnLLA.Click += btnLLA_Click;
             // 
             // frmLanstallerManager
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1349, 703);
-            this.Controls.Add(this.btnSetImage);
-            this.Controls.Add(this.lvSoftware);
-            this.Controls.Add(this.btnSecurity);
-            this.Controls.Add(this.btnRemove);
-            this.Controls.Add(this.gbxInfo);
-            this.Controls.Add(this.btnNew);
-            this.Controls.Add(this.label1);
-            this.Name = "frmLanstallerManager";
-            this.Text = "Lanstaller Management";
-            this.Load += new System.EventHandler(this.frmLanstallerMmanager_Load);
-            this.gbxInfo.ResumeLayout(false);
-            this.gbxInfo.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(1574, 811);
+            Controls.Add(btnLLA);
+            Controls.Add(btnSetImage);
+            Controls.Add(lvSoftware);
+            Controls.Add(btnSecurity);
+            Controls.Add(btnRemove);
+            Controls.Add(gbxInfo);
+            Controls.Add(btnNew);
+            Controls.Add(label1);
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "frmLanstallerManager";
+            Text = "Lanstaller Management";
+            Load += frmLanstallerMmanager_Load;
+            gbxInfo.ResumeLayout(false);
+            gbxInfo.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -175,6 +195,7 @@ namespace Lanstaller_Management_Console
         private System.Windows.Forms.Timer tmrProgress;
         private System.Windows.Forms.ListView lvSoftware;
         private System.Windows.Forms.Button btnSetImage;
+        private System.Windows.Forms.Button btnLLA;
     }
 }
 

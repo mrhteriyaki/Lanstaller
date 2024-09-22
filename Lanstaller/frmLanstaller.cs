@@ -21,7 +21,7 @@ namespace Lanstaller
 
     public partial class frmLanstaller : Form
     {
-        static readonly Double Version = 0.23; //Increment Version in tblSystem when changed.
+        static readonly Double Version = 0.24; //Increment Version in tblSystem when changed.
         readonly static string LanstallerDataDir = "C:\\ProgramData\\Lanstaller\\";
         LocalDatabase LocalDB;
 
@@ -62,7 +62,7 @@ namespace Lanstaller
 
             foreach (string cfile in core_files)
             {
-                if (!System.IO.File.Exists(AppDomain.CurrentDomain.BaseDirectory + cfile))
+                if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + cfile))
                 {
                     MessageBox.Show("Missing resource file: " + cfile);
                     Application.Exit();
@@ -108,6 +108,7 @@ namespace Lanstaller
                 Application.Exit();
             }
             Logging.LogToFile("Lanstaller Started");
+
 
         }
 

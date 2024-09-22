@@ -29,496 +29,522 @@ namespace Lanstaller
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmLanstaller));
-            this.btnInstall = new System.Windows.Forms.Button();
-            this.txtInstallDirectory = new System.Windows.Forms.TextBox();
-            this.lblinstDir = new System.Windows.Forms.Label();
-            this.gbxActions = new System.Windows.Forms.GroupBox();
-            this.chkRedist = new System.Windows.Forms.CheckBox();
-            this.chkWindowsSettings = new System.Windows.Forms.CheckBox();
-            this.chkPreferences = new System.Windows.Forms.CheckBox();
-            this.chkShortcuts = new System.Windows.Forms.CheckBox();
-            this.chkRegistry = new System.Windows.Forms.CheckBox();
-            this.chkFiles = new System.Windows.Forms.CheckBox();
-            this.gbxPref = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtHeight = new System.Windows.Forms.TextBox();
-            this.txtWidth = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtUsername = new System.Windows.Forms.TextBox();
-            this.gbxStatus = new System.Windows.Forms.GroupBox();
-            this.pbInstall = new System.Windows.Forms.ProgressBar();
-            this.lblStatus = new System.Windows.Forms.Label();
-            this.txtChatMessages = new System.Windows.Forms.TextBox();
-            this.txtChatSendMessage = new System.Windows.Forms.TextBox();
-            this.lblSpaceRequired = new System.Windows.Forms.Label();
-            this.pbTitleExpanded = new System.Windows.Forms.PictureBox();
-            this.btnExit = new System.Windows.Forms.Button();
-            this.pbTitle = new System.Windows.Forms.PictureBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.tmrRefresh = new System.Windows.Forms.Timer(this.components);
-            this.lvSoftware = new System.Windows.Forms.ListView();
-            this.pbBottomright = new System.Windows.Forms.PictureBox();
-            this.btnMin = new System.Windows.Forms.Button();
-            this.csmSoftware = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.reinstallToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.lblWANMode = new System.Windows.Forms.Label();
-            this.gbxActions.SuspendLayout();
-            this.gbxPref.SuspendLayout();
-            this.gbxStatus.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTitleExpanded)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTitle)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbBottomright)).BeginInit();
-            this.csmSoftware.SuspendLayout();
-            this.SuspendLayout();
+            btnInstall = new System.Windows.Forms.Button();
+            txtInstallDirectory = new System.Windows.Forms.TextBox();
+            lblinstDir = new System.Windows.Forms.Label();
+            gbxActions = new System.Windows.Forms.GroupBox();
+            chkRedist = new System.Windows.Forms.CheckBox();
+            chkWindowsSettings = new System.Windows.Forms.CheckBox();
+            chkPreferences = new System.Windows.Forms.CheckBox();
+            chkShortcuts = new System.Windows.Forms.CheckBox();
+            chkRegistry = new System.Windows.Forms.CheckBox();
+            chkFiles = new System.Windows.Forms.CheckBox();
+            gbxPref = new System.Windows.Forms.GroupBox();
+            label5 = new System.Windows.Forms.Label();
+            label3 = new System.Windows.Forms.Label();
+            txtHeight = new System.Windows.Forms.TextBox();
+            txtWidth = new System.Windows.Forms.TextBox();
+            label2 = new System.Windows.Forms.Label();
+            txtUsername = new System.Windows.Forms.TextBox();
+            gbxStatus = new System.Windows.Forms.GroupBox();
+            pbInstall = new System.Windows.Forms.ProgressBar();
+            lblStatus = new System.Windows.Forms.Label();
+            txtChatMessages = new System.Windows.Forms.TextBox();
+            txtChatSendMessage = new System.Windows.Forms.TextBox();
+            lblSpaceRequired = new System.Windows.Forms.Label();
+            pbTitleExpanded = new System.Windows.Forms.PictureBox();
+            btnExit = new System.Windows.Forms.Button();
+            pbTitle = new System.Windows.Forms.PictureBox();
+            label4 = new System.Windows.Forms.Label();
+            tmrRefresh = new System.Windows.Forms.Timer(components);
+            lvSoftware = new System.Windows.Forms.ListView();
+            pbBottomright = new System.Windows.Forms.PictureBox();
+            btnMin = new System.Windows.Forms.Button();
+            csmSoftware = new System.Windows.Forms.ContextMenuStrip(components);
+            reinstallToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            lblWANMode = new System.Windows.Forms.Label();
+            gbxActions.SuspendLayout();
+            gbxPref.SuspendLayout();
+            gbxStatus.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pbTitleExpanded).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbTitle).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)pbBottomright).BeginInit();
+            csmSoftware.SuspendLayout();
+            SuspendLayout();
             // 
             // btnInstall
             // 
-            this.btnInstall.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnInstall.BackgroundImage")));
-            this.btnInstall.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btnInstall.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnInstall.ForeColor = System.Drawing.Color.White;
-            this.btnInstall.Location = new System.Drawing.Point(305, 381);
-            this.btnInstall.Name = "btnInstall";
-            this.btnInstall.Size = new System.Drawing.Size(260, 70);
-            this.btnInstall.TabIndex = 2;
-            this.btnInstall.Text = "Install";
-            this.btnInstall.UseVisualStyleBackColor = true;
-            this.btnInstall.Click += new System.EventHandler(this.btnInstall_Click);
+            btnInstall.BackgroundImage = (System.Drawing.Image)resources.GetObject("btnInstall.BackgroundImage");
+            btnInstall.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            btnInstall.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            btnInstall.ForeColor = System.Drawing.Color.White;
+            btnInstall.Location = new System.Drawing.Point(356, 440);
+            btnInstall.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnInstall.Name = "btnInstall";
+            btnInstall.Size = new System.Drawing.Size(239, 64);
+            btnInstall.TabIndex = 2;
+            btnInstall.Text = "Install";
+            btnInstall.UseVisualStyleBackColor = true;
+            btnInstall.Click += btnInstall_Click;
             // 
             // txtInstallDirectory
             // 
-            this.txtInstallDirectory.BackColor = System.Drawing.Color.Black;
-            this.txtInstallDirectory.ForeColor = System.Drawing.Color.White;
-            this.txtInstallDirectory.Location = new System.Drawing.Point(305, 110);
-            this.txtInstallDirectory.Name = "txtInstallDirectory";
-            this.txtInstallDirectory.Size = new System.Drawing.Size(260, 20);
-            this.txtInstallDirectory.TabIndex = 5;
-            this.txtInstallDirectory.TextChanged += new System.EventHandler(this.txtInstallDirectory_TextChanged);
+            txtInstallDirectory.BackColor = System.Drawing.Color.Black;
+            txtInstallDirectory.ForeColor = System.Drawing.Color.White;
+            txtInstallDirectory.Location = new System.Drawing.Point(356, 127);
+            txtInstallDirectory.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtInstallDirectory.Name = "txtInstallDirectory";
+            txtInstallDirectory.Size = new System.Drawing.Size(239, 23);
+            txtInstallDirectory.TabIndex = 5;
+            txtInstallDirectory.TextChanged += txtInstallDirectory_TextChanged;
             // 
             // lblinstDir
             // 
-            this.lblinstDir.AutoSize = true;
-            this.lblinstDir.ForeColor = System.Drawing.Color.White;
-            this.lblinstDir.Location = new System.Drawing.Point(302, 94);
-            this.lblinstDir.Name = "lblinstDir";
-            this.lblinstDir.Size = new System.Drawing.Size(82, 13);
-            this.lblinstDir.TabIndex = 6;
-            this.lblinstDir.Text = "Install Directory:";
+            lblinstDir.AutoSize = true;
+            lblinstDir.ForeColor = System.Drawing.Color.White;
+            lblinstDir.Location = new System.Drawing.Point(352, 108);
+            lblinstDir.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblinstDir.Name = "lblinstDir";
+            lblinstDir.Size = new System.Drawing.Size(92, 15);
+            lblinstDir.TabIndex = 6;
+            lblinstDir.Text = "Install Directory:";
             // 
             // gbxActions
             // 
-            this.gbxActions.Controls.Add(this.chkRedist);
-            this.gbxActions.Controls.Add(this.chkWindowsSettings);
-            this.gbxActions.Controls.Add(this.chkPreferences);
-            this.gbxActions.Controls.Add(this.chkShortcuts);
-            this.gbxActions.Controls.Add(this.chkRegistry);
-            this.gbxActions.Controls.Add(this.chkFiles);
-            this.gbxActions.ForeColor = System.Drawing.Color.White;
-            this.gbxActions.Location = new System.Drawing.Point(305, 149);
-            this.gbxActions.Name = "gbxActions";
-            this.gbxActions.Size = new System.Drawing.Size(260, 146);
-            this.gbxActions.TabIndex = 8;
-            this.gbxActions.TabStop = false;
-            this.gbxActions.Text = "Actions:";
+            gbxActions.Controls.Add(chkRedist);
+            gbxActions.Controls.Add(chkWindowsSettings);
+            gbxActions.Controls.Add(chkPreferences);
+            gbxActions.Controls.Add(chkShortcuts);
+            gbxActions.Controls.Add(chkRegistry);
+            gbxActions.Controls.Add(chkFiles);
+            gbxActions.ForeColor = System.Drawing.Color.White;
+            gbxActions.Location = new System.Drawing.Point(356, 172);
+            gbxActions.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxActions.Name = "gbxActions";
+            gbxActions.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxActions.Size = new System.Drawing.Size(239, 168);
+            gbxActions.TabIndex = 8;
+            gbxActions.TabStop = false;
+            gbxActions.Text = "Actions:";
             // 
             // chkRedist
             // 
-            this.chkRedist.AutoSize = true;
-            this.chkRedist.Checked = true;
-            this.chkRedist.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkRedist.ForeColor = System.Drawing.Color.White;
-            this.chkRedist.Location = new System.Drawing.Point(5, 120);
-            this.chkRedist.Name = "chkRedist";
-            this.chkRedist.Size = new System.Drawing.Size(101, 17);
-            this.chkRedist.TabIndex = 5;
-            this.chkRedist.Text = "Redistributables";
-            this.chkRedist.UseVisualStyleBackColor = true;
+            chkRedist.AutoSize = true;
+            chkRedist.Checked = true;
+            chkRedist.CheckState = System.Windows.Forms.CheckState.Checked;
+            chkRedist.ForeColor = System.Drawing.Color.White;
+            chkRedist.Location = new System.Drawing.Point(6, 138);
+            chkRedist.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkRedist.Name = "chkRedist";
+            chkRedist.Size = new System.Drawing.Size(110, 19);
+            chkRedist.TabIndex = 5;
+            chkRedist.Text = "Redistributables";
+            chkRedist.UseVisualStyleBackColor = true;
             // 
             // chkWindowsSettings
             // 
-            this.chkWindowsSettings.AutoSize = true;
-            this.chkWindowsSettings.Checked = true;
-            this.chkWindowsSettings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkWindowsSettings.ForeColor = System.Drawing.Color.White;
-            this.chkWindowsSettings.Location = new System.Drawing.Point(5, 100);
-            this.chkWindowsSettings.Name = "chkWindowsSettings";
-            this.chkWindowsSettings.Size = new System.Drawing.Size(111, 17);
-            this.chkWindowsSettings.TabIndex = 4;
-            this.chkWindowsSettings.Text = "Windows Settings";
-            this.chkWindowsSettings.UseVisualStyleBackColor = true;
+            chkWindowsSettings.AutoSize = true;
+            chkWindowsSettings.Checked = true;
+            chkWindowsSettings.CheckState = System.Windows.Forms.CheckState.Checked;
+            chkWindowsSettings.ForeColor = System.Drawing.Color.White;
+            chkWindowsSettings.Location = new System.Drawing.Point(6, 115);
+            chkWindowsSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkWindowsSettings.Name = "chkWindowsSettings";
+            chkWindowsSettings.Size = new System.Drawing.Size(120, 19);
+            chkWindowsSettings.TabIndex = 4;
+            chkWindowsSettings.Text = "Windows Settings";
+            chkWindowsSettings.UseVisualStyleBackColor = true;
             // 
             // chkPreferences
             // 
-            this.chkPreferences.AutoSize = true;
-            this.chkPreferences.Checked = true;
-            this.chkPreferences.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkPreferences.ForeColor = System.Drawing.Color.White;
-            this.chkPreferences.Location = new System.Drawing.Point(5, 80);
-            this.chkPreferences.Name = "chkPreferences";
-            this.chkPreferences.Size = new System.Drawing.Size(108, 17);
-            this.chkPreferences.TabIndex = 3;
-            this.chkPreferences.Text = "User Preferences";
-            this.chkPreferences.UseVisualStyleBackColor = true;
+            chkPreferences.AutoSize = true;
+            chkPreferences.Checked = true;
+            chkPreferences.CheckState = System.Windows.Forms.CheckState.Checked;
+            chkPreferences.ForeColor = System.Drawing.Color.White;
+            chkPreferences.Location = new System.Drawing.Point(6, 92);
+            chkPreferences.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkPreferences.Name = "chkPreferences";
+            chkPreferences.Size = new System.Drawing.Size(113, 19);
+            chkPreferences.TabIndex = 3;
+            chkPreferences.Text = "User Preferences";
+            chkPreferences.UseVisualStyleBackColor = true;
             // 
             // chkShortcuts
             // 
-            this.chkShortcuts.AutoSize = true;
-            this.chkShortcuts.Checked = true;
-            this.chkShortcuts.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShortcuts.ForeColor = System.Drawing.Color.White;
-            this.chkShortcuts.Location = new System.Drawing.Point(5, 60);
-            this.chkShortcuts.Name = "chkShortcuts";
-            this.chkShortcuts.Size = new System.Drawing.Size(71, 17);
-            this.chkShortcuts.TabIndex = 2;
-            this.chkShortcuts.Text = "Shortcuts";
-            this.chkShortcuts.UseVisualStyleBackColor = true;
+            chkShortcuts.AutoSize = true;
+            chkShortcuts.Checked = true;
+            chkShortcuts.CheckState = System.Windows.Forms.CheckState.Checked;
+            chkShortcuts.ForeColor = System.Drawing.Color.White;
+            chkShortcuts.Location = new System.Drawing.Point(6, 69);
+            chkShortcuts.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkShortcuts.Name = "chkShortcuts";
+            chkShortcuts.Size = new System.Drawing.Size(76, 19);
+            chkShortcuts.TabIndex = 2;
+            chkShortcuts.Text = "Shortcuts";
+            chkShortcuts.UseVisualStyleBackColor = true;
             // 
             // chkRegistry
             // 
-            this.chkRegistry.AutoSize = true;
-            this.chkRegistry.Checked = true;
-            this.chkRegistry.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkRegistry.ForeColor = System.Drawing.Color.White;
-            this.chkRegistry.Location = new System.Drawing.Point(5, 40);
-            this.chkRegistry.Name = "chkRegistry";
-            this.chkRegistry.Size = new System.Drawing.Size(64, 17);
-            this.chkRegistry.TabIndex = 1;
-            this.chkRegistry.Text = "Registry";
-            this.chkRegistry.UseVisualStyleBackColor = true;
+            chkRegistry.AutoSize = true;
+            chkRegistry.Checked = true;
+            chkRegistry.CheckState = System.Windows.Forms.CheckState.Checked;
+            chkRegistry.ForeColor = System.Drawing.Color.White;
+            chkRegistry.Location = new System.Drawing.Point(6, 46);
+            chkRegistry.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkRegistry.Name = "chkRegistry";
+            chkRegistry.Size = new System.Drawing.Size(68, 19);
+            chkRegistry.TabIndex = 1;
+            chkRegistry.Text = "Registry";
+            chkRegistry.UseVisualStyleBackColor = true;
             // 
             // chkFiles
             // 
-            this.chkFiles.AutoSize = true;
-            this.chkFiles.Checked = true;
-            this.chkFiles.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkFiles.ForeColor = System.Drawing.Color.White;
-            this.chkFiles.Location = new System.Drawing.Point(5, 20);
-            this.chkFiles.Name = "chkFiles";
-            this.chkFiles.Size = new System.Drawing.Size(74, 17);
-            this.chkFiles.TabIndex = 0;
-            this.chkFiles.Text = "Copy Files";
-            this.chkFiles.UseVisualStyleBackColor = true;
+            chkFiles.AutoSize = true;
+            chkFiles.Checked = true;
+            chkFiles.CheckState = System.Windows.Forms.CheckState.Checked;
+            chkFiles.ForeColor = System.Drawing.Color.White;
+            chkFiles.Location = new System.Drawing.Point(6, 23);
+            chkFiles.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkFiles.Name = "chkFiles";
+            chkFiles.Size = new System.Drawing.Size(80, 19);
+            chkFiles.TabIndex = 0;
+            chkFiles.Text = "Copy Files";
+            chkFiles.UseVisualStyleBackColor = true;
             // 
             // gbxPref
             // 
-            this.gbxPref.Controls.Add(this.label5);
-            this.gbxPref.Controls.Add(this.label3);
-            this.gbxPref.Controls.Add(this.txtHeight);
-            this.gbxPref.Controls.Add(this.txtWidth);
-            this.gbxPref.Controls.Add(this.label2);
-            this.gbxPref.Controls.Add(this.txtUsername);
-            this.gbxPref.ForeColor = System.Drawing.Color.White;
-            this.gbxPref.Location = new System.Drawing.Point(305, 301);
-            this.gbxPref.Name = "gbxPref";
-            this.gbxPref.Size = new System.Drawing.Size(260, 74);
-            this.gbxPref.TabIndex = 9;
-            this.gbxPref.TabStop = false;
-            this.gbxPref.Text = "User Preferences";
+            gbxPref.Controls.Add(label5);
+            gbxPref.Controls.Add(label3);
+            gbxPref.Controls.Add(txtHeight);
+            gbxPref.Controls.Add(txtWidth);
+            gbxPref.Controls.Add(label2);
+            gbxPref.Controls.Add(txtUsername);
+            gbxPref.ForeColor = System.Drawing.Color.White;
+            gbxPref.Location = new System.Drawing.Point(356, 347);
+            gbxPref.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxPref.Name = "gbxPref";
+            gbxPref.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxPref.Size = new System.Drawing.Size(239, 85);
+            gbxPref.TabIndex = 9;
+            gbxPref.TabStop = false;
+            gbxPref.Text = "User Preferences";
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.ForeColor = System.Drawing.Color.White;
-            this.label5.Location = new System.Drawing.Point(124, 48);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(14, 13);
-            this.label5.TabIndex = 6;
-            this.label5.Text = "X";
+            label5.AutoSize = true;
+            label5.ForeColor = System.Drawing.Color.White;
+            label5.Location = new System.Drawing.Point(149, 53);
+            label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(14, 15);
+            label5.TabIndex = 6;
+            label5.Text = "X";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location = new System.Drawing.Point(7, 48);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(60, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Resolution:";
+            label3.AutoSize = true;
+            label3.ForeColor = System.Drawing.Color.White;
+            label3.Location = new System.Drawing.Point(12, 53);
+            label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(66, 15);
+            label3.TabIndex = 4;
+            label3.Text = "Resolution:";
             // 
             // txtHeight
             // 
-            this.txtHeight.BackColor = System.Drawing.Color.Black;
-            this.txtHeight.ForeColor = System.Drawing.Color.White;
-            this.txtHeight.Location = new System.Drawing.Point(138, 45);
-            this.txtHeight.Name = "txtHeight";
-            this.txtHeight.Size = new System.Drawing.Size(55, 20);
-            this.txtHeight.TabIndex = 3;
-            this.txtHeight.TextChanged += new System.EventHandler(this.txtHeight_TextChanged);
+            txtHeight.BackColor = System.Drawing.Color.Black;
+            txtHeight.ForeColor = System.Drawing.Color.White;
+            txtHeight.Location = new System.Drawing.Point(165, 50);
+            txtHeight.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtHeight.Name = "txtHeight";
+            txtHeight.Size = new System.Drawing.Size(63, 23);
+            txtHeight.TabIndex = 3;
+            txtHeight.TextChanged += txtHeight_TextChanged;
             // 
             // txtWidth
             // 
-            this.txtWidth.BackColor = System.Drawing.Color.Black;
-            this.txtWidth.ForeColor = System.Drawing.Color.White;
-            this.txtWidth.Location = new System.Drawing.Point(68, 45);
-            this.txtWidth.Name = "txtWidth";
-            this.txtWidth.Size = new System.Drawing.Size(55, 20);
-            this.txtWidth.TabIndex = 2;
-            this.txtWidth.TextChanged += new System.EventHandler(this.txtWidth_TextChanged);
+            txtWidth.BackColor = System.Drawing.Color.Black;
+            txtWidth.ForeColor = System.Drawing.Color.White;
+            txtWidth.Location = new System.Drawing.Point(83, 50);
+            txtWidth.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtWidth.Name = "txtWidth";
+            txtWidth.Size = new System.Drawing.Size(63, 23);
+            txtWidth.TabIndex = 2;
+            txtWidth.TextChanged += txtWidth_TextChanged;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.ForeColor = System.Drawing.Color.White;
-            this.label2.Location = new System.Drawing.Point(4, 21);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(58, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Username:";
+            label2.AutoSize = true;
+            label2.ForeColor = System.Drawing.Color.White;
+            label2.Location = new System.Drawing.Point(9, 22);
+            label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(63, 15);
+            label2.TabIndex = 1;
+            label2.Text = "Username:";
             // 
             // txtUsername
             // 
-            this.txtUsername.BackColor = System.Drawing.Color.Black;
-            this.txtUsername.ForeColor = System.Drawing.Color.White;
-            this.txtUsername.Location = new System.Drawing.Point(68, 19);
-            this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(186, 20);
-            this.txtUsername.TabIndex = 0;
-            this.txtUsername.TextChanged += new System.EventHandler(this.txtUsername_TextChanged);
+            txtUsername.BackColor = System.Drawing.Color.Black;
+            txtUsername.ForeColor = System.Drawing.Color.White;
+            txtUsername.Location = new System.Drawing.Point(83, 20);
+            txtUsername.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new System.Drawing.Size(145, 23);
+            txtUsername.TabIndex = 0;
+            txtUsername.TextChanged += txtUsername_TextChanged;
             // 
             // gbxStatus
             // 
-            this.gbxStatus.Controls.Add(this.pbInstall);
-            this.gbxStatus.Controls.Add(this.lblStatus);
-            this.gbxStatus.ForeColor = System.Drawing.Color.White;
-            this.gbxStatus.Location = new System.Drawing.Point(305, 457);
-            this.gbxStatus.Name = "gbxStatus";
-            this.gbxStatus.Size = new System.Drawing.Size(260, 122);
-            this.gbxStatus.TabIndex = 10;
-            this.gbxStatus.TabStop = false;
-            this.gbxStatus.Text = "Status";
+            gbxStatus.Controls.Add(pbInstall);
+            gbxStatus.Controls.Add(lblStatus);
+            gbxStatus.ForeColor = System.Drawing.Color.White;
+            gbxStatus.Location = new System.Drawing.Point(356, 505);
+            gbxStatus.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxStatus.Name = "gbxStatus";
+            gbxStatus.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxStatus.Size = new System.Drawing.Size(239, 166);
+            gbxStatus.TabIndex = 10;
+            gbxStatus.TabStop = false;
+            gbxStatus.Text = "Status";
             // 
             // pbInstall
             // 
-            this.pbInstall.Enabled = false;
-            this.pbInstall.Location = new System.Drawing.Point(6, 94);
-            this.pbInstall.Name = "pbInstall";
-            this.pbInstall.Size = new System.Drawing.Size(248, 22);
-            this.pbInstall.TabIndex = 1;
+            pbInstall.Enabled = false;
+            pbInstall.Location = new System.Drawing.Point(6, 134);
+            pbInstall.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pbInstall.Name = "pbInstall";
+            pbInstall.Size = new System.Drawing.Size(224, 25);
+            pbInstall.TabIndex = 1;
             // 
             // lblStatus
             // 
-            this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(5, 17);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(74, 13);
-            this.lblStatus.TabIndex = 0;
-            this.lblStatus.Text = "Status: Ready";
+            lblStatus.AutoSize = true;
+            lblStatus.Location = new System.Drawing.Point(6, 20);
+            lblStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new System.Drawing.Size(77, 15);
+            lblStatus.TabIndex = 0;
+            lblStatus.Text = "Status: Ready";
             // 
             // txtChatMessages
             // 
-            this.txtChatMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtChatMessages.BackColor = System.Drawing.Color.Black;
-            this.txtChatMessages.ForeColor = System.Drawing.Color.White;
-            this.txtChatMessages.Location = new System.Drawing.Point(574, 96);
-            this.txtChatMessages.Multiline = true;
-            this.txtChatMessages.Name = "txtChatMessages";
-            this.txtChatMessages.ReadOnly = true;
-            this.txtChatMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtChatMessages.Size = new System.Drawing.Size(366, 457);
-            this.txtChatMessages.TabIndex = 11;
+            txtChatMessages.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            txtChatMessages.BackColor = System.Drawing.Color.Black;
+            txtChatMessages.ForeColor = System.Drawing.Color.White;
+            txtChatMessages.Location = new System.Drawing.Point(603, 116);
+            txtChatMessages.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtChatMessages.Multiline = true;
+            txtChatMessages.Name = "txtChatMessages";
+            txtChatMessages.ReadOnly = true;
+            txtChatMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            txtChatMessages.Size = new System.Drawing.Size(405, 527);
+            txtChatMessages.TabIndex = 11;
             // 
             // txtChatSendMessage
             // 
-            this.txtChatSendMessage.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtChatSendMessage.BackColor = System.Drawing.Color.Black;
-            this.txtChatSendMessage.ForeColor = System.Drawing.Color.White;
-            this.txtChatSendMessage.Location = new System.Drawing.Point(609, 559);
-            this.txtChatSendMessage.Name = "txtChatSendMessage";
-            this.txtChatSendMessage.Size = new System.Drawing.Size(322, 20);
-            this.txtChatSendMessage.TabIndex = 12;
-            this.txtChatSendMessage.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtChatSendMessage_KeyUp);
+            txtChatSendMessage.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            txtChatSendMessage.BackColor = System.Drawing.Color.Black;
+            txtChatSendMessage.ForeColor = System.Drawing.Color.White;
+            txtChatSendMessage.Location = new System.Drawing.Point(643, 647);
+            txtChatSendMessage.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtChatSendMessage.Name = "txtChatSendMessage";
+            txtChatSendMessage.Size = new System.Drawing.Size(344, 23);
+            txtChatSendMessage.TabIndex = 12;
+            txtChatSendMessage.KeyUp += txtChatSendMessage_KeyUp;
             // 
             // lblSpaceRequired
             // 
-            this.lblSpaceRequired.AutoSize = true;
-            this.lblSpaceRequired.ForeColor = System.Drawing.Color.White;
-            this.lblSpaceRequired.Location = new System.Drawing.Point(302, 133);
-            this.lblSpaceRequired.Name = "lblSpaceRequired";
-            this.lblSpaceRequired.Size = new System.Drawing.Size(87, 13);
-            this.lblSpaceRequired.TabIndex = 16;
-            this.lblSpaceRequired.Text = "Space Required:";
+            lblSpaceRequired.AutoSize = true;
+            lblSpaceRequired.ForeColor = System.Drawing.Color.White;
+            lblSpaceRequired.Location = new System.Drawing.Point(352, 153);
+            lblSpaceRequired.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblSpaceRequired.Name = "lblSpaceRequired";
+            lblSpaceRequired.Size = new System.Drawing.Size(91, 15);
+            lblSpaceRequired.TabIndex = 16;
+            lblSpaceRequired.Text = "Space Required:";
             // 
             // pbTitleExpanded
             // 
-            this.pbTitleExpanded.BackColor = System.Drawing.Color.Transparent;
-            this.pbTitleExpanded.ErrorImage = null;
-            this.pbTitleExpanded.InitialImage = null;
-            this.pbTitleExpanded.Location = new System.Drawing.Point(0, 0);
-            this.pbTitleExpanded.Name = "pbTitleExpanded";
-            this.pbTitleExpanded.Size = new System.Drawing.Size(967, 90);
-            this.pbTitleExpanded.TabIndex = 17;
-            this.pbTitleExpanded.TabStop = false;
-            this.pbTitleExpanded.Click += new System.EventHandler(this.pbTitleExpanded_Click);
-            this.pbTitleExpanded.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Caption_MouseDown);
+            pbTitleExpanded.BackColor = System.Drawing.Color.Transparent;
+            pbTitleExpanded.ErrorImage = null;
+            pbTitleExpanded.InitialImage = null;
+            pbTitleExpanded.Location = new System.Drawing.Point(0, 0);
+            pbTitleExpanded.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pbTitleExpanded.Name = "pbTitleExpanded";
+            pbTitleExpanded.Size = new System.Drawing.Size(1026, 104);
+            pbTitleExpanded.TabIndex = 17;
+            pbTitleExpanded.TabStop = false;
+            pbTitleExpanded.Click += pbTitleExpanded_Click;
+            pbTitleExpanded.MouseDown += Caption_MouseDown;
             // 
             // btnExit
             // 
-            this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnExit.ForeColor = System.Drawing.Color.White;
-            this.btnExit.Location = new System.Drawing.Point(922, 0);
-            this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(30, 29);
-            this.btnExit.TabIndex = 18;
-            this.btnExit.Text = "X";
-            this.btnExit.UseVisualStyleBackColor = true;
-            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
+            btnExit.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            btnExit.ForeColor = System.Drawing.Color.White;
+            btnExit.Location = new System.Drawing.Point(980, 0);
+            btnExit.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnExit.Name = "btnExit";
+            btnExit.Size = new System.Drawing.Size(35, 33);
+            btnExit.TabIndex = 18;
+            btnExit.Text = "X";
+            btnExit.UseVisualStyleBackColor = true;
+            btnExit.Click += btnExit_Click;
             // 
             // pbTitle
             // 
-            this.pbTitle.BackgroundImage = global::Lanstaller.Properties.Resources.LanstallerThin;
-            this.pbTitle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pbTitle.InitialImage = null;
-            this.pbTitle.Location = new System.Drawing.Point(90, 5);
-            this.pbTitle.Name = "pbTitle";
-            this.pbTitle.Size = new System.Drawing.Size(748, 83);
-            this.pbTitle.TabIndex = 7;
-            this.pbTitle.TabStop = false;
-            this.pbTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Caption_MouseDown);
+            pbTitle.BackgroundImage = Properties.Resources.LanstallerThin;
+            pbTitle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            pbTitle.InitialImage = null;
+            pbTitle.Location = new System.Drawing.Point(13, 6);
+            pbTitle.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pbTitle.Name = "pbTitle";
+            pbTitle.Size = new System.Drawing.Size(873, 96);
+            pbTitle.TabIndex = 7;
+            pbTitle.TabStop = false;
+            pbTitle.MouseDown += Caption_MouseDown;
             // 
             // label4
             // 
-            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.label4.AutoSize = true;
-            this.label4.ForeColor = System.Drawing.Color.White;
-            this.label4.Location = new System.Drawing.Point(571, 562);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(32, 13);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Chat:";
+            label4.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            label4.AutoSize = true;
+            label4.ForeColor = System.Drawing.Color.White;
+            label4.Location = new System.Drawing.Point(602, 651);
+            label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(35, 15);
+            label4.TabIndex = 7;
+            label4.Text = "Chat:";
             // 
             // tmrRefresh
             // 
-            this.tmrRefresh.Enabled = true;
-            this.tmrRefresh.Interval = 4000;
-            this.tmrRefresh.Tick += new System.EventHandler(this.tmrRefresh_Tick);
+            tmrRefresh.Enabled = true;
+            tmrRefresh.Interval = 4000;
+            tmrRefresh.Tick += tmrRefresh_Tick;
             // 
             // lvSoftware
             // 
-            this.lvSoftware.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.lvSoftware.BackColor = System.Drawing.Color.Black;
-            this.lvSoftware.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lvSoftware.ForeColor = System.Drawing.Color.White;
-            this.lvSoftware.HideSelection = false;
-            this.lvSoftware.Location = new System.Drawing.Point(0, 93);
-            this.lvSoftware.Margin = new System.Windows.Forms.Padding(2);
-            this.lvSoftware.Name = "lvSoftware";
-            this.lvSoftware.Size = new System.Drawing.Size(300, 489);
-            this.lvSoftware.TabIndex = 21;
-            this.lvSoftware.UseCompatibleStateImageBehavior = false;
-            this.lvSoftware.SelectedIndexChanged += new System.EventHandler(this.lvSoftware_SelectedIndexChanged);
-            this.lvSoftware.DoubleClick += new System.EventHandler(this.lvSoftware_DoubleClick);
-            this.lvSoftware.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lvSoftware_MouseClick);
+            lvSoftware.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            lvSoftware.BackColor = System.Drawing.Color.Black;
+            lvSoftware.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            lvSoftware.ForeColor = System.Drawing.Color.White;
+            lvSoftware.Location = new System.Drawing.Point(0, 107);
+            lvSoftware.Margin = new System.Windows.Forms.Padding(2);
+            lvSoftware.Name = "lvSoftware";
+            lvSoftware.Size = new System.Drawing.Size(349, 564);
+            lvSoftware.TabIndex = 21;
+            lvSoftware.UseCompatibleStateImageBehavior = false;
+            lvSoftware.SelectedIndexChanged += lvSoftware_SelectedIndexChanged;
+            lvSoftware.DoubleClick += lvSoftware_DoubleClick;
+            lvSoftware.MouseClick += lvSoftware_MouseClick;
             // 
             // pbBottomright
             // 
-            this.pbBottomright.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.pbBottomright.BackColor = System.Drawing.Color.Transparent;
-            this.pbBottomright.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pbBottomright.BackgroundImage")));
-            this.pbBottomright.ErrorImage = null;
-            this.pbBottomright.InitialImage = null;
-            this.pbBottomright.Location = new System.Drawing.Point(935, 566);
-            this.pbBottomright.Name = "pbBottomright";
-            this.pbBottomright.Size = new System.Drawing.Size(15, 15);
-            this.pbBottomright.TabIndex = 22;
-            this.pbBottomright.TabStop = false;
-            this.pbBottomright.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pbBottomright_MouseDown);
-            this.pbBottomright.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pbBottomright_MouseMove);
-            this.pbBottomright.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pbBottomright_MouseUp);
+            pbBottomright.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            pbBottomright.BackColor = System.Drawing.Color.Transparent;
+            pbBottomright.BackgroundImage = (System.Drawing.Image)resources.GetObject("pbBottomright.BackgroundImage");
+            pbBottomright.ErrorImage = null;
+            pbBottomright.InitialImage = null;
+            pbBottomright.Location = new System.Drawing.Point(995, 653);
+            pbBottomright.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pbBottomright.Name = "pbBottomright";
+            pbBottomright.Size = new System.Drawing.Size(18, 17);
+            pbBottomright.TabIndex = 22;
+            pbBottomright.TabStop = false;
+            pbBottomright.MouseDown += pbBottomright_MouseDown;
+            pbBottomright.MouseMove += pbBottomright_MouseMove;
+            pbBottomright.MouseUp += pbBottomright_MouseUp;
             // 
             // btnMin
             // 
-            this.btnMin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMin.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnMin.ForeColor = System.Drawing.Color.White;
-            this.btnMin.Location = new System.Drawing.Point(891, 0);
-            this.btnMin.Name = "btnMin";
-            this.btnMin.Size = new System.Drawing.Size(30, 29);
-            this.btnMin.TabIndex = 23;
-            this.btnMin.Text = "_";
-            this.btnMin.UseVisualStyleBackColor = true;
-            this.btnMin.Click += new System.EventHandler(this.btnMin_Click);
+            btnMin.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnMin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnMin.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            btnMin.ForeColor = System.Drawing.Color.White;
+            btnMin.Location = new System.Drawing.Point(944, 0);
+            btnMin.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnMin.Name = "btnMin";
+            btnMin.Size = new System.Drawing.Size(35, 33);
+            btnMin.TabIndex = 23;
+            btnMin.Text = "_";
+            btnMin.UseVisualStyleBackColor = true;
+            btnMin.Click += btnMin_Click;
             // 
             // csmSoftware
             // 
-            this.csmSoftware.BackColor = System.Drawing.SystemColors.Control;
-            this.csmSoftware.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.reinstallToolStripMenuItem});
-            this.csmSoftware.Name = "csmSoftware";
-            this.csmSoftware.Size = new System.Drawing.Size(119, 26);
+            csmSoftware.BackColor = System.Drawing.SystemColors.Control;
+            csmSoftware.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { reinstallToolStripMenuItem });
+            csmSoftware.Name = "csmSoftware";
+            csmSoftware.Size = new System.Drawing.Size(119, 26);
             // 
             // reinstallToolStripMenuItem
             // 
-            this.reinstallToolStripMenuItem.Name = "reinstallToolStripMenuItem";
-            this.reinstallToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
-            this.reinstallToolStripMenuItem.Text = "Reinstall";
-            this.reinstallToolStripMenuItem.Click += new System.EventHandler(this.reinstallToolStripMenuItem_Click);
+            reinstallToolStripMenuItem.Name = "reinstallToolStripMenuItem";
+            reinstallToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            reinstallToolStripMenuItem.Text = "Reinstall";
+            reinstallToolStripMenuItem.Click += reinstallToolStripMenuItem_Click;
             // 
             // lblWANMode
             // 
-            this.lblWANMode.AutoSize = true;
-            this.lblWANMode.Location = new System.Drawing.Point(844, 47);
-            this.lblWANMode.Name = "lblWANMode";
-            this.lblWANMode.Size = new System.Drawing.Size(105, 13);
-            this.lblWANMode.TabIndex = 24;
-            this.lblWANMode.Text = "WAN Mode Enabled";
-            this.lblWANMode.Visible = false;
+            lblWANMode.AutoSize = true;
+            lblWANMode.Location = new System.Drawing.Point(894, 78);
+            lblWANMode.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblWANMode.Name = "lblWANMode";
+            lblWANMode.Size = new System.Drawing.Size(114, 15);
+            lblWANMode.TabIndex = 24;
+            lblWANMode.Text = "WAN Mode Enabled";
+            lblWANMode.Visible = false;
             // 
             // frmLanstaller
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(952, 583);
-            this.Controls.Add(this.lblWANMode);
-            this.Controls.Add(this.btnMin);
-            this.Controls.Add(this.pbBottomright);
-            this.Controls.Add(this.lvSoftware);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.btnInstall);
-            this.Controls.Add(this.txtChatSendMessage);
-            this.Controls.Add(this.txtChatMessages);
-            this.Controls.Add(this.btnExit);
-            this.Controls.Add(this.pbTitle);
-            this.Controls.Add(this.lblSpaceRequired);
-            this.Controls.Add(this.gbxStatus);
-            this.Controls.Add(this.gbxPref);
-            this.Controls.Add(this.gbxActions);
-            this.Controls.Add(this.lblinstDir);
-            this.Controls.Add(this.txtInstallDirectory);
-            this.Controls.Add(this.pbTitleExpanded);
-            this.ForeColor = System.Drawing.Color.White;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "frmLanstaller";
-            this.Text = "Lanstaller";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmLanstaller_Closing);
-            this.Load += new System.EventHandler(this.frmLanstaller_Load);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.OnPaint);
-            this.gbxActions.ResumeLayout(false);
-            this.gbxActions.PerformLayout();
-            this.gbxPref.ResumeLayout(false);
-            this.gbxPref.PerformLayout();
-            this.gbxStatus.ResumeLayout(false);
-            this.gbxStatus.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTitleExpanded)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbTitle)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbBottomright)).EndInit();
-            this.csmSoftware.ResumeLayout(false);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.Black;
+            ClientSize = new System.Drawing.Size(1015, 673);
+            Controls.Add(lblWANMode);
+            Controls.Add(btnMin);
+            Controls.Add(pbBottomright);
+            Controls.Add(lvSoftware);
+            Controls.Add(label4);
+            Controls.Add(btnInstall);
+            Controls.Add(txtChatSendMessage);
+            Controls.Add(txtChatMessages);
+            Controls.Add(btnExit);
+            Controls.Add(pbTitle);
+            Controls.Add(lblSpaceRequired);
+            Controls.Add(gbxStatus);
+            Controls.Add(gbxPref);
+            Controls.Add(gbxActions);
+            Controls.Add(lblinstDir);
+            Controls.Add(txtInstallDirectory);
+            Controls.Add(pbTitleExpanded);
+            ForeColor = System.Drawing.Color.White;
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "frmLanstaller";
+            Text = "Lanstaller";
+            FormClosing += frmLanstaller_Closing;
+            Load += frmLanstaller_Load;
+            Paint += OnPaint;
+            gbxActions.ResumeLayout(false);
+            gbxActions.PerformLayout();
+            gbxPref.ResumeLayout(false);
+            gbxPref.PerformLayout();
+            gbxStatus.ResumeLayout(false);
+            gbxStatus.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pbTitleExpanded).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbTitle).EndInit();
+            ((System.ComponentModel.ISupportInitialize)pbBottomright).EndInit();
+            csmSoftware.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

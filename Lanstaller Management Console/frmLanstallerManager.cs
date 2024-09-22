@@ -92,8 +92,8 @@ namespace Lanstaller_Management_Console
 
 
             LanstallerServer.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security=true;TrustServerCertificate=True";
-            
-            
+
+
             /*
             if (!File.Exists("config.ini"))
             {
@@ -269,7 +269,7 @@ namespace Lanstaller_Management_Console
         }
 
 
-        private void btnClear_Click(object sender,EventArgs e)
+        private void btnClear_Click(object sender, EventArgs e)
         {
             if (CurrentSelectedSoftware == null)
             {
@@ -280,7 +280,7 @@ namespace Lanstaller_Management_Console
             SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
-            
+
             SQLCmd.Parameters.AddWithValue("@swid", CurrentSelectedSoftware.id);
 
             SQLConn.Open();
@@ -321,7 +321,7 @@ namespace Lanstaller_Management_Console
             FilesPanel.lblCopyActionInfo.Text = "Status: Scanning";
             filelist = Directory.GetFiles(scanfolder, "*", SearchOption.AllDirectories);
             directories = Directory.GetDirectories(scanfolder, "*", SearchOption.AllDirectories);
-            
+
             FilesPanel.lblCopyActionInfo.Text = "Status: Scanned Files: " + filelist.Count() + "\nDirectories: " + directories.Count();
             FilesPanel.btnAddFolder.Enabled = true;
 
@@ -650,7 +650,7 @@ namespace Lanstaller_Management_Console
             {
                 FilesPanel.lblCopyActionInfo.Text = "Error";
             }
-           
+
         }
 
         private void btnFirewallRuleAdd_Click(object sender, EventArgs e)
@@ -938,7 +938,7 @@ namespace Lanstaller_Management_Console
             SqlConnection SQLConn = new SqlConnection(LanstallerServer.ConnectionString);
             SqlCommand SQLCmd = new SqlCommand();
             SQLCmd.Connection = SQLConn;
-            SQLCmd.CommandText = 
+            SQLCmd.CommandText =
                 @"IF EXISTS (SELECT software_id FROM tblImages WHERE software_id = @swid) 
                 UPDATE tblImages SET small_image = @savefile WHERE software_id = @swid 
                 ELSE INSERT INTO tblImages (software_id,small_image) VALUES (@swid,@savefile)";
@@ -949,6 +949,50 @@ namespace Lanstaller_Management_Console
             SQLConn.Open();
             SQLCmd.ExecuteNonQuery();
             SQLConn.Close();
+
+
+        }
+
+        private void btnLLA_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "Executables (*.exe)|*.exe|All files (*.*)|*.*"
+            };
+            openFileDialog.ShowDialog();
+
+            if (string.IsNullOrEmpty(openFileDialog.FileName))
+            {
+                return;
+            }
+
+            bool is32bit;
+            bool isLLA = LargeMemoryAware.IsLargeAddressAware(openFileDialog.FileName, out is32bit);
+
+            if (is32bit && !isLLA)
+            {
+                if (MessageBox.Show("File is 32-bit and does not have LLA enabled. Do you want to enable?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    if (File.Exists(openFileDialog.FileName + ".bak"))
+                    {
+                        MessageBox.Show("A bak file already exists - skipping LLA patch.");
+                    }
+                    else
+                    {
+                        File.Copy(openFileDialog.FileName, openFileDialog.FileName + ".bak");
+                        LargeMemoryAware.SetLargeAddressAware(openFileDialog.FileName);
+                    }
+
+                }
+            }
+            else if (is32bit && isLLA)
+            {
+                MessageBox.Show("LLA Is already enabled.");
+            }
+            else if (is32bit == false)
+            {
+                MessageBox.Show("Not detect as 32-bit exe");
+            }
 
 
         }
