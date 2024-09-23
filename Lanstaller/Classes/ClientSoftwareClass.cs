@@ -27,7 +27,9 @@ namespace Lanstaller
         public SoftwareInfo SInfo;
         public Status statusInfo;
 
-        SemaphoreSlim semaphore = new SemaphoreSlim(4); //Maximum concurrent small file transfers. Set to 4.
+        //Maximum concurrent small file transfers.
+        SemaphoreSlim semaphore = new SemaphoreSlim(12); //Must match DownloadTask Init 
+
         List<Task> smallDownloadtasks = new List<Task>();
         public static bool WANMode = false;
 

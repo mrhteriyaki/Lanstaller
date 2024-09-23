@@ -109,7 +109,8 @@ namespace Lanstaller
             }
             Logging.LogToFile("Lanstaller Started");
 
-
+            
+            DownloadTask.Init(); //Initialise HttpClient array.
         }
 
         void InitialFormSetup()

@@ -21,7 +21,29 @@ namespace Lanstaller.Classes
         public long totalSize = 0;
         string _Source;
         string _Destination;
-        
+
+
+        //Maximum httpClients - prevents errors under high load using all tcp ports.
+        private static readonly AllocatedHttpClient[] AHttpClients = new AllocatedHttpClient[12];
+        public static void Init()
+        {
+            for (int i = 0; i < AHttpClients.Length; i++)
+            {
+                AHttpClients[i] = new AllocatedHttpClient();
+            }
+        }
+
+        class AllocatedHttpClient
+        {
+            public HttpClient hClient;
+            public bool allocated = false;
+            public AllocatedHttpClient()
+            {
+                hClient = new HttpClient();
+                hClient.DefaultRequestHeaders.Add("authorization", _authkey);
+            }
+        }
+
 
         public static void SetAuth(string authkey)
         {
@@ -39,9 +61,21 @@ namespace Lanstaller.Classes
         public async Task DownloadAsync()
         {
             string SourceUri = _Source;
-            HttpClient hClient = new HttpClient();
-            hClient.DefaultRequestHeaders.Add("authorization", _authkey);
-                       
+
+            HttpClient hClient = null;
+            int allocatedIndex = -1;
+
+            for(int i = 0; i < AHttpClients.Length;i++)
+            {
+                if(!AHttpClients[i].allocated)
+                {
+                    AHttpClients[i].allocated = true;
+                    hClient = AHttpClients[i].hClient;
+                    allocatedIndex = i;
+                    break;
+                }
+            }
+
             try
             {
                 // Send a GET request to the specified URL
@@ -94,11 +128,12 @@ namespace Lanstaller.Classes
             {
                 Console.WriteLine($"File error: {e.Message}");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Error downloading: " + SourceUri + " " + ex.Message);
             }
-            hClient.Dispose();
+            //hClient.Dispose();
+            AHttpClients[allocatedIndex].allocated = false; //release.
         }
 
 
