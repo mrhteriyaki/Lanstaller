@@ -244,6 +244,10 @@ namespace Lanstaller.Classes
         {
             List<ConflictCheck> LST = new List<ConflictCheck>();
             JObject Conflicts = GetObject("Conflicts", SoftwareID);
+            if(Conflicts == null)
+            {
+                return new ConflictCheck(); //provide empty object on api failure.
+            }
             return Conflicts.ToObject<ConflictCheck>();
         }
 

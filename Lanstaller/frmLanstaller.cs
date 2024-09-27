@@ -72,7 +72,6 @@ namespace Lanstaller
 
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
-
             CheckCoreFilesExist();
             WindowStartSize = this.Size;
             if (!LoadConfigFile())
@@ -822,13 +821,16 @@ namespace Lanstaller
             {
                 if (CP.IsProcessRunning())
                 {
-                    compatNotes += "Incompatible process detected - please close: " + CP.GetName();
+                    compatNotes += "Incompatible process detected - please close: " + CP.GetName() + "\n";
                 }
             }
 
             foreach (ConflictCheck.ConflictPort CP in CC.ConflictPorts)
             {
-
+                if(CP.CheckPortUsage())
+                {
+                    compatNotes += "Network port used by the game is in use (" + CP.GetPortNumber + ").\n";
+                }
             }
 
             txtCompat.Text = compatNotes;
