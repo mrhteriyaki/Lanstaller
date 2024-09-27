@@ -10,14 +10,10 @@ namespace LanstallerShared
 {
     public class ConflictProcess
     {
-        string processName;
-        string processDisplayName;
+        public string processName;
+        public string processDisplayName;
 
-        public string GetName()
-        {
-            return processDisplayName;
-        }
-
+        
         public bool IsProcessRunning()
         {
             Process[] processes = Process.GetProcessesByName(processName);

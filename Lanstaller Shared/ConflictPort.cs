@@ -11,17 +11,14 @@ namespace LanstallerShared
 {
     public class ConflictPort
     {
-        int Port { get; set; }
-        PortType Protocol { get; set; } //1 = TCP, 2 = UDP
+        public int Port;
+        public PortType Protocol; //1 = TCP, 2 = UDP
         public enum PortType
         {
             TCP = 1,
             UDP = 2
         }
-        public int GetPortNumber()
-        {
-            return Port;
-        }
+       
         public static List<ConflictPort> GetPorts(int SoftwareId)
         {
             List<ConflictPort> PortList = new List<ConflictPort>();
