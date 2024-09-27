@@ -17,6 +17,7 @@ namespace LanstallerShared
         public bool IsProcessRunning()
         {
             Process[] processes = Process.GetProcessesByName(processName);
+            
             return processes.Length > 0;
         }
 

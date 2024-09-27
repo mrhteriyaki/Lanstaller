@@ -255,7 +255,7 @@ namespace Lanstaller.Classes
         public static List<ConflictProcess> GetConProcessList(int SoftwareID)
         {
             List<ConflictProcess> LST = new List<ConflictProcess>();
-            JArray Array = GetList("ConPorts", SoftwareID);
+            JArray Array = GetList("ConProcess", SoftwareID);
             foreach (var itm in Array)
             {
                 LST.Add(itm.ToObject<ConflictProcess>());
