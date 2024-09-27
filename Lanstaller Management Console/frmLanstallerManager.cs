@@ -94,11 +94,6 @@ namespace Lanstaller_Management_Console
 
             LanstallerServer.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security=true;TrustServerCertificate=True";
 
-
-            List<ConflictProcess> test = ConflictProcess.GetProcesses(32);
-            MessageBox.Show(test[0].GetName());
-
-            MessageBox.Show(JsonConvert.SerializeObject(ConflictProcess.GetProcesses(32)));
             
             /*
             if (!File.Exists("config.ini"))

@@ -819,7 +819,7 @@ namespace Lanstaller
             {
                 if (CP.IsProcessRunning())
                 {
-                    compatNotes = compatNotes + "Incompatible process detected - please close: " + CP.GetName() + "\n";
+                    compatNotes = compatNotes + "Incompatible process detected - please close: " + CP.processDisplayName + "\n";
                 }
             }
 
@@ -827,7 +827,7 @@ namespace Lanstaller
             {
                 if(CP.CheckPortUsage())
                 {
-                    compatNotes = compatNotes + "Network port used by the game is in use (" + CP.GetPortNumber().ToString() + ").\n";
+                    compatNotes = compatNotes + "Network port used by the game is in use (" + CP.Port.ToString() + ").\n";
                 }
             }
 
