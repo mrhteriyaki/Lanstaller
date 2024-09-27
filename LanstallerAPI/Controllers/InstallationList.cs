@@ -100,7 +100,7 @@ namespace LanstallerAPI.Controllers
         [HttpGet, Route("Conflicts"), Authorize]
         public string Conflicts(int id)
         {
-            return JsonConvert.SerializeObject(ConflictCheck.GetConflicts(id));
+            return JsonConvert.SerializeObject(new ConflictCheck(id));
         }
 
         

@@ -815,13 +815,13 @@ namespace Lanstaller
         void UpdateCompatabilityNotes(int SoftwareId)
         {
             string compatNotes = string.Empty;
-            
             ConflictCheck CC = APIClient.GetConflictList(SoftwareId);
+            MessageBox.Show(SoftwareId.ToString());
             foreach (ConflictCheck.ConflictProcess CP in CC.ConflictProcesses)
             {
                 if (CP.IsProcessRunning())
                 {
-                    compatNotes += "Incompatible process detected - please close: " + CP.GetName() + "\n";
+                    compatNotes = compatNotes + "Incompatible process detected - please close: " + CP.GetName() + "\n";
                 }
             }
 
@@ -829,7 +829,7 @@ namespace Lanstaller
             {
                 if(CP.CheckPortUsage())
                 {
-                    compatNotes += "Network port used by the game is in use (" + CP.GetPortNumber + ").\n";
+                    compatNotes = compatNotes + "Network port used by the game is in use (" + CP.GetPortNumber().ToString() + ").\n";
                 }
             }
 

@@ -11,8 +11,17 @@ namespace LanstallerShared
 {
     public class ConflictCheck
     {
-        public List<ConflictPort> ConflictPorts = new List<ConflictPort>();
-        public List<ConflictProcess> ConflictProcesses = new List<ConflictProcess>();
+        int softwareid = 0;
+        public List<ConflictPort> ConflictPorts;
+        public List<ConflictProcess> ConflictProcesses;
+
+        public ConflictCheck(int SoftwareId)
+        {
+            softwareid = SoftwareId;
+            ConflictPorts = ConflictPort.GetPorts(softwareid);
+            ConflictProcesses = ConflictProcess.GetProcesses(softwareid);
+        }
+
         public class ConflictPort
         {
             int Port;
@@ -90,7 +99,6 @@ namespace LanstallerShared
                 return processDisplayName;
             }
 
-
             public bool IsProcessRunning()
             {
                 Process[] processes = Process.GetProcessesByName(processName);
@@ -125,14 +133,6 @@ namespace LanstallerShared
             }
         }
 
-
-        public static ConflictCheck GetConflicts(int SoftwareId)
-        {
-            ConflictCheck Conflicts = new ConflictCheck();
-            Conflicts.ConflictProcesses = ConflictProcess.GetProcesses(SoftwareId);
-            Conflicts.ConflictPorts = ConflictPort.GetPorts(SoftwareId);
-            return Conflicts;
-        }
 
     }
 }
