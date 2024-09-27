@@ -239,14 +239,29 @@ namespace Lanstaller.Classes
             return LST;
         }
 
-        //Conflicts
-        public static ConflictCheck GetConflictList(int SoftwareID)
+        //Port Conflicts
+        public static List<ConflictPort> GetConPortList(int SoftwareID)
         {
-            List<ConflictCheck> LST = new List<ConflictCheck>();
-            JObject Conflicts = GetObject("Conflicts", SoftwareID);
-            return Conflicts.ToObject<ConflictCheck>();
+            List<ConflictPort> LST = new List<ConflictPort>();
+            JArray Array = GetList("ConPorts", SoftwareID);
+            foreach (var itm in Array)
+            {
+                LST.Add(itm.ToObject<ConflictPort>());
+            }
+            return LST;
         }
 
+        //Process Conflicts
+        public static List<ConflictProcess> GetConProcessList(int SoftwareID)
+        {
+            List<ConflictProcess> LST = new List<ConflictProcess>();
+            JArray Array = GetList("ConPorts", SoftwareID);
+            foreach (var itm in Array)
+            {
+                LST.Add(itm.ToObject<ConflictProcess>());
+            }
+            return LST;
+        }
 
         //Serials
         public static List<SerialNumber> GetSerialsList(int SoftwareID)

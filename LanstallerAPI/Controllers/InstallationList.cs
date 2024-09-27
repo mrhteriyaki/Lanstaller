@@ -97,12 +97,18 @@ namespace LanstallerAPI.Controllers
         }
 
 
-        [HttpGet, Route("Conflicts"), Authorize]
-        public string Conflicts(int id)
+        [HttpGet, Route("ConPorts"), Authorize]
+        public string ConPorts(int id)
         {
-            return JsonConvert.SerializeObject(new ConflictCheck(id));
+            return JsonConvert.SerializeObject(ConflictPort.GetPorts(id));
+        }
+        
+        [HttpGet, Route("ConProcess"), Authorize]
+        public string ConProcess(int id)
+        {
+            return JsonConvert.SerializeObject(ConflictProcess.GetProcesses(id));
+
         }
 
-        
     }
 }

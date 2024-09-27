@@ -94,6 +94,7 @@ namespace Lanstaller_Management_Console
             LanstallerServer.ConnectionString = "Data Source=192.168.88.3,1433;Initial Catalog=lanstaller;Integrated Security=true;TrustServerCertificate=True";
 
 
+
             /*
             if (!File.Exists("config.ini"))
             {

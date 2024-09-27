@@ -814,10 +814,8 @@ namespace Lanstaller
 
         void UpdateCompatabilityNotes(int SoftwareId)
         {
-            string compatNotes = string.Empty;
-            ConflictCheck CC = APIClient.GetConflictList(SoftwareId);
-            MessageBox.Show(SoftwareId.ToString());
-            foreach (ConflictCheck.ConflictProcess CP in CC.ConflictProcesses)
+            string compatNotes = string.Empty;           
+            foreach (ConflictProcess CP in APIClient.GetConProcessList(SoftwareId))
             {
                 if (CP.IsProcessRunning())
                 {
@@ -825,7 +823,7 @@ namespace Lanstaller
                 }
             }
 
-            foreach (ConflictCheck.ConflictPort CP in CC.ConflictPorts)
+            foreach (ConflictPort CP in APIClient.GetConPortList(SoftwareId))
             {
                 if(CP.CheckPortUsage())
                 {
