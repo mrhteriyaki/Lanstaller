@@ -22,7 +22,7 @@ namespace Lanstaller
     public partial class frmLanstaller : Form
     {
         static readonly Double Version = 0.24; //Increment Version in tblSystem when changed.
-        readonly static string LanstallerDataDir = "C:\\ProgramData\\Lanstaller\\";
+        readonly static string LanstallerDataDir = @"C:\ProgramData\Lanstaller\";
         LocalDatabase LocalDB;
 
         private static object lock_InstallQueue = new object();
@@ -72,7 +72,7 @@ namespace Lanstaller
 
         private void frmLanstaller_Load(object sender, EventArgs e)
         {
-            
+
             CheckCoreFilesExist();
             WindowStartSize = this.Size;
             if (!LoadConfigFile())
@@ -109,7 +109,7 @@ namespace Lanstaller
             }
             Logging.LogToFile("Lanstaller Started");
 
-            
+
             DownloadTask.Init(); //Initialise HttpClient array.
         }
 
@@ -190,11 +190,11 @@ namespace Lanstaller
             //For direct link to database.
             //SList = SoftwareClass.LoadSoftware();
 
-            SList = APIClient.GetSoftwareListFromAPI();
+            SList = APIClient.GetSoftwareList();
             FileServer FileServer;
             try
             {
-                FileServer = APIClient.GetFileServerFromAPI()[0];
+                FileServer = APIClient.GetFileServer()[0];
             }
             catch (Exception ex)
             {
@@ -224,7 +224,7 @@ namespace Lanstaller
             lvSoftware.SmallImageList.ImageSize = new Size(25, 25);
 
 
-            FileServer FS = APIClient.GetFileServerFromAPI()[0];
+            FileServer FS = APIClient.GetFileServer()[0];
             foreach (SoftwareInfo SWI in SList)
             {
                 ListViewItem LVI = new ListViewItem(SWI.Name);
@@ -288,7 +288,7 @@ namespace Lanstaller
                             File.Delete(updaterpath);
                         }
                         //Download file.
-                        FileServer FS = APIClient.GetFileServerFromAPI()[0];
+                        FileServer FS = APIClient.GetFileServer()[0];
                         string updaterUrl = APIClient.APIServer + "StaticFiles/Lanstaller.Updater.exe";
                         try
                         {
@@ -522,7 +522,7 @@ namespace Lanstaller
             //Get serial keys from user - may need to put on another thread to stop gui block.
             if (InstallSW.installregistry) //Only request serials if registry checked.
             {
-                foreach (SerialNumber SN in APIClient.GetSerialsListFromAPI(InstallSW.SInfo.id))
+                foreach (SerialNumber SN in APIClient.GetSerialsList(InstallSW.SInfo.id))
                 {
                     InstallSW.AddSerial(SN);
                 }
@@ -785,12 +785,14 @@ namespace Lanstaller
         }
 
 
+
         void CheckInstalled()
         {
             install_option = true;
             if (lvSoftware.SelectedItems.Count == 1)
             {
-                currentSoftwareShortcuts = LocalDB.GetShortcuts(SList[lvSoftware.SelectedItems[0].Index].id);
+                int softwareId = SList[lvSoftware.SelectedItems[0].Index].id;
+                currentSoftwareShortcuts = LocalDB.GetShortcuts(softwareId);
                 if (currentSoftwareShortcuts.Count > 0)
                 {
                     foreach (ShortcutOperation SC in currentSoftwareShortcuts)
@@ -799,12 +801,37 @@ namespace Lanstaller
                         {
                             install_option = false;
                             btnInstall.Text = "Start";
+
+                            //Api call for compatibility notes from main thread may cause delays - need optimise.
+                            UpdateCompatabilityNotes(softwareId);
+
                             return;
                         }
                     }
                 }
             }
             btnInstall.Text = "Install";
+        }
+
+        void UpdateCompatabilityNotes(int SoftwareId)
+        {
+            string compatNotes = string.Empty;
+            
+            ConflictCheck CC = APIClient.GetConflictList(SoftwareId);
+            foreach (ConflictCheck.ConflictProcess CP in CC.ConflictProcesses)
+            {
+                if (CP.IsProcessRunning())
+                {
+                    compatNotes += "Incompatible process detected - please close: " + CP.GetName();
+                }
+            }
+
+            foreach (ConflictCheck.ConflictPort CP in CC.ConflictPorts)
+            {
+
+            }
+
+            txtCompat.Text = compatNotes;
         }
 
 
@@ -878,11 +905,6 @@ namespace Lanstaller
             {
                 CheckboxSet(chkRedist, true);
             }
-
-
-
-
-
         }
 
         int active_chk = 0;

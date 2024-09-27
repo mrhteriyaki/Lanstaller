@@ -96,6 +96,13 @@ namespace LanstallerAPI.Controllers
             return JsonConvert.SerializeObject(UserSerial.GetUserSerials(id));
         }
 
+
+        [HttpGet, Route("Conflicts"), Authorize]
+        public string Conflicts(int id)
+        {
+            return JsonConvert.SerializeObject(ConflictCheck.GetConflicts(id));
+        }
+
         
     }
 }

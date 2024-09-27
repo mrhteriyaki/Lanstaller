@@ -65,6 +65,9 @@ namespace Lanstaller
             csmSoftware = new System.Windows.Forms.ContextMenuStrip(components);
             reinstallToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             lblWANMode = new System.Windows.Forms.Label();
+            txtCompat = new System.Windows.Forms.TextBox();
+            label1 = new System.Windows.Forms.Label();
+            label6 = new System.Windows.Forms.Label();
             gbxActions.SuspendLayout();
             gbxPref.SuspendLayout();
             gbxStatus.SuspendLayout();
@@ -336,13 +339,13 @@ namespace Lanstaller
             txtChatMessages.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             txtChatMessages.BackColor = System.Drawing.Color.Black;
             txtChatMessages.ForeColor = System.Drawing.Color.White;
-            txtChatMessages.Location = new System.Drawing.Point(603, 116);
+            txtChatMessages.Location = new System.Drawing.Point(602, 411);
             txtChatMessages.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             txtChatMessages.Multiline = true;
             txtChatMessages.Name = "txtChatMessages";
             txtChatMessages.ReadOnly = true;
             txtChatMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            txtChatMessages.Size = new System.Drawing.Size(405, 527);
+            txtChatMessages.Size = new System.Drawing.Size(405, 215);
             txtChatMessages.TabIndex = 11;
             // 
             // txtChatSendMessage
@@ -350,10 +353,10 @@ namespace Lanstaller
             txtChatSendMessage.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             txtChatSendMessage.BackColor = System.Drawing.Color.Black;
             txtChatSendMessage.ForeColor = System.Drawing.Color.White;
-            txtChatSendMessage.Location = new System.Drawing.Point(643, 647);
+            txtChatSendMessage.Location = new System.Drawing.Point(603, 647);
             txtChatSendMessage.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             txtChatSendMessage.Name = "txtChatSendMessage";
-            txtChatSendMessage.Size = new System.Drawing.Size(344, 23);
+            txtChatSendMessage.Size = new System.Drawing.Size(384, 23);
             txtChatSendMessage.TabIndex = 12;
             txtChatSendMessage.KeyUp += txtChatSendMessage_KeyUp;
             // 
@@ -402,7 +405,7 @@ namespace Lanstaller
             pbTitle.BackgroundImage = Properties.Resources.LanstallerThin;
             pbTitle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             pbTitle.InitialImage = null;
-            pbTitle.Location = new System.Drawing.Point(13, 6);
+            pbTitle.Location = new System.Drawing.Point(20, 6);
             pbTitle.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             pbTitle.Name = "pbTitle";
             pbTitle.Size = new System.Drawing.Size(873, 96);
@@ -415,7 +418,7 @@ namespace Lanstaller
             label4.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             label4.AutoSize = true;
             label4.ForeColor = System.Drawing.Color.White;
-            label4.Location = new System.Drawing.Point(602, 651);
+            label4.Location = new System.Drawing.Point(602, 629);
             label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(35, 15);
@@ -493,7 +496,7 @@ namespace Lanstaller
             // lblWANMode
             // 
             lblWANMode.AutoSize = true;
-            lblWANMode.Location = new System.Drawing.Point(894, 78);
+            lblWANMode.Location = new System.Drawing.Point(896, 78);
             lblWANMode.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             lblWANMode.Name = "lblWANMode";
             lblWANMode.Size = new System.Drawing.Size(114, 15);
@@ -501,12 +504,51 @@ namespace Lanstaller
             lblWANMode.Text = "WAN Mode Enabled";
             lblWANMode.Visible = false;
             // 
+            // txtCompat
+            // 
+            txtCompat.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            txtCompat.BackColor = System.Drawing.Color.Black;
+            txtCompat.ForeColor = System.Drawing.Color.White;
+            txtCompat.Location = new System.Drawing.Point(602, 127);
+            txtCompat.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtCompat.Multiline = true;
+            txtCompat.Name = "txtCompat";
+            txtCompat.ReadOnly = true;
+            txtCompat.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            txtCompat.Size = new System.Drawing.Size(405, 278);
+            txtCompat.TabIndex = 25;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.ForeColor = System.Drawing.Color.White;
+            label1.Location = new System.Drawing.Point(461, 329);
+            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(92, 15);
+            label1.TabIndex = 26;
+            label1.Text = "Install Directory:";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.ForeColor = System.Drawing.Color.White;
+            label6.Location = new System.Drawing.Point(603, 108);
+            label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label6.Name = "label6";
+            label6.Size = new System.Drawing.Size(82, 15);
+            label6.TabIndex = 27;
+            label6.Text = "Compatibility:";
+            // 
             // frmLanstaller
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.Black;
             ClientSize = new System.Drawing.Size(1015, 673);
+            Controls.Add(label6);
+            Controls.Add(label1);
+            Controls.Add(txtCompat);
             Controls.Add(lblWANMode);
             Controls.Add(btnMin);
             Controls.Add(pbBottomright);
@@ -582,6 +624,9 @@ namespace Lanstaller
         private System.Windows.Forms.ContextMenuStrip csmSoftware;
         private System.Windows.Forms.ToolStripMenuItem reinstallToolStripMenuItem;
         private System.Windows.Forms.Label lblWANMode;
+        private System.Windows.Forms.TextBox txtCompat;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label6;
     }
 }
 

@@ -77,7 +77,7 @@ namespace Lanstaller
                 //RegistryList = GetRegistry(SInfo.id);
 
                 //Web
-                RegistryOperations = GetRegistryListFromAPI(SInfo.id);
+                RegistryOperations = GetRegistryList(SInfo.id);
                 GenerateRegistry();
             }
 
@@ -88,7 +88,7 @@ namespace Lanstaller
             }
 
 
-            ShortcutOperations = GetShortcutListFromAPI(SInfo.id);
+            ShortcutOperations = GetShortcutList(SInfo.id);
             foreach (ShortcutOperation SCO in ShortcutOperations)
             {
                 SCO.location = ReplaceVariable(SCO.location);
@@ -115,11 +115,11 @@ namespace Lanstaller
                 //FWL = GetFirewallRules(SInfo.id);
 
                 //WEB
-                FirewallRules = GetFirewallRulesListFromAPI(SInfo.id);
+                FirewallRules = GetFirewallRulesList(SInfo.id);
                 GenerateFirewallRules();
 
                 //Compatibility.
-                List<CompatabilityMode> CPL = GetCompatibilitiesFromAPI(SInfo.id);
+                List<CompatabilityMode> CPL = GetCompatibilities(SInfo.id);
                 foreach (CompatabilityMode CP in CPL)
                 {
                     GenerateCompatibility(CP.filename, CP.compat_type);
@@ -135,7 +135,7 @@ namespace Lanstaller
                 //POList = GetPreferenceFiles(SInfo.id);
 
                 //WEB
-                PreferenceOperations = GetPreferencesListFromAPI(SInfo.id);
+                PreferenceOperations = GetPreferencesList(SInfo.id);
 
                 GeneratePreferenceFiles();
             }
@@ -293,7 +293,7 @@ namespace Lanstaller
         public void GenerateRedistributables(int sid) //Incomplete.
         {
 
-            foreach (Redistributable Redist in GetRedistributablesListFromAPI(sid))
+            foreach (Redistributable Redist in GetRedistributablesList(sid))
             {
                 if (Redist.filecheck != "")
                 {
@@ -311,7 +311,7 @@ namespace Lanstaller
 
                 try
                 {
-                    TransferFile(GetFileServerFromAPI()[0], Redist.path, destpath);
+                    TransferFile(GetFileServer()[0], Redist.path, destpath);
                 }
                 catch(Exception ex)
                 {
@@ -505,13 +505,13 @@ namespace Lanstaller
             //FCL = GetFiles(SInfo.id);
 
             //Get File List from Web Api
-            FileCopyOperations = GetFilesListFromAPI(SInfo.id);
+            FileCopyOperations = GetFilesList(SInfo.id);
             VerifyCopyOperations = new ConcurrentQueue<FileCopyOperation>();
 
 
             //Get Directories, split up all sub directory paths and add to generation list.
             statusInfo.SetStage(2.2);
-            foreach (string Dir in GetDirectoriesFromAPI(SInfo.id))
+            foreach (string Dir in GetDirectories(SInfo.id))
             {
                 DirectoryList.Add(ReplaceVariable(Dir));
             }
@@ -536,7 +536,7 @@ namespace Lanstaller
                 }
             }
             statusInfo.SetStage(3.2);
-            FileServer FileServer = GetFileServerFromAPI()[0];
+            FileServer FileServer = GetFileServer()[0];
 
             statusInfo.SetStage(3.3);
 

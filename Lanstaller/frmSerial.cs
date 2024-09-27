@@ -39,7 +39,7 @@ namespace Lanstaller
             if (cmbxServerSerials.SelectedIndex != -1)
             {
                 //Send back Server Serial of confirmation for use.
-                APIClient.SetAvailableSerialsFromAPI(serial_pool[cmbxServerSerials.SelectedIndex].id);
+                APIClient.SetAvailableSerials(serial_pool[cmbxServerSerials.SelectedIndex].id);
             }
 
             if (!String.IsNullOrWhiteSpace(txtSerial.Text))
@@ -89,7 +89,7 @@ namespace Lanstaller
 
         private void frmSerial_Load(object sender, EventArgs e)
         {
-            serial_pool = APIClient.GetAvailableSerialsFromAPI(serialid);
+            serial_pool = APIClient.GetAvailableSerials(serialid);
 
             foreach (UserSerial serial in serial_pool)
             {
