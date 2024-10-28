@@ -87,14 +87,8 @@ namespace Lanstaller
             }
 
             SetupThreads(); //Put other supporting threads her
-
-            //Get list of installed programs - future use to skip redist.
-            //WindowsInstallerClass.CheckProgram();
-
-            //Need to put auth/connection check - invalid auth response should re-prompt with ConfigInput.
-
             LoadClientSettings();
-
+            DownloadTask.Init(); //Initialise HttpClients.
             InitialFormSetup();
 
             try
@@ -108,8 +102,11 @@ namespace Lanstaller
             }
             Logging.LogToFile("Lanstaller Started");
 
+            //Get list of installed programs - future use to skip redist.
+            //WindowsInstallerClass.CheckProgram();
 
-            DownloadTask.Init(); //Initialise HttpClient array.
+            //Need to put auth/connection check - invalid auth response should re-prompt with ConfigInput.
+
         }
 
         void InitialFormSetup()

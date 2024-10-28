@@ -31,6 +31,7 @@ namespace Lanstaller.Classes
             {
                 AHttpClients[i] = new AllocatedHttpClient();
             }
+            Console.WriteLine("HttpClients initialised.");
         }
 
         class AllocatedHttpClient
