@@ -106,8 +106,9 @@ namespace Lanstaller
             //WindowsInstallerClass.CheckProgram();
 
             //Need to put auth/connection check - invalid auth response should re-prompt with ConfigInput.
-
+           
         }
+        
 
         void InitialFormSetup()
         {
