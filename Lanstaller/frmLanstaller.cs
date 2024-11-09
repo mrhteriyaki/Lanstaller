@@ -613,6 +613,12 @@ namespace Lanstaller
         bool warningShown = false;
         private void txtInstallDirectory_TextChanged(object sender, EventArgs e)
         {
+            if(txtInstallDirectory.Text.Contains('/'))
+            {
+                txtInstallDirectory.Text = txtInstallDirectory.Text.Replace("/", "\\");
+                return;
+            }
+
             UserSettings.SetInstallDirectory(txtInstallDirectory.Text);
 
             if (InstallThreadRunning && !warningShown)
