@@ -30,10 +30,10 @@ namespace Lanstaller
 
             //Install Directory
             InstallDirectory = LanstallerKey.GetValue("installdir", defaultinstalldir).ToString();
+
             //Screen.PrimaryScreen requires app.manifest settings DpiAwareness and DpiAware to show correct value after Windows scaling.
-            Resolutions.Resolution MonitorRes = Resolutions.GetResolution();
-            ScreenWidth = int.Parse(LanstallerKey.GetValue("screenwidth", MonitorRes.Width).ToString());
-            ScreenHeight = int.Parse(LanstallerKey.GetValue("screenheight", MonitorRes.Height).ToString());
+            ScreenWidth = int.Parse(LanstallerKey.GetValue("screenwidth", Screen.PrimaryScreen.Bounds.Width).ToString());
+            ScreenHeight = int.Parse(LanstallerKey.GetValue("screenheight", Screen.PrimaryScreen.Bounds.Height).ToString());
             Username = LanstallerKey.GetValue("username", System.Environment.UserName).ToString();
         }
 
@@ -53,7 +53,7 @@ namespace Lanstaller
         public static void SetWidth(int Value)
         {
             var key = Registry.CurrentUser.OpenSubKey(SettingsKey, true);
-            if (Value == Resolutions.GetResolution().Width)
+            if (Value == Screen.PrimaryScreen.Bounds.Width)
             {
                 key.DeleteValue("screenwidth", false); // Delete if value matches screen width
             }
@@ -66,7 +66,7 @@ namespace Lanstaller
         public static void SetHeight(int Value)
         {
             var key = Registry.CurrentUser.OpenSubKey(SettingsKey, true);
-            if (Value == Resolutions.GetResolution().Height)
+            if (Value == Screen.PrimaryScreen.Bounds.Height)
             {
                 key.DeleteValue("screenheight", false); // Delete if value matches screen width
             }
