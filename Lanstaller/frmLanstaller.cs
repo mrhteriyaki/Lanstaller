@@ -235,9 +235,9 @@ namespace Lanstaller
                     string imgDst = ImageDir + "\\" + imgFilename;
                     if (!File.Exists(imgDst))
                     {
-                        Task task = Task.Run(() => ClientSoftwareClass.TransferFile(FS, Uri.EscapeUriString(SWI.image_small), imgDst));
-                        await task;
-                        task.Wait();
+                        await Task.Run(() => ClientSoftwareClass.TransferFile(FS, Uri.EscapeDataString(SWI.image_small), imgDst));
+
+
                         //Will need cache invalidation in future for refresh / updates.
                     }
                     lvSoftware.SmallImageList.Images.Add(Image.FromFile(imgDst));

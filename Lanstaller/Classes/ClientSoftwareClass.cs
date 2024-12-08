@@ -616,7 +616,7 @@ namespace Lanstaller
                 //Complete validation of downloaded files.
                 //restart previous loop if failures exist.
 
-                Task.WhenAll(smallDownloadtasks).Wait();
+                Task.WhenAll(smallDownloadtasks).GetAwaiter().GetResult();
 
                 statusInfo.SetStage(4);
 
@@ -652,7 +652,7 @@ namespace Lanstaller
             {
                 DownloadTask DT = new DownloadTask(FileServer.path + Source, Destination);
                 Task Dtask = DT.DownloadAsync();
-                Dtask.Wait(); //If stuck here - async issue occurs when running from main thread, use task with await.
+                Dtask.GetAwaiter().GetResult(); //If stuck here - async issue occurs when running from main thread, use task with await.
             }
             else if (FileServer.protocol == 2) //SMB
             {
@@ -677,7 +677,7 @@ namespace Lanstaller
 
                         DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.size);
                         Task Dtask = DT.DownloadAsync();
-                        Dtask.Wait();
+                        Dtask.GetAwaiter().GetResult();
                         statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                         VerifyCopyOperations.Enqueue(FCO);
 
@@ -686,7 +686,7 @@ namespace Lanstaller
                 }
                 else
                 {
-                    Task.WhenAll(smallDownloadtasks).Wait(); //Finish all smaller downloads.
+                    Task.WhenAll(smallDownloadtasks).GetAwaiter().GetResult(); //Finish all smaller downloads.
 
                     DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.size);
                     Task Dtask = DT.DownloadAsync();
@@ -694,7 +694,7 @@ namespace Lanstaller
                     {
                         statusInfo.SetPartialState(FileCopyIndex, DT.downloadedbytes);                       
                     }
-                    Dtask.Wait();
+                    Dtask.GetAwaiter().GetResult();
                     statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                     VerifyCopyOperations.Enqueue(FCO);
 

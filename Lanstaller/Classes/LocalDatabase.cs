@@ -106,7 +106,9 @@ namespace Lanstaller.Classes
 
         private void WriteListDB(List<LocalInstallRecord> updateList)
         {
-            StreamWriter DBSW = new StreamWriter(_dbpath);
+            string tmpfile = _dbpath + ".tmp";
+
+            StreamWriter DBSW = new StreamWriter(tmpfile);
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented, // This enables pretty printing
@@ -114,6 +116,12 @@ namespace Lanstaller.Classes
 
             DBSW.Write(JsonConvert.SerializeObject(updateList, settings));
             DBSW.Close();
+
+            if(File.Exists(_dbpath))
+            {
+                File.Delete(_dbpath);
+            }
+            File.Move(tmpfile, _dbpath);
         }
 
         public void RemoveLocalInstall(int SoftwareID)
