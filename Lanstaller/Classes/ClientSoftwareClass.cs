@@ -28,7 +28,9 @@ namespace Lanstaller
         public Status statusInfo;
 
         //Maximum concurrent small file transfers.
-        SemaphoreSlim semaphore = new SemaphoreSlim(12); //Must match DownloadTask Init 
+        SemaphoreSlim semaphore = new SemaphoreSlim(8); //Must not exceed DownloadTask httpClient array size. 
+        readonly int MaxMultiThreadSize = 524288; //Less than 512KB or WAN mode, run concurrent downloads.
+
 
         List<Task> smallDownloadtasks = new List<Task>();
         public static bool WANMode = false;
@@ -87,6 +89,10 @@ namespace Lanstaller
                 CopyFiles();
             }
 
+            if (frmLanstaller.shutdown)
+            {
+                return;
+            }
 
             ShortcutOperations = GetShortcutList(SInfo.id);
             foreach (ShortcutOperation SCO in ShortcutOperations)
@@ -313,7 +319,7 @@ namespace Lanstaller
                 {
                     TransferFile(GetFileServer()[0], Redist.path, destpath);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show("Failed to download redistributable. " + ex.Message);
                     return;
@@ -437,66 +443,65 @@ namespace Lanstaller
         {
             try
             {
-
-            
-            int CheckCounter = 0;
-            FileCopyOperation FVO;
-            while (CheckCounter < FileCount) //When all files queued for verification and hashed.
-            {
-                if (VerifyCopyOperations.Count == 0)
+                int CheckCounter = 0;
+                FileCopyOperation FVO;
+                while (CheckCounter < FileCount) //When all files queued for verification and hashed.
                 {
-                    if (frmLanstaller.shutdownToken.IsCancellationRequested)
+                    if (frmLanstaller.shutdown)
                     {
                         //Exit if main threads have closed.
                         return;
                     }
-                    continue;
-                }
-                else
-                {
-                    //FVO = VerifyCopyOperations.Dequeue();
-                    while (!VerifyCopyOperations.TryDequeue(out FVO))
+
+                    if (VerifyCopyOperations.Count == 0)
                     {
-                        Thread.Sleep(1); //Delay if unable to dequeue.
-                    }
-
-                }
-                CheckCounter++;
-                if (FVO.verified)
-                {
-                    continue; //skip already verified.
-                }
-
-                //Console.WriteLine("Checking hash for: " + FVO.destination);
-                if (File.Exists(FVO.destination))
-                {
-                    //Possible optimisation
-                    //Where some files are missing, split verification of existing files and missing files into threads.
-
-
-                    //MessageBox.Show("MD5: " + FVO.destination);
-                    string check_hash = FileInfoClass.CalculateMD5(FVO.destination);
-                    if (FVO.fileinfo.hash.Equals(check_hash))
-                    {
-                        FVO.verified = true;
                         continue;
                     }
-                    Logging.LogToFile("Deleting file - failed validation: " + FVO.destination + " Expected hash: " + FVO.fileinfo.hash + " Check result: " + check_hash);
-                    File.Delete(FVO.destination); // Delete file if partially downloaded.
-                }
-                else
-                {
-                    Logging.LogToFile("Verification error - missing file: " + FVO.destination);
+                    else
+                    {
+                        //FVO = VerifyCopyOperations.Dequeue();
+                        while (!VerifyCopyOperations.TryDequeue(out FVO))
+                        {
+                            Thread.Sleep(1); //Delay if unable to dequeue.
+                        }
+
+                    }
+                    CheckCounter++;
+                    if (FVO.verified)
+                    {
+                        continue; //skip already verified.
+                    }
+
+                    //Console.WriteLine("Checking hash for: " + FVO.destination);
+                    if (File.Exists(FVO.destination))
+                    {
+                        //Possible optimisation
+                        //Where some files are missing, split verification of existing files and missing files into threads.
+
+
+                        //MessageBox.Show("MD5: " + FVO.destination);
+                        string check_hash = FileInfoClass.CalculateMD5(FVO.destination);
+                        if (FVO.fileinfo.hash.Equals(check_hash))
+                        {
+                            FVO.verified = true;
+                            continue;
+                        }
+                        Logging.LogToFile("Deleting file - failed validation: " + FVO.destination + " Expected hash: " + FVO.fileinfo.hash + " Check result: " + check_hash);
+                        File.Delete(FVO.destination); // Delete file if partially downloaded.
+                    }
+                    else
+                    {
+                        Logging.LogToFile("Verification error - missing file: " + FVO.destination);
+                    }
                 }
             }
-            }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Verification thread crashed - error message: " + ex.Message);
             }
         }
 
-       
+
         //Copy files from list provided, directory list for folder generation (Including empty dirs)
         void CopyFiles()
         {
@@ -524,7 +529,7 @@ namespace Lanstaller
                 //string filedirectory = FCO.destination.Substring(0, FCO.destination.LastIndexOf("\\"));
                 //GetSubFolders(filedirectory);
             }
-            
+
 
             //Generate any required Directories for Files.
             statusInfo.SetStage(3.1);
@@ -544,7 +549,7 @@ namespace Lanstaller
             int FailLoopCount = 0;
             while (FilesNotValidated)
             {
-                if (frmLanstaller.shutdownToken.IsCancellationRequested)
+                if (frmLanstaller.shutdown)
                 {
                     return;
                 }
@@ -560,7 +565,7 @@ namespace Lanstaller
 
                 while (CopyIndex < FileCopyOperations.Count)
                 {
-                    if (frmLanstaller.shutdownToken.IsCancellationRequested)
+                    if (frmLanstaller.shutdown)
                     {
                         return;
                     }
@@ -665,10 +670,10 @@ namespace Lanstaller
         async void TransferFile(FileServer FileServer, int FileCopyIndex)
         {
             FileCopyOperation FCO = FileCopyOperations[FileCopyIndex];
-            
+
             if (FileServer.protocol == 1) //Web
             {
-                if (WANMode || FCO.fileinfo.size < 524288) //Less than 512KB or WAN mode, run concurrent downloads.
+                if (WANMode || FCO.fileinfo.size < MaxMultiThreadSize)
                 {
                     //Multi Thread smaller files to avoid overhead blocking file transfer.
                     smallDownloadtasks.Add(Task.Run(async () =>
@@ -676,8 +681,7 @@ namespace Lanstaller
                         await semaphore.WaitAsync();
 
                         DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.size);
-                        Task Dtask = DT.DownloadAsync();
-                        Dtask.GetAwaiter().GetResult();
+                        await DT.DownloadAsync(); //Wait until download done.
                         statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                         VerifyCopyOperations.Enqueue(FCO);
 
@@ -686,15 +690,16 @@ namespace Lanstaller
                 }
                 else
                 {
-                    Task.WhenAll(smallDownloadtasks).GetAwaiter().GetResult(); //Finish all smaller downloads.
+                    await Task.WhenAll(smallDownloadtasks); //Finish all smaller downloads.
+                    smallDownloadtasks.Clear();
 
                     DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.size);
                     Task Dtask = DT.DownloadAsync();
                     while (!Dtask.IsCompleted)
                     {
-                        statusInfo.SetPartialState(FileCopyIndex, DT.downloadedbytes);                       
+                        statusInfo.SetPartialState(FileCopyIndex, DT.downloadedbytes);
                     }
-                    Dtask.GetAwaiter().GetResult();
+                    await Dtask; //Wait until download done.
                     statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
                     VerifyCopyOperations.Enqueue(FCO);
 
@@ -702,14 +707,35 @@ namespace Lanstaller
             }
             else if (FileServer.protocol == 2) //SMB
             {
-                File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
-                statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
-                VerifyCopyOperations.Enqueue(FCO);
+                if (FCO.fileinfo.size < MaxMultiThreadSize)
+                {
+                    //Confirmed Multi-thread increased transfer rate from 10mbps to 50mbps in testing with 8 threads.
+                    smallDownloadtasks.Add(Task.Run(async () =>
+                    {
+                        await semaphore.WaitAsync();
+
+                        File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
+                        statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
+                        VerifyCopyOperations.Enqueue(FCO);
+
+                        semaphore.Release();
+                    }));
+                }
+                else
+                {
+                    await Task.WhenAll(smallDownloadtasks); //MaxMultiThreadSize file size threshold reached, finish all smaller downloads.
+                    smallDownloadtasks.Clear();
+
+                    File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
+                    statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
+                    VerifyCopyOperations.Enqueue(FCO);
+                }
+
             }
         }
 
 
-        
+
 
 
         public static void GenerateCompatibility(string filename, int compat_type)

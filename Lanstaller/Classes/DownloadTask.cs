@@ -15,40 +15,24 @@ namespace Lanstaller.Classes
 {
     public class DownloadTask
     {
-        static string _authkey;
-
         public long downloadedbytes = 0;
         public long totalSize = 0;
         string _Source;
         string _Destination;
-
-
+        
+        static int allocatedIndex = 0; //Index of allocated httpClient, must match semaphor loop release.
+        
         //Maximum httpClients - prevents errors under high load using all tcp ports.
-        private static readonly AllocatedHttpClient[] AHttpClients = new AllocatedHttpClient[12];
+        private static readonly HttpClient[] httpClients = new HttpClient[64];
+
+
         public static void Init()
         {
-            for (int i = 0; i < AHttpClients.Length; i++)
+            for (int i = 0; i < httpClients.Length; i++)
             {
-                AHttpClients[i] = new AllocatedHttpClient();
+                httpClients[i] = new HttpClient();
+                httpClients[i].DefaultRequestHeaders.Add("authorization", APIClient.Authkey);
             }
-            Console.WriteLine("HttpClients initialised.");
-        }
-
-        class AllocatedHttpClient
-        {
-            public HttpClient hClient;
-            public bool allocated = false;
-            public AllocatedHttpClient()
-            {
-                hClient = new HttpClient();
-                hClient.DefaultRequestHeaders.Add("authorization", _authkey);
-            }
-        }
-
-
-        public static void SetAuth(string authkey)
-        {
-            _authkey = authkey;
         }
 
         public DownloadTask(string Source, string Destination, long fileSize = 0) //Optional file size param allows for more efficient memory buffer allocation.
@@ -63,7 +47,18 @@ namespace Lanstaller.Classes
         {
             string SourceUri = _Source;
 
-            HttpClient hClient = null;
+            HttpClient hClient = httpClients[allocatedIndex];
+            if (httpClients.Length < allocatedIndex)
+            {
+                allocatedIndex++;
+            }
+            else
+            {
+                allocatedIndex = 0;
+            }
+            
+
+            /*
             int allocatedIndex = -1;
 
             for(int i = 0; i < AHttpClients.Length;i++)
@@ -76,6 +71,7 @@ namespace Lanstaller.Classes
                     break;
                 }
             }
+            */
 
             try
             {
@@ -134,7 +130,7 @@ namespace Lanstaller.Classes
                 Console.WriteLine("Error downloading: " + SourceUri + " " + ex.Message);
             }
             //hClient.Dispose();
-            AHttpClients[allocatedIndex].allocated = false; //release.
+            //AHttpClients[allocatedIndex].allocated = false; //release.
         }
 
 

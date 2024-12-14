@@ -1,4 +1,5 @@
 ﻿
+using Lanstaller.Classes;
 using LanstallerShared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,17 +15,11 @@ namespace Lanstaller
 {
     internal class ChatClient
     {
-        static string _authkey;
-        public static void SetAuth(string authkey)
-        {
-            _authkey = authkey;
-        }
-
         static WebClient GetChatWC()
         {
             WebClient wc = new WebClient();
             wc.Headers.Clear();
-            wc.Headers.Add("authorization", _authkey);
+            wc.Headers.Add("authorization", APIClient.Authkey);
             return wc;
         }
 

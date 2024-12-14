@@ -27,24 +27,19 @@ namespace Lanstaller.Classes
         //Many Webclient objects will cause excessive port usage stuck in time_wait open state.
         //Seperate objects for multi-threading or exception will occur 'WebClient does not support concurrent I/O Operations'
 
-        static string _authkey = "";
+        public static string Authkey = "";
         public static string APIServer = "";
         WebClient WC;
 
         public APIClient()
         {
             WC = new WebClient();
-            WC.Headers.Add("authorization", _authkey);
+            WC.Headers.Add("authorization", Authkey);
 
             //Suggest timeout value to handle failed requests.
-            
         }
 
-        public static void SetAuth(string authkey)
-        {
-            _authkey = authkey;
-            DownloadTask.SetAuth(authkey);
-        }
+            
 
 
    

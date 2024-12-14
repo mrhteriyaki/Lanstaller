@@ -35,7 +35,7 @@ namespace Lanstaller
         Thread InstallThread; //installer thread.
         Thread sCheck; //support checks.
 
-        public static CancellationTokenSource shutdownToken = new CancellationTokenSource();
+        public static bool shutdown = false;
         static bool install_option = true;
         static bool InstallThreadRunning = false;
         private static object lock_InstallThreadRunning = new object();
@@ -155,8 +155,7 @@ namespace Lanstaller
                 if (line.StartsWith("authkey="))
                 {
                     string auth = line.Split('=')[1];
-                    APIClient.SetAuth(auth);
-                    ChatClient.SetAuth(auth);
+                    APIClient.Authkey = auth;
 
                 }
                 else if (line.StartsWith("apiserver="))
@@ -334,32 +333,37 @@ namespace Lanstaller
 
         void StatusMonitorThread()
         {
-            while (!shutdownToken.IsCancellationRequested)
+            while (frmLanstaller.shutdown == false)
             {
                 if (CurrentCSW == null)
                 {
                     continue;
                 }
 
-
-                lblStatus.Invoke((MethodInvoker)delegate
+                try
                 {
-                    if (CurrentCSW != null)
+                    lblStatus.Invoke((MethodInvoker)delegate
                     {
-                        lblStatus.Text = CurrentCSW.statusInfo.GetStatus();
-                    }
-                });
+                        if (CurrentCSW != null)
+                        {
+                            lblStatus.Text = CurrentCSW.statusInfo.GetStatus();
+                        }
+                    });
 
 
 
-                pbInstall.Invoke((MethodInvoker)delegate
+                    pbInstall.Invoke((MethodInvoker)delegate
+                    {
+                        if (CurrentCSW != null)
+                        {
+                            pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
+                        }
+                    });
+                }
+                catch
                 {
-                    if (CurrentCSW != null)
-                    {
-                        pbInstall.Value = CurrentCSW.statusInfo.GetProgressPercentage();
-                    }
-                });
-
+                    //exception occurs while shutdown.
+                }
 
                 Thread.Sleep(50);
             }
@@ -370,7 +374,7 @@ namespace Lanstaller
         {
             UpdateChatMessages();
             //lastcheck = CM.timestamp;
-            while (!shutdownToken.IsCancellationRequested)
+            while (!frmLanstaller.shutdown)
             {
                 if (ChatClient.GetMessageCount(lastid) != 0)
                 {
@@ -554,7 +558,7 @@ namespace Lanstaller
         void InstThread()
         {
 
-            while (InstallQueue.Count > 0 && !shutdownToken.IsCancellationRequested)
+            while (InstallQueue.Count > 0 && !frmLanstaller.shutdown)
             {
                 lock (lock_InstallQueue)
                 {
@@ -575,7 +579,7 @@ namespace Lanstaller
 
                 CurrentCSW.Install();
 
-                if (shutdownToken.IsCancellationRequested)
+                if (frmLanstaller.shutdown)
                 {
                     return;
                 }
@@ -645,7 +649,7 @@ namespace Lanstaller
 
         private void frmLanstaller_Closing(object sender, FormClosingEventArgs e)
         {
-            shutdownToken.Cancel();
+            frmLanstaller.shutdown = true;
         }
 
 

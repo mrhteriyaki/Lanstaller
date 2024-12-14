@@ -84,10 +84,10 @@ namespace Lanstaller
             btnInstall.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnInstall.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             btnInstall.ForeColor = System.Drawing.Color.White;
-            btnInstall.Location = new System.Drawing.Point(356, 440);
-            btnInstall.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnInstall.Location = new System.Drawing.Point(407, 587);
+            btnInstall.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             btnInstall.Name = "btnInstall";
-            btnInstall.Size = new System.Drawing.Size(239, 64);
+            btnInstall.Size = new System.Drawing.Size(273, 85);
             btnInstall.TabIndex = 2;
             btnInstall.Text = "Install";
             btnInstall.UseVisualStyleBackColor = true;
@@ -97,10 +97,10 @@ namespace Lanstaller
             // 
             txtInstallDirectory.BackColor = System.Drawing.Color.Black;
             txtInstallDirectory.ForeColor = System.Drawing.Color.White;
-            txtInstallDirectory.Location = new System.Drawing.Point(356, 127);
-            txtInstallDirectory.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtInstallDirectory.Location = new System.Drawing.Point(407, 169);
+            txtInstallDirectory.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             txtInstallDirectory.Name = "txtInstallDirectory";
-            txtInstallDirectory.Size = new System.Drawing.Size(239, 23);
+            txtInstallDirectory.Size = new System.Drawing.Size(273, 27);
             txtInstallDirectory.TabIndex = 5;
             txtInstallDirectory.TextChanged += txtInstallDirectory_TextChanged;
             // 
@@ -108,10 +108,10 @@ namespace Lanstaller
             // 
             lblinstDir.AutoSize = true;
             lblinstDir.ForeColor = System.Drawing.Color.White;
-            lblinstDir.Location = new System.Drawing.Point(352, 108);
-            lblinstDir.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblinstDir.Location = new System.Drawing.Point(402, 144);
+            lblinstDir.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             lblinstDir.Name = "lblinstDir";
-            lblinstDir.Size = new System.Drawing.Size(92, 15);
+            lblinstDir.Size = new System.Drawing.Size(116, 20);
             lblinstDir.TabIndex = 6;
             lblinstDir.Text = "Install Directory:";
             // 
@@ -124,11 +124,11 @@ namespace Lanstaller
             gbxActions.Controls.Add(chkRegistry);
             gbxActions.Controls.Add(chkFiles);
             gbxActions.ForeColor = System.Drawing.Color.White;
-            gbxActions.Location = new System.Drawing.Point(356, 172);
-            gbxActions.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxActions.Location = new System.Drawing.Point(407, 229);
+            gbxActions.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             gbxActions.Name = "gbxActions";
-            gbxActions.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            gbxActions.Size = new System.Drawing.Size(239, 168);
+            gbxActions.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            gbxActions.Size = new System.Drawing.Size(273, 224);
             gbxActions.TabIndex = 8;
             gbxActions.TabStop = false;
             gbxActions.Text = "Actions:";
@@ -139,10 +139,10 @@ namespace Lanstaller
             chkRedist.Checked = true;
             chkRedist.CheckState = System.Windows.Forms.CheckState.Checked;
             chkRedist.ForeColor = System.Drawing.Color.White;
-            chkRedist.Location = new System.Drawing.Point(6, 138);
-            chkRedist.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkRedist.Location = new System.Drawing.Point(7, 184);
+            chkRedist.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             chkRedist.Name = "chkRedist";
-            chkRedist.Size = new System.Drawing.Size(110, 19);
+            chkRedist.Size = new System.Drawing.Size(138, 24);
             chkRedist.TabIndex = 5;
             chkRedist.Text = "Redistributables";
             chkRedist.UseVisualStyleBackColor = true;
@@ -153,10 +153,10 @@ namespace Lanstaller
             chkWindowsSettings.Checked = true;
             chkWindowsSettings.CheckState = System.Windows.Forms.CheckState.Checked;
             chkWindowsSettings.ForeColor = System.Drawing.Color.White;
-            chkWindowsSettings.Location = new System.Drawing.Point(6, 115);
-            chkWindowsSettings.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkWindowsSettings.Location = new System.Drawing.Point(7, 153);
+            chkWindowsSettings.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             chkWindowsSettings.Name = "chkWindowsSettings";
-            chkWindowsSettings.Size = new System.Drawing.Size(120, 19);
+            chkWindowsSettings.Size = new System.Drawing.Size(149, 24);
             chkWindowsSettings.TabIndex = 4;
             chkWindowsSettings.Text = "Windows Settings";
             chkWindowsSettings.UseVisualStyleBackColor = true;
@@ -167,10 +167,10 @@ namespace Lanstaller
             chkPreferences.Checked = true;
             chkPreferences.CheckState = System.Windows.Forms.CheckState.Checked;
             chkPreferences.ForeColor = System.Drawing.Color.White;
-            chkPreferences.Location = new System.Drawing.Point(6, 92);
-            chkPreferences.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkPreferences.Location = new System.Drawing.Point(7, 123);
+            chkPreferences.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             chkPreferences.Name = "chkPreferences";
-            chkPreferences.Size = new System.Drawing.Size(113, 19);
+            chkPreferences.Size = new System.Drawing.Size(140, 24);
             chkPreferences.TabIndex = 3;
             chkPreferences.Text = "User Preferences";
             chkPreferences.UseVisualStyleBackColor = true;
@@ -181,10 +181,10 @@ namespace Lanstaller
             chkShortcuts.Checked = true;
             chkShortcuts.CheckState = System.Windows.Forms.CheckState.Checked;
             chkShortcuts.ForeColor = System.Drawing.Color.White;
-            chkShortcuts.Location = new System.Drawing.Point(6, 69);
-            chkShortcuts.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkShortcuts.Location = new System.Drawing.Point(7, 92);
+            chkShortcuts.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             chkShortcuts.Name = "chkShortcuts";
-            chkShortcuts.Size = new System.Drawing.Size(76, 19);
+            chkShortcuts.Size = new System.Drawing.Size(92, 24);
             chkShortcuts.TabIndex = 2;
             chkShortcuts.Text = "Shortcuts";
             chkShortcuts.UseVisualStyleBackColor = true;
@@ -195,10 +195,10 @@ namespace Lanstaller
             chkRegistry.Checked = true;
             chkRegistry.CheckState = System.Windows.Forms.CheckState.Checked;
             chkRegistry.ForeColor = System.Drawing.Color.White;
-            chkRegistry.Location = new System.Drawing.Point(6, 46);
-            chkRegistry.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkRegistry.Location = new System.Drawing.Point(7, 61);
+            chkRegistry.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             chkRegistry.Name = "chkRegistry";
-            chkRegistry.Size = new System.Drawing.Size(68, 19);
+            chkRegistry.Size = new System.Drawing.Size(84, 24);
             chkRegistry.TabIndex = 1;
             chkRegistry.Text = "Registry";
             chkRegistry.UseVisualStyleBackColor = true;
@@ -209,10 +209,10 @@ namespace Lanstaller
             chkFiles.Checked = true;
             chkFiles.CheckState = System.Windows.Forms.CheckState.Checked;
             chkFiles.ForeColor = System.Drawing.Color.White;
-            chkFiles.Location = new System.Drawing.Point(6, 23);
-            chkFiles.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            chkFiles.Location = new System.Drawing.Point(7, 31);
+            chkFiles.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             chkFiles.Name = "chkFiles";
-            chkFiles.Size = new System.Drawing.Size(80, 19);
+            chkFiles.Size = new System.Drawing.Size(98, 24);
             chkFiles.TabIndex = 0;
             chkFiles.Text = "Copy Files";
             chkFiles.UseVisualStyleBackColor = true;
@@ -226,11 +226,11 @@ namespace Lanstaller
             gbxPref.Controls.Add(label2);
             gbxPref.Controls.Add(txtUsername);
             gbxPref.ForeColor = System.Drawing.Color.White;
-            gbxPref.Location = new System.Drawing.Point(356, 347);
-            gbxPref.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxPref.Location = new System.Drawing.Point(407, 463);
+            gbxPref.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             gbxPref.Name = "gbxPref";
-            gbxPref.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            gbxPref.Size = new System.Drawing.Size(239, 85);
+            gbxPref.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            gbxPref.Size = new System.Drawing.Size(273, 113);
             gbxPref.TabIndex = 9;
             gbxPref.TabStop = false;
             gbxPref.Text = "User Preferences";
@@ -239,10 +239,10 @@ namespace Lanstaller
             // 
             label5.AutoSize = true;
             label5.ForeColor = System.Drawing.Color.White;
-            label5.Location = new System.Drawing.Point(149, 53);
-            label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label5.Location = new System.Drawing.Point(170, 71);
+            label5.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(14, 15);
+            label5.Size = new System.Drawing.Size(18, 20);
             label5.TabIndex = 6;
             label5.Text = "X";
             // 
@@ -250,10 +250,10 @@ namespace Lanstaller
             // 
             label3.AutoSize = true;
             label3.ForeColor = System.Drawing.Color.White;
-            label3.Location = new System.Drawing.Point(12, 53);
-            label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label3.Location = new System.Drawing.Point(14, 71);
+            label3.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(66, 15);
+            label3.Size = new System.Drawing.Size(82, 20);
             label3.TabIndex = 4;
             label3.Text = "Resolution:";
             // 
@@ -261,10 +261,10 @@ namespace Lanstaller
             // 
             txtHeight.BackColor = System.Drawing.Color.Black;
             txtHeight.ForeColor = System.Drawing.Color.White;
-            txtHeight.Location = new System.Drawing.Point(165, 50);
-            txtHeight.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtHeight.Location = new System.Drawing.Point(189, 67);
+            txtHeight.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             txtHeight.Name = "txtHeight";
-            txtHeight.Size = new System.Drawing.Size(63, 23);
+            txtHeight.Size = new System.Drawing.Size(71, 27);
             txtHeight.TabIndex = 3;
             txtHeight.TextChanged += txtHeight_TextChanged;
             // 
@@ -272,10 +272,10 @@ namespace Lanstaller
             // 
             txtWidth.BackColor = System.Drawing.Color.Black;
             txtWidth.ForeColor = System.Drawing.Color.White;
-            txtWidth.Location = new System.Drawing.Point(83, 50);
-            txtWidth.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtWidth.Location = new System.Drawing.Point(95, 67);
+            txtWidth.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             txtWidth.Name = "txtWidth";
-            txtWidth.Size = new System.Drawing.Size(63, 23);
+            txtWidth.Size = new System.Drawing.Size(71, 27);
             txtWidth.TabIndex = 2;
             txtWidth.TextChanged += txtWidth_TextChanged;
             // 
@@ -283,10 +283,10 @@ namespace Lanstaller
             // 
             label2.AutoSize = true;
             label2.ForeColor = System.Drawing.Color.White;
-            label2.Location = new System.Drawing.Point(9, 22);
-            label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label2.Location = new System.Drawing.Point(10, 29);
+            label2.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(63, 15);
+            label2.Size = new System.Drawing.Size(78, 20);
             label2.TabIndex = 1;
             label2.Text = "Username:";
             // 
@@ -294,10 +294,10 @@ namespace Lanstaller
             // 
             txtUsername.BackColor = System.Drawing.Color.Black;
             txtUsername.ForeColor = System.Drawing.Color.White;
-            txtUsername.Location = new System.Drawing.Point(83, 20);
-            txtUsername.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtUsername.Location = new System.Drawing.Point(95, 27);
+            txtUsername.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             txtUsername.Name = "txtUsername";
-            txtUsername.Size = new System.Drawing.Size(145, 23);
+            txtUsername.Size = new System.Drawing.Size(165, 27);
             txtUsername.TabIndex = 0;
             txtUsername.TextChanged += txtUsername_TextChanged;
             // 
@@ -306,11 +306,11 @@ namespace Lanstaller
             gbxStatus.Controls.Add(pbInstall);
             gbxStatus.Controls.Add(lblStatus);
             gbxStatus.ForeColor = System.Drawing.Color.White;
-            gbxStatus.Location = new System.Drawing.Point(356, 505);
-            gbxStatus.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            gbxStatus.Location = new System.Drawing.Point(407, 673);
+            gbxStatus.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             gbxStatus.Name = "gbxStatus";
-            gbxStatus.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            gbxStatus.Size = new System.Drawing.Size(239, 166);
+            gbxStatus.Padding = new System.Windows.Forms.Padding(5, 4, 5, 4);
+            gbxStatus.Size = new System.Drawing.Size(273, 221);
             gbxStatus.TabIndex = 10;
             gbxStatus.TabStop = false;
             gbxStatus.Text = "Status";
@@ -318,19 +318,19 @@ namespace Lanstaller
             // pbInstall
             // 
             pbInstall.Enabled = false;
-            pbInstall.Location = new System.Drawing.Point(6, 134);
-            pbInstall.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pbInstall.Location = new System.Drawing.Point(7, 179);
+            pbInstall.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             pbInstall.Name = "pbInstall";
-            pbInstall.Size = new System.Drawing.Size(224, 25);
+            pbInstall.Size = new System.Drawing.Size(256, 33);
             pbInstall.TabIndex = 1;
             // 
             // lblStatus
             // 
             lblStatus.AutoSize = true;
-            lblStatus.Location = new System.Drawing.Point(6, 20);
-            lblStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblStatus.Location = new System.Drawing.Point(7, 27);
+            lblStatus.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             lblStatus.Name = "lblStatus";
-            lblStatus.Size = new System.Drawing.Size(77, 15);
+            lblStatus.Size = new System.Drawing.Size(97, 20);
             lblStatus.TabIndex = 0;
             lblStatus.Text = "Status: Ready";
             // 
@@ -339,13 +339,13 @@ namespace Lanstaller
             txtChatMessages.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             txtChatMessages.BackColor = System.Drawing.Color.Black;
             txtChatMessages.ForeColor = System.Drawing.Color.White;
-            txtChatMessages.Location = new System.Drawing.Point(602, 411);
-            txtChatMessages.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtChatMessages.Location = new System.Drawing.Point(688, 548);
+            txtChatMessages.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             txtChatMessages.Multiline = true;
             txtChatMessages.Name = "txtChatMessages";
             txtChatMessages.ReadOnly = true;
             txtChatMessages.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            txtChatMessages.Size = new System.Drawing.Size(405, 215);
+            txtChatMessages.Size = new System.Drawing.Size(462, 285);
             txtChatMessages.TabIndex = 11;
             // 
             // txtChatSendMessage
@@ -353,10 +353,10 @@ namespace Lanstaller
             txtChatSendMessage.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             txtChatSendMessage.BackColor = System.Drawing.Color.Black;
             txtChatSendMessage.ForeColor = System.Drawing.Color.White;
-            txtChatSendMessage.Location = new System.Drawing.Point(603, 647);
-            txtChatSendMessage.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtChatSendMessage.Location = new System.Drawing.Point(689, 863);
+            txtChatSendMessage.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             txtChatSendMessage.Name = "txtChatSendMessage";
-            txtChatSendMessage.Size = new System.Drawing.Size(384, 23);
+            txtChatSendMessage.Size = new System.Drawing.Size(438, 27);
             txtChatSendMessage.TabIndex = 12;
             txtChatSendMessage.KeyUp += txtChatSendMessage_KeyUp;
             // 
@@ -364,10 +364,10 @@ namespace Lanstaller
             // 
             lblSpaceRequired.AutoSize = true;
             lblSpaceRequired.ForeColor = System.Drawing.Color.White;
-            lblSpaceRequired.Location = new System.Drawing.Point(352, 153);
-            lblSpaceRequired.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblSpaceRequired.Location = new System.Drawing.Point(402, 204);
+            lblSpaceRequired.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             lblSpaceRequired.Name = "lblSpaceRequired";
-            lblSpaceRequired.Size = new System.Drawing.Size(91, 15);
+            lblSpaceRequired.Size = new System.Drawing.Size(116, 20);
             lblSpaceRequired.TabIndex = 16;
             lblSpaceRequired.Text = "Space Required:";
             // 
@@ -377,9 +377,9 @@ namespace Lanstaller
             pbTitleExpanded.ErrorImage = null;
             pbTitleExpanded.InitialImage = null;
             pbTitleExpanded.Location = new System.Drawing.Point(0, 0);
-            pbTitleExpanded.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pbTitleExpanded.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             pbTitleExpanded.Name = "pbTitleExpanded";
-            pbTitleExpanded.Size = new System.Drawing.Size(1026, 104);
+            pbTitleExpanded.Size = new System.Drawing.Size(1173, 139);
             pbTitleExpanded.TabIndex = 17;
             pbTitleExpanded.TabStop = false;
             pbTitleExpanded.Click += pbTitleExpanded_Click;
@@ -391,10 +391,10 @@ namespace Lanstaller
             btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             btnExit.ForeColor = System.Drawing.Color.White;
-            btnExit.Location = new System.Drawing.Point(980, 0);
-            btnExit.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnExit.Location = new System.Drawing.Point(1120, 0);
+            btnExit.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             btnExit.Name = "btnExit";
-            btnExit.Size = new System.Drawing.Size(35, 33);
+            btnExit.Size = new System.Drawing.Size(40, 44);
             btnExit.TabIndex = 18;
             btnExit.Text = "X";
             btnExit.UseVisualStyleBackColor = true;
@@ -405,10 +405,10 @@ namespace Lanstaller
             pbTitle.BackgroundImage = Properties.Resources.LanstallerThin;
             pbTitle.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             pbTitle.InitialImage = null;
-            pbTitle.Location = new System.Drawing.Point(20, 6);
-            pbTitle.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pbTitle.Location = new System.Drawing.Point(23, 8);
+            pbTitle.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             pbTitle.Name = "pbTitle";
-            pbTitle.Size = new System.Drawing.Size(873, 96);
+            pbTitle.Size = new System.Drawing.Size(998, 128);
             pbTitle.TabIndex = 7;
             pbTitle.TabStop = false;
             pbTitle.MouseDown += Caption_MouseDown;
@@ -418,10 +418,10 @@ namespace Lanstaller
             label4.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             label4.AutoSize = true;
             label4.ForeColor = System.Drawing.Color.White;
-            label4.Location = new System.Drawing.Point(602, 629);
-            label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label4.Location = new System.Drawing.Point(688, 839);
+            label4.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(35, 15);
+            label4.Size = new System.Drawing.Size(42, 20);
             label4.TabIndex = 7;
             label4.Text = "Chat:";
             // 
@@ -437,10 +437,10 @@ namespace Lanstaller
             lvSoftware.BackColor = System.Drawing.Color.Black;
             lvSoftware.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             lvSoftware.ForeColor = System.Drawing.Color.White;
-            lvSoftware.Location = new System.Drawing.Point(0, 107);
-            lvSoftware.Margin = new System.Windows.Forms.Padding(2);
+            lvSoftware.Location = new System.Drawing.Point(0, 143);
+            lvSoftware.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             lvSoftware.Name = "lvSoftware";
-            lvSoftware.Size = new System.Drawing.Size(349, 564);
+            lvSoftware.Size = new System.Drawing.Size(398, 751);
             lvSoftware.TabIndex = 21;
             lvSoftware.UseCompatibleStateImageBehavior = false;
             lvSoftware.SelectedIndexChanged += lvSoftware_SelectedIndexChanged;
@@ -455,10 +455,10 @@ namespace Lanstaller
             pbBottomright.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             pbBottomright.ErrorImage = null;
             pbBottomright.InitialImage = null;
-            pbBottomright.Location = new System.Drawing.Point(995, 653);
-            pbBottomright.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            pbBottomright.Location = new System.Drawing.Point(1137, 871);
+            pbBottomright.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             pbBottomright.Name = "pbBottomright";
-            pbBottomright.Size = new System.Drawing.Size(18, 17);
+            pbBottomright.Size = new System.Drawing.Size(21, 23);
             pbBottomright.TabIndex = 22;
             pbBottomright.TabStop = false;
             pbBottomright.MouseDown += pbBottomright_MouseDown;
@@ -471,10 +471,10 @@ namespace Lanstaller
             btnMin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnMin.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
             btnMin.ForeColor = System.Drawing.Color.White;
-            btnMin.Location = new System.Drawing.Point(944, 0);
-            btnMin.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            btnMin.Location = new System.Drawing.Point(1079, 0);
+            btnMin.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             btnMin.Name = "btnMin";
-            btnMin.Size = new System.Drawing.Size(35, 33);
+            btnMin.Size = new System.Drawing.Size(40, 44);
             btnMin.TabIndex = 23;
             btnMin.Text = "_";
             btnMin.UseVisualStyleBackColor = true;
@@ -483,24 +483,25 @@ namespace Lanstaller
             // csmSoftware
             // 
             csmSoftware.BackColor = System.Drawing.SystemColors.Control;
+            csmSoftware.ImageScalingSize = new System.Drawing.Size(20, 20);
             csmSoftware.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { reinstallToolStripMenuItem });
             csmSoftware.Name = "csmSoftware";
-            csmSoftware.Size = new System.Drawing.Size(119, 26);
+            csmSoftware.Size = new System.Drawing.Size(135, 28);
             // 
             // reinstallToolStripMenuItem
             // 
             reinstallToolStripMenuItem.Name = "reinstallToolStripMenuItem";
-            reinstallToolStripMenuItem.Size = new System.Drawing.Size(118, 22);
+            reinstallToolStripMenuItem.Size = new System.Drawing.Size(134, 24);
             reinstallToolStripMenuItem.Text = "Reinstall";
             reinstallToolStripMenuItem.Click += reinstallToolStripMenuItem_Click;
             // 
             // lblWANMode
             // 
             lblWANMode.AutoSize = true;
-            lblWANMode.Location = new System.Drawing.Point(896, 78);
-            lblWANMode.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lblWANMode.Location = new System.Drawing.Point(1024, 104);
+            lblWANMode.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             lblWANMode.Name = "lblWANMode";
-            lblWANMode.Size = new System.Drawing.Size(114, 15);
+            lblWANMode.Size = new System.Drawing.Size(144, 20);
             lblWANMode.TabIndex = 24;
             lblWANMode.Text = "WAN Mode Enabled";
             lblWANMode.Visible = false;
@@ -510,23 +511,23 @@ namespace Lanstaller
             txtCompat.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             txtCompat.BackColor = System.Drawing.Color.Black;
             txtCompat.ForeColor = System.Drawing.Color.White;
-            txtCompat.Location = new System.Drawing.Point(602, 127);
-            txtCompat.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            txtCompat.Location = new System.Drawing.Point(688, 169);
+            txtCompat.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             txtCompat.Multiline = true;
             txtCompat.Name = "txtCompat";
             txtCompat.ReadOnly = true;
             txtCompat.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            txtCompat.Size = new System.Drawing.Size(405, 278);
+            txtCompat.Size = new System.Drawing.Size(462, 369);
             txtCompat.TabIndex = 25;
             // 
             // label1
             // 
             label1.AutoSize = true;
             label1.ForeColor = System.Drawing.Color.White;
-            label1.Location = new System.Drawing.Point(461, 329);
-            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Location = new System.Drawing.Point(527, 439);
+            label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(92, 15);
+            label1.Size = new System.Drawing.Size(116, 20);
             label1.TabIndex = 26;
             label1.Text = "Install Directory:";
             // 
@@ -534,19 +535,19 @@ namespace Lanstaller
             // 
             label6.AutoSize = true;
             label6.ForeColor = System.Drawing.Color.White;
-            label6.Location = new System.Drawing.Point(603, 108);
-            label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label6.Location = new System.Drawing.Point(689, 144);
+            label6.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             label6.Name = "label6";
-            label6.Size = new System.Drawing.Size(82, 15);
+            label6.Size = new System.Drawing.Size(102, 20);
             label6.TabIndex = 27;
             label6.Text = "Compatibility:";
             // 
             // frmLanstaller
             // 
-            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             BackColor = System.Drawing.Color.Black;
-            ClientSize = new System.Drawing.Size(1015, 673);
+            ClientSize = new System.Drawing.Size(1160, 897);
             Controls.Add(label6);
             Controls.Add(label1);
             Controls.Add(txtCompat);
@@ -570,7 +571,7 @@ namespace Lanstaller
             ForeColor = System.Drawing.Color.White;
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
-            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             Name = "frmLanstaller";
             Text = "Lanstaller";
             FormClosing += frmLanstaller_Closing;
