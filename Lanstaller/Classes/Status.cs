@@ -31,7 +31,7 @@ namespace Lanstaller.Classes
         long[] bytesCopied;
         long InstalledBytes = 0;
         double InstallSizeGB;
-
+        int VerificationIndex = 0;
 
         //Used for status label.
         string status = "Status: Ready";
@@ -55,11 +55,16 @@ namespace Lanstaller.Classes
             }
         }
 
+        public void SetVerificationState(int FileCount)
+        {
+            VerificationIndex = FileCount;
+        }
+
         public void SetPartialState(int index, long bytesDownloaded)
         {
             bytesCopied[index] = bytesDownloaded;
         }
-
+        
 
 
         //Set Stages.
@@ -161,6 +166,11 @@ namespace Lanstaller.Classes
                 "\nProgress (GB): " + Math.Round(gbsize, 2).ToString() +
                 " / " + Math.Round(InstallSizeGB, 2).ToString();
             }
+            else if (stage == 4)
+            {
+                status = SInfo.Name + "\nVerifying Files: " + VerificationIndex.ToString() + " / " + SInfo.file_count.ToString();
+            }
+
 
             lock (_statuslock)
             {

@@ -18,6 +18,7 @@ using static Lanstaller.Classes.APIClient;
 using System.Threading;
 using Lanstaller.Classes;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Lanstaller
 {
@@ -28,11 +29,14 @@ namespace Lanstaller
         public Status statusInfo;
 
         //Maximum concurrent small file transfers.
-        SemaphoreSlim semaphore = new SemaphoreSlim(8); //Must not exceed DownloadTask httpClient array size. 
+        List<Task> smallDownloadtasks = new List<Task>();
+        SemaphoreSlim fileCopySemaphore = new SemaphoreSlim(8); //Must not exceed DownloadTask httpClient array size. 
         readonly int MaxMultiThreadSize = 524288; //Less than 512KB or WAN mode, run concurrent downloads.
 
+        //File verification threads.
+        List<Task> verificationTasks = new List<Task>();
+        SemaphoreSlim verificationSemaphore = new SemaphoreSlim(4);
 
-        List<Task> smallDownloadtasks = new List<Task>();
         public static bool WANMode = false;
 
         public string InstallDir;
@@ -45,7 +49,7 @@ namespace Lanstaller
         bool error_occured = false;
 
 
-        ConcurrentQueue<FileCopyOperation> VerifyCopyOperations;
+        ConcurrentQueue<int> VerifyCopyOperationIndex;
         List<FileCopyOperation> FileCopyOperations;
         List<RegistryOperation> RegistryOperations;
         List<ShortcutOperation> ShortcutOperations;
@@ -439,13 +443,16 @@ namespace Lanstaller
         }
 
 
-        void VerifyFilesThread(int FileCount)
+        //Possible optimisation
+        //Where some files are missing, split verification of existing files and missing files into threads.
+        async void VerifyFilesThread(int FileCount) //If any files fail validation, this will be called again in a loop from CopyFiles thread..
         {
             try
             {
-                int CheckCounter = 0;
-                FileCopyOperation FVO;
-                while (CheckCounter < FileCount) //When all files queued for verification and hashed.
+                int Index = 0;
+                statusInfo.SetVerificationState(0);
+
+                while (Index < FileCount) //When all files queued for verification and hashed.
                 {
                     if (frmLanstaller.shutdown)
                     {
@@ -453,47 +460,58 @@ namespace Lanstaller
                         return;
                     }
 
-                    if (VerifyCopyOperations.Count == 0)
+                    //No files ready for verification, wait.
+                    if (VerifyCopyOperationIndex.Count == 0)
                     {
+                        Thread.Sleep(1); //unsure if better to use Task.Delay
                         continue;
                     }
+
+                    int FVOIndex; //File Verification queue.
+                    while (!VerifyCopyOperationIndex.TryDequeue(out FVOIndex))
+                    {
+                        Thread.Sleep(1); //Delay if unable to dequeue.
+                    }
+
+                    //FVO set to completed file transfer - start verification of file.
+                    Index++;
+                    statusInfo.SetVerificationState(Index);
+                    if (FileCopyOperations[FVOIndex].verified)
+                    {
+                        continue; //File already previously verified.
+                    }
+
+                    //async disabled for now, problems with Waitall.
+                    //await verificationSemaphore.WaitAsync();
+
+                    // verificationTasks.Add(Task.Run(async () =>
+                    //{
+                    if (File.Exists(FileCopyOperations[FVOIndex].destination))
+                    {
+                        string check_hash = FileInfoClass.CalculateMD5(FileCopyOperations[FVOIndex].destination);
+                        if (FileCopyOperations[FVOIndex].fileinfo.hash.Equals(check_hash))
+                        {
+                            FileCopyOperations[FVOIndex].verified = true;
+                        }
+                        else
+                        {
+                            Logging.LogToFile("Deleting file - failed validation: " + FileCopyOperations[FVOIndex].destination + " Expected hash: " + FileCopyOperations[FVOIndex].fileinfo.hash + " Check result: " + check_hash);
+                            File.Delete(FileCopyOperations[FVOIndex].destination); // Delete file if partially downloaded.
+                        }
+                    }
                     else
                     {
-                        //FVO = VerifyCopyOperations.Dequeue();
-                        while (!VerifyCopyOperations.TryDequeue(out FVO))
-                        {
-                            Thread.Sleep(1); //Delay if unable to dequeue.
-                        }
-
+                        Logging.LogToFile("Verification error - missing file: " + FileCopyOperations[FVOIndex].destination);
                     }
-                    CheckCounter++;
-                    if (FVO.verified)
-                    {
-                        continue; //skip already verified.
-                    }
+                    //  verificationSemaphore.Release();
+                    //}));
 
-                    //Console.WriteLine("Checking hash for: " + FVO.destination);
-                    if (File.Exists(FVO.destination))
-                    {
-                        //Possible optimisation
-                        //Where some files are missing, split verification of existing files and missing files into threads.
-
-
-                        //MessageBox.Show("MD5: " + FVO.destination);
-                        string check_hash = FileInfoClass.CalculateMD5(FVO.destination);
-                        if (FVO.fileinfo.hash.Equals(check_hash))
-                        {
-                            FVO.verified = true;
-                            continue;
-                        }
-                        Logging.LogToFile("Deleting file - failed validation: " + FVO.destination + " Expected hash: " + FVO.fileinfo.hash + " Check result: " + check_hash);
-                        File.Delete(FVO.destination); // Delete file if partially downloaded.
-                    }
-                    else
-                    {
-                        Logging.LogToFile("Verification error - missing file: " + FVO.destination);
-                    }
                 }
+
+                //await Task.WhenAll(verificationTasks);
+
+                //MessageBox.Show("TEST");
+
             }
             catch (Exception ex)
             {
@@ -511,7 +529,7 @@ namespace Lanstaller
 
             //Get File List from Web Api
             FileCopyOperations = GetFilesList(SInfo.id);
-            VerifyCopyOperations = new ConcurrentQueue<FileCopyOperation>();
+            VerifyCopyOperationIndex = [];
 
 
             //Get Directories, split up all sub directory paths and add to generation list.
@@ -557,11 +575,14 @@ namespace Lanstaller
                 int CopyIndex = 0;
                 statusInfo.ResetCopyState();
 
-                VerifyCopyOperations = new ConcurrentQueue<FileCopyOperation>();
+                VerifyCopyOperationIndex = [];
 
-                Thread VerifyCopyThread = new Thread(() => VerifyFilesThread(FileCopyOperations.Count));
-                VerifyCopyThread.Name = "Verify Copy Thread";
-                VerifyCopyThread.Start();
+                Thread VerificationThread = new Thread(() => VerifyFilesThread(FileCopyOperations.Count));
+                VerificationThread.Name = "Verification Thread";
+                VerificationThread.Start();
+
+                //var VerificationTask = Task.Run(() => VerifyFilesThread(FileCopyOperations.Count));
+
 
                 while (CopyIndex < FileCopyOperations.Count)
                 {
@@ -575,47 +596,35 @@ namespace Lanstaller
                     //Verify existing files.
                     if (File.Exists(FCO.destination)) //Check directory first, prevent directory exception on file exists.
                     {
-                        if (string.IsNullOrEmpty(FCO.fileinfo.hash))
+                        //Compare server hash value to local, also skip if verified previously.
+                        VerifyCopyOperationIndex.Enqueue(CopyIndex);
+                        statusInfo.SetCopyState(CopyIndex, FCO.fileinfo.size);
+                        CopyIndex++; //increment file counter.
+                        continue; //Skip file copy, go to next.
+                    }
+                    else
+                    {
+                        //Copy File.
+                        try
                         {
-                            if (MessageBox.Show("Error - file hash not available from server, continue anyway?", "Hash Error", MessageBoxButtons.YesNo) == DialogResult.No)
-                            {
-                                return;
-                            }
+                            TransferFile(FileServer, CopyIndex);
+                            CopyIndex++;
                         }
-                        else
+                        catch (ThreadAbortException ex)
                         {
-                            //Compare server hash value to local, also skip if verified previously.
-                            if (FCO.verified || FCO.fileinfo.hash.Equals(FileInfoClass.CalculateMD5(FCO.destination)))
-                            {
-                                FCO.verified = true;
-                                VerifyCopyOperations.Enqueue(FCO);
-
-                                statusInfo.SetCopyState(CopyIndex, FCO.fileinfo.size);
-                                CopyIndex++; //increment file counter.
-                                continue; //Skip file copy, go to next.
-                            }
+                            statusInfo.SetError("File copy stopped - thread Abort Exception: " + ex.Message);
+                            continue;
+                        }
+                        catch (Exception ex)
+                        {
+                            statusInfo.SetError("File copy failed - thread Abort Exception: " + ex.Message);
+                            //MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "Destination:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
+                            //SetStatus("Download error:" + ex.ToString());
+                            Thread.Sleep(5);
+                            continue;
                         }
                     }
 
-                    //Copy File.
-                    try
-                    {
-                        TransferFile(FileServer, CopyIndex);
-                        CopyIndex++;
-                    }
-                    catch (ThreadAbortException ex)
-                    {
-                        statusInfo.SetError("File copy stopped - thread Abort Exception: " + ex.Message);
-                        continue;
-                    }
-                    catch (Exception ex)
-                    {
-                        statusInfo.SetError("File copy failed - thread Abort Exception: " + ex.Message);
-                        //MessageBox.Show("Failure to copy file:" + FCO.fileinfo.source + Environment.NewLine + "Destination:" + FCO.destination + Environment.NewLine + "Error:" + ex.ToString());
-                        //SetStatus("Download error:" + ex.ToString());
-                        Thread.Sleep(5);
-                        continue;
-                    }
                 }
 
                 //Complete validation of downloaded files.
@@ -625,7 +634,9 @@ namespace Lanstaller
 
                 statusInfo.SetStage(4);
 
-                VerifyCopyThread.Join();
+                VerificationThread.Join();
+                //Task.WhenAll(VerificationTask).GetAwaiter().GetResult();
+
                 FilesNotValidated = false;
 
                 FailLoopCount++;
@@ -671,21 +682,30 @@ namespace Lanstaller
         {
             FileCopyOperation FCO = FileCopyOperations[FileCopyIndex];
 
-            if (FileServer.protocol == 1) //Web
+            //Empty Files, check size first for efficiency in latter checks.
+            if (FCO.fileinfo.size == 0 && FCO.fileinfo.hash.Equals("d41d8cd98f00b204e9800998ecf8427e"))
+            {
+                //unsure if creation date may need to be implemented.
+                File.Create(FCO.destination);
+                statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
+                VerifyCopyOperationIndex.Enqueue(FileCopyIndex);
+
+            }
+            else if (FileServer.protocol == 1) //Web
             {
                 if (WANMode || FCO.fileinfo.size < MaxMultiThreadSize)
                 {
                     //Multi Thread smaller files to avoid overhead blocking file transfer.
                     smallDownloadtasks.Add(Task.Run(async () =>
                     {
-                        await semaphore.WaitAsync();
+                        await fileCopySemaphore.WaitAsync();
 
                         DownloadTask DT = new DownloadTask(FileServer.path + FCO.fileinfo.source, FCO.destination, FCO.fileinfo.size);
                         await DT.DownloadAsync(); //Wait until download done.
                         statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
-                        VerifyCopyOperations.Enqueue(FCO);
+                        VerifyCopyOperationIndex.Enqueue(FileCopyIndex);
 
-                        semaphore.Release();
+                        fileCopySemaphore.Release();
                     }));
                 }
                 else
@@ -701,7 +721,7 @@ namespace Lanstaller
                     }
                     await Dtask; //Wait until download done.
                     statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
-                    VerifyCopyOperations.Enqueue(FCO);
+                    VerifyCopyOperationIndex.Enqueue(FileCopyIndex);
 
                 }
             }
@@ -712,13 +732,13 @@ namespace Lanstaller
                     //Confirmed Multi-thread increased transfer rate from 10mbps to 50mbps in testing with 8 threads.
                     smallDownloadtasks.Add(Task.Run(async () =>
                     {
-                        await semaphore.WaitAsync();
+                        await fileCopySemaphore.WaitAsync();
 
                         File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
                         statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
-                        VerifyCopyOperations.Enqueue(FCO);
+                        VerifyCopyOperationIndex.Enqueue(FileCopyIndex);
 
-                        semaphore.Release();
+                        fileCopySemaphore.Release();
                     }));
                 }
                 else
@@ -728,7 +748,7 @@ namespace Lanstaller
 
                     File.Copy(FileServer.path + Uri.UnescapeDataString(FCO.fileinfo.source), FCO.destination, true);
                     statusInfo.SetCopyState(FileCopyIndex, FCO.fileinfo.size);
-                    VerifyCopyOperations.Enqueue(FCO);
+                    VerifyCopyOperationIndex.Enqueue(FileCopyIndex);
                 }
 
             }
